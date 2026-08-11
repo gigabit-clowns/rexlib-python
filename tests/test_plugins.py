@@ -43,9 +43,8 @@ def __get_dummy_plugin_directory() -> str:
   
   if platform.system() == 'Windows':
     return os.path.join(prefix, 'bin', DUMMY_PLUGIN_DIRECTORY_NAME)
-  elif os.path.exists(os.path.join(prefix, 'lib')):
+  if os.path.exists(os.path.join(prefix, 'lib')):
     return os.path.join(prefix, 'lib', DUMMY_PLUGIN_DIRECTORY_NAME)
-  elif os.path.exists(os.path.join(prefix, 'lib64')):
+  if os.path.exists(os.path.join(prefix, 'lib64')):
     return os.path.join(prefix, 'lib64', DUMMY_PLUGIN_DIRECTORY_NAME)
-  else:
-    raise OSError("Could not find the dummy plugin directory.")
+  raise OSError("Could not find the dummy plugin directory.")

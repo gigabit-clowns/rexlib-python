@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 """
+Extract xmipp4-core's compiled artifacts from its release wheel.
+
 Extracts the compiled artifacts (bin/include/lib) from an xmipp4-core
 release wheel into a plain <prefix>/{bin,include,lib} directory, bypassing
 pip entirely. Used on Windows, where pip refuses to install a wheel tagged
@@ -19,6 +21,7 @@ ARCH_TAGS = {"AMD64": "win_amd64", "ARM64": "win_arm64"}
 
 
 def main() -> None:
+	"""Extract the release wheel matching argv and print the staged prefix."""
 	wheel_dir, dest_dir, arch = sys.argv[1], sys.argv[2], sys.argv[3]
 	tag = ARCH_TAGS[arch]
 	wheel = next(pathlib.Path(wheel_dir).glob(f"*-py3-none-{tag}.whl"))
