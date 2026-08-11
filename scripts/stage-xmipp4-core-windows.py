@@ -21,12 +21,19 @@ ARCH_TAGS = {"AMD64": "win_amd64", "ARM64": "win_arm64"}
 
 
 def main() -> None:
-	"""Extract the release wheel matching argv and print the staged prefix."""
+	"""Extract the release wheel matching argv and print the staged prefix.
+
+	Only the final staged prefix goes to stdout, since the caller captures
+	it to set CMAKE_PREFIX_PATH; everything else is logged to stderr so it
+	still shows up in CI logs without corrupting that capture.
+	"""
 	wheel_dir, dest_dir, arch = sys.argv[1], sys.argv[2], sys.argv[3]
 	tag = ARCH_TAGS[arch]
 	wheel = next(pathlib.Path(wheel_dir).glob(f"*-py3-none-{tag}.whl"))
 	dest = pathlib.Path(dest_dir)
+	print(f"Staging {wheel.resolve()} into {dest.resolve()}", file=sys.stderr)
 
+	extracted = 0
 	with zipfile.ZipFile(wheel) as zf:
 		for name in zf.namelist():
 			if ".data/data/" not in name:
@@ -37,7 +44,9 @@ def main() -> None:
 			target = dest / rel
 			target.parent.mkdir(parents=True, exist_ok=True)
 			target.write_bytes(zf.read(name))
+			extracted += 1
 
+	print(f"Extracted {extracted} files", file=sys.stderr)
 	print(dest.resolve())
 
 
