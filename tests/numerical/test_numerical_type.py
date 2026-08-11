@@ -36,6 +36,30 @@ def test_full_supports_char8_with_a_character(__setup_context):
 	)
 	assert isinstance(result, xmipp4.ndarray.Array)
 
+def test_full_rejects_a_non_character_char8_value(__setup_context):
+	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
+		[2, 2], xmipp4.numerical.NumericalType.char8
+	)
+	with pytest.raises(TypeError, match='single-character'):
+		xmipp4.functional.full(
+			descriptor,
+			xmipp4.hardware.MemoryResourceAffinity.host,
+			1,
+			__setup_context
+		)
+
+def test_full_reports_the_offending_type(__setup_context):
+	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
+		[2, 2], xmipp4.numerical.NumericalType.float32
+	)
+	with pytest.raises(TypeError, match='float32'):
+		xmipp4.functional.full(
+			descriptor,
+			xmipp4.hardware.MemoryResourceAffinity.host,
+			object(),
+			__setup_context
+		)
+
 @pytest.mark.parametrize('name', FLOAT_TYPES + COMPLEX_TYPES)
 def test_fill_supports_floating_point_type(name, __setup_context):
 	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
