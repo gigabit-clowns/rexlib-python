@@ -137,4 +137,4 @@ jobs:
             echo "::error::.pyi stubs are out of date. Run ./scripts/generate-stubs.sh and commit the result."
             exit 1
           fi
-          echo ".pyi stups are up to date!"
+          echo ".pyi stubs are up to date!"
