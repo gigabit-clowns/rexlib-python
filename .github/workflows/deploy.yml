@@ -63,14 +63,14 @@ jobs:
           CIBW_ARCHS: "${{ matrix.architectures }}"
           CIBW_ENVIRONMENT: >- # TODO: Remove when xmipp4-core is in Pypi
             PIP_FIND_LINKS=local_deps/xmipp4-core/dist
-            XMIPP4_CORE_PREBUILT_DIR=${{ github.workspace }}/xmipp4-core-prebuilt
+            XMIPP4_CORE_PREBUILT_DIR=xmipp4-core-prebuilt
           # FIXME this should not be required.
-          # Builds xmipp4-core from source once per architecture.
+		  # Builds xmipp4-core from source once per architecture.
           CIBW_BEFORE_BUILD_WINDOWS: >-
             (if not exist "%XMIPP4_CORE_PREBUILT_DIR%" mkdir "%XMIPP4_CORE_PREBUILT_DIR%")
-            & (pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core
+            & (set "PIP_FIND_LINKS=" && pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core
             || (pip wheel --no-deps -w "%XMIPP4_CORE_PREBUILT_DIR%" git+https://github.com/gigabit-clowns/xmipp4-core@main
-            && pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core))
+            && set "PIP_FIND_LINKS=" && pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core))
           CIBW_TEST_SKIP: "*-win_arm64" # Windows on ARM cannot be tested, raises warning
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
