@@ -29,7 +29,9 @@ jobs:
           - os: macos-latest
             architectures: "x86_64 arm64 universal2"
           - os: windows-latest
-            architectures: "AMD64 ARM64"
+            architectures: "AMD64"
+          - os: windows-latest
+            architectures: "ARM64"
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -59,9 +61,19 @@ jobs:
         uses: pypa/cibuildwheel@4726cd35bb13f7bde50cf2761f2499ac7b3aa32c # v4.1.1
         env:
           CIBW_ARCHS: "${{ matrix.architectures }}"
-          CIBW_ENVIRONMENT: 'PIP_FIND_LINKS=local_deps/xmipp4-core/dist' # TODO: Remove when xmipp4-core is in Pypi
+          CIBW_ENVIRONMENT: >-
+            PIP_FIND_LINKS=local_deps/xmipp4-core/dist
+            XMIPP4_CORE_PREBUILT_DIR=${{ github.workspace }}/xmipp4-core-prebuilt
+          # TODO: Remove when xmipp4-core is in Pypi
           CIBW_BEFORE_BUILD_WINDOWS: | # FIXME this should not be required
-            pip install git+https://github.com/gigabit-clowns/xmipp4-core@main
+            # Builds xmipp4-core from source at most once per job (i.e. once
+            # per architecture) instead of once per Python version: the
+            # PIP_FIND_LINKS wheel doesn't satisfy find_package() inside the
+            # isolated build venv on Windows, but a from-source rebuild for
+            # every one of the ~6 Python versions in this job is redundant,
+            # since the resulting binary only depends on the architecture.
+            if not exist "%XMIPP4_CORE_PREBUILT_DIR%" mkdir "%XMIPP4_CORE_PREBUILT_DIR%"
+            pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core || (pip wheel --no-deps -w "%XMIPP4_CORE_PREBUILT_DIR%" git+https://github.com/gigabit-clowns/xmipp4-core@main && pip install --no-index --find-links="%XMIPP4_CORE_PREBUILT_DIR%" xmipp4-core)
           CIBW_TEST_SKIP: "*-win_arm64" # Windows on ARM cannot be tested, raises warning
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
