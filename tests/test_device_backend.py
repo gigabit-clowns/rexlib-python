@@ -19,6 +19,21 @@ def test_device_accepts_a_device_index():
 	with xmipp4.device(index) as ctx:
 		assert xmipp4.get_active_execution_context() is ctx
 
+def test_device_accepts_a_device_session():
+	catalog = xmipp4.ServiceCatalog()
+	manager = xmipp4.hardware.get_device_manager(catalog)
+	session = manager.create_device_session(xmipp4.hardware.DeviceIndex('cpu', 0))
+	with xmipp4.device(session) as ctx:
+		assert ctx.device_context.device_session is session
+
+def test_device_accepts_a_device_context():
+	catalog = xmipp4.ServiceCatalog()
+	manager = xmipp4.hardware.get_device_manager(catalog)
+	session = manager.create_device_session(xmipp4.hardware.DeviceIndex('cpu', 0))
+	device_context = xmipp4.hardware.DeviceContext(session)
+	with xmipp4.device(device_context) as ctx:
+		assert ctx.device_context.device_session is session
+
 def test_nested_device_restores_the_outer_context():
 	with xmipp4.device('cpu') as outer:
 		with xmipp4.device('cpu') as inner:
