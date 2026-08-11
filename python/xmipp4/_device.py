@@ -5,9 +5,9 @@ from __future__ import annotations
 from types import TracebackType
 from typing import Union
 
-from ._catalog import get_default_catalog
 from ._context import _set_active_execution_context, get_active_execution_context
 from ._core_binding import dispatch, hardware
+from ._session_pool import get_pooled_device_session
 
 DeviceSpec = Union[
 	str, hardware.DeviceIndex, hardware.DeviceSession, hardware.DeviceContext
@@ -24,9 +24,7 @@ def _resolve_device_context(spec: DeviceSpec) -> hardware.DeviceContext:
 		if isinstance(spec, str)
 		else spec
 	)
-	catalog = get_default_catalog()
-	session = hardware.get_device_manager(catalog).create_device_session(index)
-	return hardware.DeviceContext(session)
+	return hardware.DeviceContext(get_pooled_device_session(index))
 
 class _ActiveDeviceContext:
 	"""Context manager that activates an ExecutionContext for its duration."""
@@ -62,12 +60,11 @@ def device(spec: DeviceSpec) -> _ActiveDeviceContext:
 	Args:
 		spec: The device to activate. One of:
 			- A "backend:id" / "backend" string, or a `DeviceIndex`
-			  (see `xmipp4.hardware.DeviceIndex`): a new `DeviceSession` is
-			  created for it, which is expensive and not shareable with any
-			  other logical device handle -- prefer one of the options below
-			  when activating the same device repeatedly (e.g. in a loop).
+			  (see `xmipp4.hardware.DeviceIndex`): its `DeviceSession` is
+			  taken from a process-wide pool, so repeatedly activating the
+			  same device reuses one session instead of building a new one.
 			- A `DeviceSession` (see `xmipp4.hardware.DeviceSession`),
-			  reused as-is.
+			  reused as-is, bypassing the pool.
 			- A `DeviceContext` (see `xmipp4.hardware.DeviceContext`),
 			  used as-is.
 
