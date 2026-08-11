@@ -20,7 +20,7 @@ from .._context import get_active_execution_context
 def _resolve_context(context: ExecutionContext | None) -> ExecutionContext:
 	if context is None:
 		context = get_active_execution_context()
-		if context is None:
+		if context.device_context.device_session is None:
 			raise RuntimeError(
 				"No execution context was provided and there is no active "
 				"device context. Pass context= explicitly or use "

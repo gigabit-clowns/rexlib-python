@@ -27,14 +27,7 @@ class _ActiveDeviceContext:
 		session = hardware.get_device_manager(catalog).create_device_session(index)
 		device_context = hardware.DeviceContext(session)
 
-		active = get_active_execution_context()
-		if active is not None:
-			context = active.with_device_context(device_context)
-		else:
-			program_manager = dispatch.get_program_manager(catalog)
-			context_dispatcher = dispatch.make_eager_dispatcher(program_manager)
-			context = dispatch.ExecutionContext(device_context, context_dispatcher)
-
+		context = get_active_execution_context().with_device_context(device_context)
 		self.__previous = _set_active_execution_context(context)
 		return context
 
@@ -50,12 +43,11 @@ def device(spec: str | hardware.DeviceIndex) -> _ActiveDeviceContext:
 	"""
 	Activate a device as the current thread's execution context.
 
-	Builds a device session and device context for the given device, and
-	makes the resulting execution context the active one (see
-	`xmipp4.get_active_execution_context`) for the duration of the `with`
-	block, restoring the previously active one on exit. If there is already
-	an active execution context, its dispatcher is preserved; only the
-	device context is replaced.
+	Derives an execution context from whatever is currently active (see
+	`xmipp4.get_active_execution_context`) by replacing its device context,
+	and makes it active for the duration of the `with` block, restoring the
+	previously active one on exit. Everything but the device context (e.g.
+	the dispatcher) is preserved.
 
 	Args:
 		spec: The device to activate, either a "backend:id" /
