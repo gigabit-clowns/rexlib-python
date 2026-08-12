@@ -69,8 +69,9 @@ def test_missing_override_raises_when_called_from_cpp(__setup_properties):
 	class Bare(xmipp4.hardware.Device):
 		pass
 
+	bare = Bare()
 	with pytest.raises(RuntimeError, match='pure virtual'):
-		xmipp4.hardware.DeviceSession(Bare(), __setup_properties)
+		xmipp4.hardware.DeviceSession(bare, __setup_properties)
 
 def test_python_device_is_usable_as_an_execution_context(
 	__setup_mock_device, __setup_properties
