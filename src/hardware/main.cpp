@@ -27,11 +27,6 @@ namespace py = pybind11;
 
 void bind_hardware(pybind11::module_ &m)
 {
-	// Every type is registered before any of them defines a member, so that
-	// pybind11 can resolve cross-references in signatures whichever way they
-	// point. This is what lets MemoryResource.create_allocator and
-	// MemoryAllocator.memory_resource refer to each other, and it makes the
-	// order below irrelevant.
 	auto command_queue = declare_command_queue(m);
 	auto device = declare_device(m);
 	auto device_backend = declare_device_backend(m);
