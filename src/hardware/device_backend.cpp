@@ -27,13 +27,12 @@ void define_device_backend(device_backend_class &c)
 		.def_property_readonly("version", &device_backend::get_version)
 		.def_property_readonly(
 			"devices",
-			[](const device_backend &self) -> std::vector<std::size_t>
+			[](const device_backend &self)
 			{
 				std::vector<std::size_t> ids;
-
-	self.enumerate_devices(ids);
+				self.enumerate_devices(ids);
 				return ids;
-}
+			}
 		)
 		.def(
 			"get_device_properties",

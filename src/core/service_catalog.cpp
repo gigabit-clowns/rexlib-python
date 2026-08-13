@@ -25,11 +25,9 @@ void define_service_catalog(service_catalog_class &c)
 			[](service_catalog &catalog, const plugin_manager &manager) 
 			{
 				return register_all_plugins_at(manager, catalog);
-
-	},
+			},
 			py::keep_alive<1, 2>() // Do not destroy the manager before the catalog
 		);
 }
-
 
 } // namespace xmipp4

@@ -32,13 +32,12 @@ void define_device_manager(device_manager_class &c, pybind11::module_ &m)
 	c
 		.def_property_readonly(
 			"backends",
-			[](device_manager &self) -> std::vector<std::string>
+			[](device_manager &self)
 			{
 				std::vector<std::string> backends;
-
-	self.enumerate_backends(backends);
+				self.enumerate_backends(backends);
 				return backends;
-}
+			}
 		)
 		.def(
 			"get_backend",

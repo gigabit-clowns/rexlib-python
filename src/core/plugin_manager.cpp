@@ -52,7 +52,7 @@ void define_plugin_manager(plugin_manager_class &c, pybind11::module_ &m)
 		)
 		.def_property_readonly(
 			"plugins",
-			[](const py::object &self) -> py::list
+			[](const py::object &self)
 			{
 				py::list result;
 				
