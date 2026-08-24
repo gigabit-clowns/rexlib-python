@@ -85,11 +85,12 @@ def load_library() -> ctypes.CDLL:
 	This function attempts to load the rexlib shared object from the system's
 	library directories. It raises an exception if the library cannot be found.
 	
-	The library and the distribution shipping it are named differently: the
-	shared object is librexlib.so, while the wheel carrying it is rexlib-native
-	(the plain rexlib name on PyPI belongs to this binding).
+	The two names differ. The stem is `rexlib`, which the platform decorates
+	into `librexlib.so`, `librexlib.dylib` or `rexlib.dll`; the wheel that
+	records the file is `librexlib`, because the plain `rexlib` name on PyPI
+	belongs to this binding.
 	
 	Returns:
 		ctypes.CDLL: The loaded library.
 	"""
-	return __load_library("rexlib", "rexlib-native")
+	return __load_library("rexlib", "librexlib")

@@ -1,7 +1,7 @@
 [build-system]
 requires = [
 	"scikit-build-core==1.0.3",
-	"rexlib-native==0.1.*",
+	"librexlib==0.1.*",
 	"pybind11-stubgen==2.5.5"
 ]
 build-backend = "scikit_build_core.build"
@@ -36,7 +36,7 @@ license = "GPL-3.0-only"
 
 requires-python = ">=3.9"
 dependencies = [
-    "rexlib-native==0.1.*"
+    "librexlib==0.1.*"
 ] 
 
 [project.optional-dependencies]

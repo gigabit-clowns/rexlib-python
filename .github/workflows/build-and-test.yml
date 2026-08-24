@@ -37,7 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib-dist" -p '*.whl' --clobber
-          pip install --no-index --find-links="${{ github.workspace }}/../rexlib-dist" rexlib-native
+          pip install --no-index --find-links="${{ github.workspace }}/../rexlib-dist" librexlib
 
       - name: Configure and build with CMake
         uses: threeal/cmake-action@725d1314ccf9ea922805d7e3f9d9bcbca892b406 # v2
@@ -90,7 +90,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib/dist" -p '*.whl' --clobber
-          pip install --no-index --find-links="${{ github.workspace }}/../rexlib/dist" rexlib-native
+          pip install --no-index --find-links="${{ github.workspace }}/../rexlib/dist" librexlib
 
       - name: Install with pip
         run: pip install .[test] -v --find-links="${{ github.workspace }}/../rexlib/dist" -Ccmake.define.BUILD_TESTING=ON

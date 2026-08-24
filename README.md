@@ -6,7 +6,7 @@ To install this package, simply run:
 ```
 pip install rexlib
 ```
-To install in development mode, you will first need to install `rexlib-native` in your current environment, and then, from the root of this project, run:
+To install in development mode, you will first need to install `librexlib` in your current environment, and then, from the root of this project, run:
 ```
 CMAKE_BUILD_PARALLEL_LEVEL=$(nproc) pip install . --no-build-isolation -v -Ccmake.define.BUILD_TESTING=ON
 ```
