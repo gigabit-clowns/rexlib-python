@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/dispatch/program_manager.hpp>
+#include <rexlib/core/dispatch/program_manager.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -20,4 +20,4 @@ program_manager_class declare_program_manager(pybind11::module_ &m);
 void define_program_manager(pybind11::module_ &m);
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

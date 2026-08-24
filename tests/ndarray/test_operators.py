@@ -4,7 +4,7 @@ import copy
 
 import pytest
 
-import xmipp4
+import rexlib
 
 BINARY_OPERATORS = [
 	('add', lambda x, y: x + y),
@@ -31,25 +31,25 @@ UNARY_OPERATORS = [
 @pytest.mark.parametrize('name, operator', BINARY_OPERATORS)
 def test_binary_operator_returns_an_array(name, operator, __setup_arrays):
 	x, y = __setup_arrays
-	with xmipp4.device('cpu'):
-		assert isinstance(operator(x, y), xmipp4.ndarray.Array)
+	with rexlib.device('cpu'):
+		assert isinstance(operator(x, y), rexlib.ndarray.Array)
 
 @pytest.mark.parametrize('name, operator', UNARY_OPERATORS)
 def test_unary_operator_returns_an_array(name, operator, __setup_arrays):
 	x, _ = __setup_arrays
-	with xmipp4.device('cpu'):
-		assert isinstance(operator(x), xmipp4.ndarray.Array)
+	with rexlib.device('cpu'):
+		assert isinstance(operator(x), rexlib.ndarray.Array)
 
 @pytest.mark.parametrize('name, operator', IN_PLACE_OPERATORS)
 def test_in_place_operator_keeps_the_same_array(name, operator, __setup_arrays):
 	x, y = __setup_arrays
-	with xmipp4.device('cpu'):
+	with rexlib.device('cpu'):
 		assert operator(x, y) is x
 
 @pytest.mark.parametrize('name, operator', BINARY_OPERATORS)
 def test_binary_operator_rejects_a_non_array(name, operator, __setup_arrays):
 	x, _ = __setup_arrays
-	with xmipp4.device('cpu'), pytest.raises(TypeError):
+	with rexlib.device('cpu'), pytest.raises(TypeError):
 		operator(x, 1)
 
 @pytest.mark.parametrize('name, operator', BINARY_OPERATORS)
@@ -60,34 +60,34 @@ def test_binary_operator_needs_an_active_context(name, operator, __setup_arrays)
 
 def test_copy_returns_a_new_array(__setup_arrays):
 	x, _ = __setup_arrays
-	with xmipp4.device('cpu'):
+	with rexlib.device('cpu'):
 		result = copy.copy(x)
-	assert isinstance(result, xmipp4.ndarray.Array)
+	assert isinstance(result, rexlib.ndarray.Array)
 	assert result is not x
 
 def test_deepcopy_returns_a_new_array(__setup_arrays):
 	x, _ = __setup_arrays
-	with xmipp4.device('cpu'):
+	with rexlib.device('cpu'):
 		result = copy.deepcopy(x)
-	assert isinstance(result, xmipp4.ndarray.Array)
+	assert isinstance(result, rexlib.ndarray.Array)
 	assert result is not x
 
 def test_operators_work_on_arrays_built_by_the_binding(__setup_arrays):
 	x, y = __setup_arrays
-	assert type(x) is xmipp4.ndarray.Array
-	with xmipp4.device('cpu'):
-		assert isinstance(x + y, xmipp4.ndarray.Array)
+	assert type(x) is rexlib.ndarray.Array
+	with rexlib.device('cpu'):
+		assert isinstance(x + y, rexlib.ndarray.Array)
 
 @pytest.fixture
 def __setup_arrays():
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], xmipp4.numerical.NumericalType.float32
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], rexlib.numerical.NumericalType.float32
 	)
-	with xmipp4.device('cpu'):
-		x = xmipp4.functional.ones(
-			descriptor, xmipp4.hardware.MemoryResourceAffinity.host
+	with rexlib.device('cpu'):
+		x = rexlib.functional.ones(
+			descriptor, rexlib.hardware.MemoryResourceAffinity.host
 		)
-		y = xmipp4.functional.ones(
-			descriptor, xmipp4.hardware.MemoryResourceAffinity.host
+		y = rexlib.functional.ones(
+			descriptor, rexlib.hardware.MemoryResourceAffinity.host
 		)
 	return x, y

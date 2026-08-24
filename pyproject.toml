@@ -1,19 +1,19 @@
 [build-system]
 requires = [
 	"scikit-build-core==1.0.3",
-	"xmipp4-core==0.1.*",
+	"rexlib-native==0.1.*",
 	"pybind11-stubgen==2.5.5"
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "xmipp4-python"
+name = "rexlib"
 dynamic = ["version"]
 authors = [
     { name = "Oier Lauzirika Zarrabeitia", email = "oierlauzi@bizkaia.eu" },
     { name = "Martin Salinas", email = "ssalinasmartin@gmail.com" }
 ]
-description = "Python binding for the xmipp4 framework"
+description = "Python binding for the rexlib framework"
 classifiers = [
 	"Topic :: Scientific/Engineering :: Image Processing",
 	"Intended Audience :: Science/Research",
@@ -36,7 +36,7 @@ license = "GPL-3.0-only"
 
 requires-python = ">=3.9"
 dependencies = [
-    "xmipp4-core==0.1.*"
+    "rexlib-native==0.1.*"
 ] 
 
 [project.optional-dependencies]
@@ -47,8 +47,8 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/gigabit-clowns/xmipp4-python"
-Issues = "https://github.com/gigabit-clowns/xmipp4-python/issues"
+Homepage = "https://github.com/gigabit-clowns/rexlib-python"
+Issues = "https://github.com/gigabit-clowns/rexlib-python/issues"
 
 [tool.scikit-build]
 experimental=true # For wheel.install-dir
@@ -67,5 +67,5 @@ input = "VERSION"
 regex = "(?P<value>\\d+\\.\\d+\\.\\d+)"
 
 [tool.cibuildwheel]
-#test-command = "{project}/scripts/run_test.sh" # TODO add when xmipp4-core is in PyPI
+#test-command = "{project}/scripts/run_test.sh" # TODO add when rexlib is in PyPI
 #test-extras = ["test"]

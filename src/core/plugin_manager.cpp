@@ -2,16 +2,16 @@
 
 #include "plugin_manager.hpp"
 
-#include <xmipp4/core/plugin_manager.hpp>
+#include <rexlib/core/plugin_manager.hpp>
 
-#include <xmipp4/core/plugin.hpp>
+#include <rexlib/core/plugin.hpp>
 
 #include <pybind11/stl.h>
 
 #include <optional>
 #include <string>
 
-namespace xmipp4
+namespace rexlib
 {
 
 namespace py = pybind11;
@@ -76,4 +76,4 @@ void define_plugin_manager(plugin_manager_class &c, pybind11::module_ &m)
 	m.def("get_default_plugin_directory", &get_default_plugin_directory);
 }
 
-} // namespace xmipp4
+} // namespace rexlib

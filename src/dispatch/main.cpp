@@ -6,7 +6,7 @@
 #include "execution_context.hpp"
 #include "program_manager.hpp"
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -23,4 +23,4 @@ void bind_dispatch(pybind11::module_ &m)
 }
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

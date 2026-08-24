@@ -2,7 +2,7 @@
 
 #include "device.hpp"
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -38,4 +38,4 @@ void define_device(device_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

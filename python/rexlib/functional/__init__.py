@@ -2,19 +2,19 @@
 
 """Array operations with an optional, implicit execution context.
 
-Wraps `xmipp4._core_binding.functional`: same functions and parameter
+Wraps `rexlib._binding.functional`: same functions and parameter
 order, but `context` defaults to the active one (see
-`xmipp4.get_active_execution_context`) instead of being required.
+`rexlib.get_active_execution_context`) instead of being required.
 """
 
 from __future__ import annotations
 from typing import Any
 
-from .._core_binding import functional as _raw
-from .._core_binding.ndarray import Array, ArrayDescriptor
-from .._core_binding.numerical import NumericalType
-from .._core_binding.hardware import MemoryResourceAffinity
-from .._core_binding.dispatch import ExecutionContext
+from .._binding import functional as _raw
+from .._binding.ndarray import Array, ArrayDescriptor
+from .._binding.numerical import NumericalType
+from .._binding.hardware import MemoryResourceAffinity
+from .._binding.dispatch import ExecutionContext
 from .._context import get_active_execution_context
 
 def _resolve_context(context: ExecutionContext | None) -> ExecutionContext:
@@ -24,7 +24,7 @@ def _resolve_context(context: ExecutionContext | None) -> ExecutionContext:
 			raise RuntimeError(
 				"No execution context was provided and there is no active "
 				"device context. Pass context= explicitly or use "
-				"'with xmipp4.device(...):'."
+				"'with rexlib.device(...):'."
 			)
 	return context
 

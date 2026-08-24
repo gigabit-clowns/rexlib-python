@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/device_manager.hpp>
+#include <rexlib/core/hardware/device_manager.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -19,4 +19,4 @@ device_manager_class declare_device_manager(pybind11::module_ &m);
 void define_device_manager(device_manager_class &c, pybind11::module_ &m);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

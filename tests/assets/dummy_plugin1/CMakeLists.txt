@@ -9,12 +9,12 @@ set_target_properties(
 	${TARGET_NAME}
 	PROPERTIES 
 		CXX_STANDARD 20
-		DEFINE_SYMBOL "XMIPP4_DUMMY_PLUGIN1_EXPORTING"
+		DEFINE_SYMBOL "REXLIB_DUMMY_PLUGIN1_EXPORTING"
 )
 target_link_libraries(
 	${TARGET_NAME}
 	PRIVATE
-		xmipp4-core
+		rexlib::rexlib
 )
 
 if(WIN32)
@@ -24,5 +24,5 @@ else()
 endif()
 install(
 	TARGETS ${TARGET_NAME}
-	LIBRARY DESTINATION ${MODULE_INSTALL_DIR}/xmipp4-dummy-plugins/
+	LIBRARY DESTINATION ${MODULE_INSTALL_DIR}/rexlib-dummy-plugins/
 )

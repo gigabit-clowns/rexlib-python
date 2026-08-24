@@ -6,7 +6,7 @@ from types import TracebackType
 from typing import Union
 
 from ._context import _set_active_execution_context, get_active_execution_context
-from ._core_binding import dispatch, hardware
+from ._binding import dispatch, hardware
 from ._session_pool import get_pooled_device_session
 
 DeviceSpec = Union[
@@ -52,7 +52,7 @@ def device(spec: DeviceSpec) -> _ActiveDeviceContext:
 	Activate a device as the current thread's execution context.
 
 	Derives an execution context from whatever is currently active (see
-	`xmipp4.get_active_execution_context`) by replacing its device context,
+	`rexlib.get_active_execution_context`) by replacing its device context,
 	and makes it active for the duration of the `with` block, restoring the
 	previously active one on exit. Everything but the device context (e.g.
 	the dispatcher) is preserved.
@@ -60,12 +60,12 @@ def device(spec: DeviceSpec) -> _ActiveDeviceContext:
 	Args:
 		spec: The device to activate. One of:
 			- A "backend:id" / "backend" string, or a `DeviceIndex`
-			  (see `xmipp4.hardware.DeviceIndex`): its `DeviceSession` is
+			  (see `rexlib.hardware.DeviceIndex`): its `DeviceSession` is
 			  taken from a process-wide pool, so repeatedly activating the
 			  same device reuses one session instead of building a new one.
-			- A `DeviceSession` (see `xmipp4.hardware.DeviceSession`),
+			- A `DeviceSession` (see `rexlib.hardware.DeviceSession`),
 			  reused as-is, bypassing the pool.
-			- A `DeviceContext` (see `xmipp4.hardware.DeviceContext`),
+			- A `DeviceContext` (see `rexlib.hardware.DeviceContext`),
 			  used as-is.
 
 	Returns:

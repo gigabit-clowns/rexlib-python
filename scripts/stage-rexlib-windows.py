@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 """
-Extract xmipp4-core's compiled artifacts from its release wheel.
+Extract rexlib's compiled artifacts from its release wheel.
 
-Extracts the compiled artifacts (bin/include/lib) from an xmipp4-core
+Extracts the compiled artifacts (bin/include/lib) from an rexlib
 release wheel into a plain <prefix>/{bin,include,lib} directory, bypassing
 pip entirely. Used on Windows, where pip refuses to install a wheel tagged
 for a different platform than the current host (needed when cross-compiling
 for ARM64 on an amd64 runner), and where scikit-build-core's own
-CMAKE_PREFIX_PATH auto-detection doesn't account for xmipp4-core's
+CMAKE_PREFIX_PATH auto-detection doesn't account for rexlib's
 wheel.install-dir = "/data" layout. See deploy.yml for how this is wired up.
 """
 

@@ -2,9 +2,9 @@
 
 #include "event.hpp"
 
-#include <xmipp4/core/hardware/event.hpp>
+#include <rexlib/core/hardware/event.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -25,4 +25,4 @@ void define_event(event_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

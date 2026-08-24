@@ -2,13 +2,13 @@
 
 #include "device_index.hpp"
 
-#include <xmipp4/core/hardware/device_index.hpp>
+#include <rexlib/core/hardware/device_index.hpp>
 
 #include <pybind11/operators.h>
 
 #include <sstream>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -86,4 +86,4 @@ void define_device_index(device_index_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

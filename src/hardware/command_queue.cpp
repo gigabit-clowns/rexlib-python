@@ -2,10 +2,10 @@
 
 #include "command_queue.hpp"
 
-#include <xmipp4/core/hardware/command_queue.hpp>
-#include <xmipp4/core/hardware/event.hpp>
+#include <rexlib/core/hardware/command_queue.hpp>
+#include <rexlib/core/hardware/event.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -25,4 +25,4 @@ void define_command_queue(command_queue_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

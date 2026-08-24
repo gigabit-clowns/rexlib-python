@@ -2,15 +2,15 @@
 
 #include "array_descriptor.hpp"
 
-#include <xmipp4/core/ndarray/array_descriptor.hpp>
-#include <xmipp4/core/span.hpp>
+#include <rexlib/core/ndarray/array_descriptor.hpp>
+#include <rexlib/core/span.hpp>
 
 #include <pybind11/stl.h> // Required for std::vector binding
 #include <pybind11/operators.h>
 
 #include <vector>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace ndarray
 {
@@ -48,4 +48,4 @@ void define_array_descriptor(array_descriptor_class &c, pybind11::module_ &m)
 
 
 } // namespace ndarray
-} // namespace xmipp4
+} // namespace rexlib

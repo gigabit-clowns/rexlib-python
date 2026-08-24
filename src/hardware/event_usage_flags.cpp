@@ -2,13 +2,13 @@
 
 #include "event_usage_flags.hpp"
 
-#include <xmipp4/core/hardware/event_usage_flags.hpp>
+#include <rexlib/core/hardware/event_usage_flags.hpp>
 
 #include <pybind11/operators.h>
 
 #include <sstream>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -57,4 +57,4 @@ void define_event_usage_flags(event_usage_flags_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

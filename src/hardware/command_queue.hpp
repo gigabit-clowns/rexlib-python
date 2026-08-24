@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/command_queue.hpp>
+#include <rexlib/core/hardware/command_queue.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -19,4 +19,4 @@ command_queue_class declare_command_queue(pybind11::module_ &m);
 void define_command_queue(command_queue_class &c);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

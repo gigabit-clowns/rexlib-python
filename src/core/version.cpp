@@ -2,13 +2,13 @@
 
 #include "version.hpp"
 
-#include <xmipp4/core/version.hpp>
+#include <rexlib/core/version.hpp>
 
 #include <sstream>
 
 #include <pybind11/operators.h>
 
-namespace xmipp4
+namespace rexlib
 {
 
 namespace py = pybind11;
@@ -72,4 +72,4 @@ void define_version(version_class &c)
 		));
 }
 
-} // namespace xmipp4
+} // namespace rexlib

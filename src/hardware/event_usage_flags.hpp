@@ -4,9 +4,9 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/event_usage_flags.hpp>
+#include <rexlib/core/hardware/event_usage_flags.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -21,4 +21,4 @@ event_usage_flags_class declare_event_usage_flags(pybind11::module_ &m);
 void define_event_usage_flags(event_usage_flags_class &c);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

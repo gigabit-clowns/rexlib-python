@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/dispatch/dispatcher.hpp>
+#include <rexlib/core/dispatch/dispatcher.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -20,4 +20,4 @@ dispatcher_class declare_dispatcher(pybind11::module_ &m);
 void define_dispatcher(pybind11::module_ &m);
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

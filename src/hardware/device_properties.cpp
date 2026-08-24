@@ -2,9 +2,9 @@
 
 #include "device_properties.hpp"
 
-#include <xmipp4/core/hardware/device_properties.hpp>
+#include <rexlib/core/hardware/device_properties.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -72,4 +72,4 @@ void define_device_properties(device_properties_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

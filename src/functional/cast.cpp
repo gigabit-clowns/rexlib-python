@@ -2,16 +2,16 @@
 
 #include "cast.hpp"
 
-#include <xmipp4/functional/cast.hpp>
-#include <xmipp4/core/ndarray/array.hpp>
-#include <xmipp4/core/numerical/numerical_type.hpp>
-#include <xmipp4/core/dispatch/execution_context.hpp>
+#include <rexlib/functional/cast.hpp>
+#include <rexlib/core/ndarray/array.hpp>
+#include <rexlib/core/numerical/numerical_type.hpp>
+#include <rexlib/core/dispatch/execution_context.hpp>
 
 #include <pybind11/stl.h>
 
 #include <optional>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace functional
 {
@@ -25,14 +25,14 @@ static array py_cast_copy(
 	std::optional<array*> out
 )
 {
-	return xmipp4::cast_copy(input, target_type, context, out.value_or(nullptr));
+	return rexlib::cast_copy(input, target_type, context, out.value_or(nullptr));
 }
 
 void bind_cast(pybind11::module_ &m)
 {
 	m.def(
 		"cast",
-		&xmipp4::cast,
+		&rexlib::cast,
 		py::arg("input"), py::arg("target_type"), py::arg("context")
 	);
 	m.def(
@@ -43,4 +43,4 @@ void bind_cast(pybind11::module_ &m)
 }
 
 } // namespace functional
-} // namespace xmipp4
+} // namespace rexlib

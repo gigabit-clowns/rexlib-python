@@ -4,7 +4,7 @@ from __future__ import annotations
 import threading
 
 from ._catalog import get_default_catalog
-from ._core_binding import hardware
+from ._binding import hardware
 
 # DeviceIndex defines __eq__ without __hash__, so it cannot be a dict key.
 __pool: dict[tuple[str, int], hardware.DeviceSession] = {}

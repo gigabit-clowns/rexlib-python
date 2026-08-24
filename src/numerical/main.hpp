@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace numerical
 {
@@ -12,4 +12,4 @@ namespace numerical
 void bind_numerical(pybind11::module_ &m);
 
 } // namespace numerical
-} // namespace xmipp4
+} // namespace rexlib

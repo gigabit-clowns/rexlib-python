@@ -2,9 +2,9 @@
 
 #include "memory_resource_affinity.hpp"
 
-#include <xmipp4/core/hardware/memory_resource_affinity.hpp>
+#include <rexlib/core/hardware/memory_resource_affinity.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -24,4 +24,4 @@ void define_memory_resource_affinity(memory_resource_affinity_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/memory_allocator.hpp>
+#include <rexlib/core/hardware/memory_allocator.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -19,4 +19,4 @@ memory_allocator_class declare_memory_allocator(pybind11::module_ &m);
 void define_memory_allocator(memory_allocator_class &c);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

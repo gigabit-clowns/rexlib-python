@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -12,4 +12,4 @@ namespace dispatch
 void bind_dispatch(pybind11::module_ &m);
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

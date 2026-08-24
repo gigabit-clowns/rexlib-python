@@ -2,7 +2,7 @@
 
 import pytest
 
-import xmipp4
+import rexlib
 
 INTEGER_TYPES = [
 	'int8', 'int16', 'int32', 'int64',
@@ -13,98 +13,98 @@ COMPLEX_TYPES = ['complex_float16', 'complex_float32', 'complex_float64']
 
 @pytest.mark.parametrize('name', INTEGER_TYPES + FLOAT_TYPES + COMPLEX_TYPES + ['boolean'])
 def test_full_supports_numerical_type(name, __setup_context):
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], getattr(xmipp4.numerical.NumericalType, name)
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], getattr(rexlib.numerical.NumericalType, name)
 	)
-	result = xmipp4.functional.full(
+	result = rexlib.functional.full(
 		descriptor,
-		xmipp4.hardware.MemoryResourceAffinity.host,
+		rexlib.hardware.MemoryResourceAffinity.host,
 		1,
 		__setup_context
 	)
-	assert isinstance(result, xmipp4.ndarray.Array)
+	assert isinstance(result, rexlib.ndarray.Array)
 
 def test_full_supports_char8_with_a_character(__setup_context):
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], xmipp4.numerical.NumericalType.char8
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], rexlib.numerical.NumericalType.char8
 	)
-	result = xmipp4.functional.full(
+	result = rexlib.functional.full(
 		descriptor,
-		xmipp4.hardware.MemoryResourceAffinity.host,
+		rexlib.hardware.MemoryResourceAffinity.host,
 		'a',
 		__setup_context
 	)
-	assert isinstance(result, xmipp4.ndarray.Array)
+	assert isinstance(result, rexlib.ndarray.Array)
 
 def test_full_rejects_a_non_character_char8_value(__setup_context):
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], xmipp4.numerical.NumericalType.char8
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], rexlib.numerical.NumericalType.char8
 	)
 	with pytest.raises(TypeError, match='single-character'):
-		xmipp4.functional.full(
+		rexlib.functional.full(
 			descriptor,
-			xmipp4.hardware.MemoryResourceAffinity.host,
+			rexlib.hardware.MemoryResourceAffinity.host,
 			1,
 			__setup_context
 		)
 
 def test_full_reports_the_offending_type(__setup_context):
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], xmipp4.numerical.NumericalType.float32
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], rexlib.numerical.NumericalType.float32
 	)
 	with pytest.raises(TypeError, match='float32'):
-		xmipp4.functional.full(
+		rexlib.functional.full(
 			descriptor,
-			xmipp4.hardware.MemoryResourceAffinity.host,
+			rexlib.hardware.MemoryResourceAffinity.host,
 			object(),
 			__setup_context
 		)
 
 @pytest.mark.parametrize('name', FLOAT_TYPES + COMPLEX_TYPES)
 def test_fill_supports_floating_point_type(name, __setup_context):
-	descriptor = xmipp4.ndarray.make_contiguous_array_descriptor(
-		[2, 2], getattr(xmipp4.numerical.NumericalType, name)
+	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
+		[2, 2], getattr(rexlib.numerical.NumericalType, name)
 	)
-	target = xmipp4.functional.empty(
+	target = rexlib.functional.empty(
 		descriptor,
-		xmipp4.hardware.MemoryResourceAffinity.host,
+		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	xmipp4.functional.fill(target, 1.5, __setup_context)
+	rexlib.functional.fill(target, 1.5, __setup_context)
 
 @pytest.mark.parametrize('name', INTEGER_TYPES + FLOAT_TYPES)
 def test_cast_copy_between_types(name, __setup_context):
-	source = xmipp4.functional.ones(
-		xmipp4.ndarray.make_contiguous_array_descriptor(
-			[2, 2], xmipp4.numerical.NumericalType.float32
+	source = rexlib.functional.ones(
+		rexlib.ndarray.make_contiguous_array_descriptor(
+			[2, 2], rexlib.numerical.NumericalType.float32
 		),
-		xmipp4.hardware.MemoryResourceAffinity.host,
+		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	result = xmipp4.functional.cast_copy(
+	result = rexlib.functional.cast_copy(
 		source,
-		getattr(xmipp4.numerical.NumericalType, name),
+		getattr(rexlib.numerical.NumericalType, name),
 		__setup_context
 	)
-	assert isinstance(result, xmipp4.ndarray.Array)
+	assert isinstance(result, rexlib.ndarray.Array)
 
 def test_numerical_types_are_distinct():
 	names = INTEGER_TYPES + FLOAT_TYPES + COMPLEX_TYPES + ['boolean', 'char8']
-	types = {getattr(xmipp4.numerical.NumericalType, name) for name in names}
+	types = {getattr(rexlib.numerical.NumericalType, name) for name in names}
 	assert len(types) == len(names)
 
 def test_numerical_type_converts_to_string():
-	assert 'float32' in str(xmipp4.numerical.NumericalType.float32)
+	assert 'float32' in str(rexlib.numerical.NumericalType.float32)
 
 def test_numerical_type_exposes_its_value():
-	assert isinstance(xmipp4.numerical.NumericalType.float32.value, int)
+	assert isinstance(rexlib.numerical.NumericalType.float32.value, int)
 
 @pytest.fixture
 def __setup_context():
-	catalog = xmipp4.ServiceCatalog()
-	manager = xmipp4.hardware.get_device_manager(catalog)
-	session = manager.create_device_session(xmipp4.hardware.DeviceIndex('cpu', 0))
-	device_context = xmipp4.hardware.DeviceContext(session)
-	program_manager = xmipp4.dispatch.get_program_manager(catalog)
-	dispatcher = xmipp4.dispatch.make_eager_dispatcher(program_manager)
-	return xmipp4.dispatch.ExecutionContext(device_context, dispatcher)
+	catalog = rexlib.ServiceCatalog()
+	manager = rexlib.hardware.get_device_manager(catalog)
+	session = manager.create_device_session(rexlib.hardware.DeviceIndex('cpu', 0))
+	device_context = rexlib.hardware.DeviceContext(session)
+	program_manager = rexlib.dispatch.get_program_manager(catalog)
+	dispatcher = rexlib.dispatch.make_eager_dispatcher(program_manager)
+	return rexlib.dispatch.ExecutionContext(device_context, dispatcher)

@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -12,4 +12,4 @@ namespace hardware
 void bind_hardware(pybind11::module_ &m);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

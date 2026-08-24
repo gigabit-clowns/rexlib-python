@@ -2,10 +2,10 @@
 
 #include "memory_resource.hpp"
 
-#include <xmipp4/core/hardware/memory_resource.hpp>
-#include <xmipp4/core/hardware/memory_allocator.hpp>
+#include <rexlib/core/hardware/memory_resource.hpp>
+#include <rexlib/core/hardware/memory_allocator.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -31,4 +31,4 @@ void define_memory_resource(memory_resource_class &c, pybind11::module_ &m)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

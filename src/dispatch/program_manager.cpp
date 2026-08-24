@@ -2,9 +2,9 @@
 
 #include "program_manager.hpp"
 
-#include <xmipp4/core/service_catalog.hpp>
+#include <rexlib/core/service_catalog.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -25,4 +25,4 @@ void define_program_manager(pybind11::module_ &m)
 }
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

@@ -5,7 +5,7 @@
 #include "array.hpp"
 #include "array_descriptor.hpp"
 
-namespace xmipp4
+namespace rexlib
 {
 namespace ndarray
 {
@@ -19,4 +19,4 @@ void bind_ndarray(pybind11::module_ &m)
 }
 
 } // namespace ndarray
-} // namespace xmipp4
+} // namespace rexlib

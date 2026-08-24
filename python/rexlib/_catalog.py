@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from __future__ import annotations
-from ._core_binding import ServiceCatalog
+from ._binding import ServiceCatalog
 
 __default_catalog: ServiceCatalog | None = None
 
@@ -9,7 +9,7 @@ def get_default_catalog() -> ServiceCatalog:
 	"""
 	Get the process-wide default service catalog.
 
-	xmipp4::service_catalog is not a singleton in C++ (its uniqueness is
+	rexlib::service_catalog is not a singleton in C++ (its uniqueness is
 	scoped to the owning instance). This function provides a lazily
 	constructed, process-wide instance for callers that don't need to
 	manage their own catalog.

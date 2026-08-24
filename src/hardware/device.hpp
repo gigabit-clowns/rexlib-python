@@ -4,16 +4,16 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/device.hpp>
-#include <xmipp4/core/hardware/command_queue.hpp>
-#include <xmipp4/core/hardware/event.hpp>
-#include <xmipp4/core/hardware/event_usage_flags.hpp>
-#include <xmipp4/core/hardware/memory_resource.hpp>
-#include <xmipp4/core/hardware/memory_resource_affinity.hpp>
+#include <rexlib/core/hardware/device.hpp>
+#include <rexlib/core/hardware/command_queue.hpp>
+#include <rexlib/core/hardware/event.hpp>
+#include <rexlib/core/hardware/event_usage_flags.hpp>
+#include <rexlib/core/hardware/memory_resource.hpp>
+#include <rexlib/core/hardware/memory_resource_affinity.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -65,4 +65,4 @@ device_class declare_device(pybind11::module_ &m);
 void define_device(device_class &c);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

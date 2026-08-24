@@ -2,10 +2,10 @@
 
 """Arrays, enriched with the Python operators the bound type cannot carry.
 
-Wraps `xmipp4._core_binding.ndarray`, adding operators to `Array`.
+Wraps `rexlib._binding.ndarray`, adding operators to `Array`.
 Operators cannot take an execution context, so they go through
-`xmipp4.functional`, which falls back to the active one (see
-`xmipp4.get_active_execution_context`).
+`rexlib.functional`, which falls back to the active one (see
+`rexlib.get_active_execution_context`).
 
 The operators are installed onto the bound `Array` rather than onto a
 subclass: every array is built in C++, so a subclass would only ever be
@@ -15,7 +15,7 @@ seen by callers that construct one by hand.
 from __future__ import annotations
 
 from .. import functional as _functional
-from .._core_binding.ndarray import (
+from .._binding.ndarray import (
 	Array as Array,
 	ArrayDescriptor as ArrayDescriptor,
 	is_initialized as is_initialized,

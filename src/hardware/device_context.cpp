@@ -2,13 +2,13 @@
 
 #include "device_context.hpp"
 
-#include <xmipp4/core/hardware/device_context.hpp>
-#include <xmipp4/core/hardware/device_session.hpp>
-#include <xmipp4/core/hardware/command_queue.hpp>
-#include <xmipp4/core/hardware/memory_allocator.hpp>
-#include <xmipp4/core/hardware/memory_resource_affinity.hpp>
+#include <rexlib/core/hardware/device_context.hpp>
+#include <rexlib/core/hardware/device_session.hpp>
+#include <rexlib/core/hardware/command_queue.hpp>
+#include <rexlib/core/hardware/memory_allocator.hpp>
+#include <rexlib/core/hardware/memory_resource_affinity.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -54,4 +54,4 @@ void define_device_context(device_context_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

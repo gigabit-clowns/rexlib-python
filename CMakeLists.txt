@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.18)
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION PROJECT_VERSION)
 string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 project(
-  xmipp4-python
+  rexlib-python
 	VERSION ${PROJECT_VERSION}
 	LANGUAGES C CXX
 )
@@ -15,7 +15,7 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 # Declare build options
-#option(XMIPP4_PYTHON_BUILD_DOC "Build documentation" ON)
+#option(REXLIB_PYTHON_BUILD_DOC "Build documentation" ON)
 
 # Set the module path
 #list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
@@ -31,9 +31,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-# Find xmipp4-core
-if (NOT TARGET xmipp4-core)
-	find_package(xmipp4-core REQUIRED)
+# Find rexlib
+if (NOT TARGET rexlib::rexlib)
+	find_package(rexlib REQUIRED)
 endif()
 
 if(SKBUILD_PLATLIB_DIR)
@@ -61,8 +61,8 @@ endif()
 
 # Install python directory
 install(DIRECTORY
-	${CMAKE_CURRENT_SOURCE_DIR}/python/xmipp4/
-	DESTINATION "${PYTHON_INSTALL_DIR}/xmipp4"
+	${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/
+	DESTINATION "${PYTHON_INSTALL_DIR}/rexlib"
 )
 
 # Type stubs are generated from the extension that was just installed, so
@@ -70,33 +70,33 @@ install(DIRECTORY
 #
 # Generating them requires importing the extension, which a cross-compiling
 # build cannot do. Those builds get stubs handed to them through
-# XMIPP4_STUBS_DIR instead; the stubs describe the Python API, which is the
+# REXLIB_STUBS_DIR instead; the stubs describe the Python API, which is the
 # same whatever the target architecture.
-set(XMIPP4_STUBS_DIR "" CACHE PATH
+set(REXLIB_STUBS_DIR "" CACHE PATH
 	"Directory holding pre-generated stubs, for builds that cannot import \
 the extension they produce. Generated during the build when empty.")
 
-set(XMIPP4_STUB_DESTINATION "${PYTHON_INSTALL_DIR}/xmipp4/_core_binding")
+set(REXLIB_STUB_DESTINATION "${PYTHON_INSTALL_DIR}/rexlib/_binding")
 
 # Relative to the project, so that the same value works on a runner and
 # inside a build container, where the project is mounted elsewhere.
-if(XMIPP4_STUBS_DIR AND NOT IS_ABSOLUTE "${XMIPP4_STUBS_DIR}")
-	set(XMIPP4_STUBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${XMIPP4_STUBS_DIR}")
+if(REXLIB_STUBS_DIR AND NOT IS_ABSOLUTE "${REXLIB_STUBS_DIR}")
+	set(REXLIB_STUBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${REXLIB_STUBS_DIR}")
 endif()
 
-if(XMIPP4_STUBS_DIR)
+if(REXLIB_STUBS_DIR)
 	# Stubs are not needed at run time, so shipping none of them would go
 	# unnoticed until somebody wondered why their editor stopped helping.
-	file(GLOB XMIPP4_PROVIDED_STUBS "${XMIPP4_STUBS_DIR}/*.pyi")
-	if(NOT XMIPP4_PROVIDED_STUBS)
+	file(GLOB REXLIB_PROVIDED_STUBS "${REXLIB_STUBS_DIR}/*.pyi")
+	if(NOT REXLIB_PROVIDED_STUBS)
 		message(FATAL_ERROR
-			"XMIPP4_STUBS_DIR is set to '${XMIPP4_STUBS_DIR}', which holds no "
+			"REXLIB_STUBS_DIR is set to '${REXLIB_STUBS_DIR}', which holds no "
 			".pyi files."
 		)
 	endif()
 
-	install(DIRECTORY "${XMIPP4_STUBS_DIR}/"
-		DESTINATION "${XMIPP4_STUB_DESTINATION}"
+	install(DIRECTORY "${REXLIB_STUBS_DIR}/"
+		DESTINATION "${REXLIB_STUB_DESTINATION}"
 		FILES_MATCHING PATTERN "*.pyi"
 	)
 else()
@@ -104,14 +104,14 @@ else()
 		execute_process(
 			COMMAND \"${Python_EXECUTABLE}\"
 				\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py\"
-				--module xmipp4._core_binding
+				--module rexlib._binding
 				--search-path \"${PYTHON_INSTALL_DIR}\"
-				--output \"${XMIPP4_STUB_DESTINATION}\"
-			RESULT_VARIABLE XMIPP4_STUBGEN_RESULT
+				--output \"${REXLIB_STUB_DESTINATION}\"
+			RESULT_VARIABLE REXLIB_STUBGEN_RESULT
 		)
-		if(NOT XMIPP4_STUBGEN_RESULT EQUAL 0)
+		if(NOT REXLIB_STUBGEN_RESULT EQUAL 0)
 			message(FATAL_ERROR
-				\"Could not generate the type stubs. Pass XMIPP4_STUBS_DIR \"
+				\"Could not generate the type stubs. Pass REXLIB_STUBS_DIR \"
 				\"when the extension cannot be imported by the build.\"
 			)
 		endif()

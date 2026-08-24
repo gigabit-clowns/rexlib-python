@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/numerical/numerical_type.hpp>
+#include <rexlib/core/numerical/numerical_type.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace numerical
 {
@@ -19,4 +19,4 @@ numerical_type_class declare_numerical_type(pybind11::module_ &m);
 void define_numerical_type(numerical_type_class &c);
 
 } // namespace numerical
-} // namespace xmipp4
+} // namespace rexlib

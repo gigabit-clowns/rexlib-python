@@ -29,19 +29,19 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Download xmipp4-core binaries # TODO: Remove when xmipp4-core is in Pypi
+      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download development -R gigabit-clowns/xmipp4-core -D local_deps/xmipp4-core/dist -p '*.whl' --clobber
+          gh release download development -R gigabit-clowns/rexlib -D local_deps/rexlib/dist -p '*.whl' --clobber
 
       - name: Install with pip
-        run: pip install . -v --find-links=local_deps/xmipp4-core/dist
+        run: pip install . -v --find-links=local_deps/rexlib/dist
 
       - name: Collect the generated stubs
         run: |
           mkdir -p stubs
-          cp "$(python -c 'import xmipp4, pathlib; print(pathlib.Path(xmipp4.__file__).parent)')"/_core_binding/*.pyi stubs/
+          cp "$(python -c 'import rexlib, pathlib; print(pathlib.Path(rexlib.__file__).parent)')"/_binding/*.pyi stubs/
           ls -l stubs
 
       - name: Upload stubs
@@ -76,11 +76,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Download xmipp4-core binaries # TODO: Remove when xmipp4-core is in Pypi
+      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download development -R gigabit-clowns/xmipp4-core -D local_deps/xmipp4-core/dist -p '*.whl' --clobber
+          gh release download development -R gigabit-clowns/rexlib -D local_deps/rexlib/dist -p '*.whl' --clobber
 
       - name: Download the type stubs
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
@@ -101,15 +101,15 @@ jobs:
           if (-not $crt) { $crt = $env:RUNNER_TEMP }
           Add-Content -Path $env:GITHUB_ENV -Value "ARM64_CRT_DIR=$crt"
 
-      - name: Stage xmipp4-core for CMake (Windows)
+      - name: Stage rexlib for CMake (Windows)
         # Bypasses pip: it refuses to install a wheel tagged for a different
         # platform than the host (blocks ARM64 cross-compilation), and
         # scikit-build-core's own CMAKE_PREFIX_PATH auto-detection doesn't
-        # account for xmipp4-core's wheel.install-dir = "/data" layout.
+        # account for rexlib's wheel.install-dir = "/data" layout.
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $dest = python scripts/stage-xmipp4-core-windows.py local_deps/xmipp4-core/dist xmipp4-core-prefix "${{ matrix.architectures }}"
+          $dest = python scripts/stage-rexlib-windows.py local_deps/rexlib/dist rexlib-prefix "${{ matrix.architectures }}"
           Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$dest"
 
       - name: Build wheels
@@ -117,24 +117,24 @@ jobs:
         env:
           CIBW_ARCHS: "${{ matrix.architectures }}"
           CIBW_ENVIRONMENT: >-
-            PIP_FIND_LINKS=local_deps/xmipp4-core/dist
-            SKBUILD_CMAKE_DEFINE="XMIPP4_STUBS_DIR=stubs"
+            PIP_FIND_LINKS=local_deps/rexlib/dist
+            SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
           # Windows skips build isolation entirely (CMAKE_PREFIX_PATH above
-          # already points at xmipp4-core), it only needs the build backend.
+          # already points at rexlib), it only needs the build backend.
           CIBW_BUILD_FRONTEND_WINDOWS: "build; args: --no-isolation"
           CIBW_BEFORE_BUILD_WINDOWS: pip install scikit-build-core==1.0.3
           CIBW_TEST_SKIP: "*-win_arm64" # Windows on ARM cannot be tested, raises warning
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel}
-            --exclude "libxmipp4-core.so*"
+            --exclude "librexlib.so*"
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: >
             delocate-wheel --require-archs {delocate_archs}
             -w {dest_dir} -v {wheel}
             --ignore-missing-dependencies
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >
             delvewheel repair -w {dest_dir} -v {wheel}
-            --exclude xmipp4-core.dll
+            --exclude rexlib.dll
             --add-path "${{ env.ARM64_CRT_DIR }}"
 
       - name: Upload wheels
@@ -149,20 +149,20 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Download xmipp4-core binaries # TODO: Remove when xmipp4-core is in Pypi
+      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download development -R gigabit-clowns/xmipp4-core -D "${{ github.workspace }}/../xmipp4-core/dist" -p '*.whl' --clobber
+          gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib/dist" -p '*.whl' --clobber
 
-      - name: Install build tool # TODO: Remove when xmipp4-core is in Pypi
+      - name: Install build tool # TODO: Remove when rexlib is in Pypi
         run: pip install build
 
       - name: Build sdist
-        env: # TODO: Remove when xmipp4-core is in Pypi
-          PIP_FIND_LINKS: "${{ github.workspace }}/../xmipp4-core/dist"
-        run: python -m build --sdist # TODO: Remove when xmipp4-core is in Pypi
-        # run: pipx run build --sdist # TODO: Enable when xmipp4-core is in Pypi
+        env: # TODO: Remove when rexlib is in Pypi
+          PIP_FIND_LINKS: "${{ github.workspace }}/../rexlib/dist"
+        run: python -m build --sdist # TODO: Remove when rexlib is in Pypi
+        # run: pipx run build --sdist # TODO: Enable when rexlib is in Pypi
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <xmipp4/core/numerical/fixed_width_float.hpp>
+#include <rexlib/core/numerical/fixed_width_float.hpp>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/complex.h>
@@ -12,15 +12,15 @@ namespace pybind11
 namespace detail
 {
 
-// xmipp4::float16_t has no native Python counterpart (Python has no
+// rexlib::float16_t has no native Python counterpart (Python has no
 // half-width float type); convert through `float`. This also makes
 // std::complex<float16_t> work via pybind11/complex.h, which composes
 // on top of type_caster<float16_t> for the real/imaginary parts.
 template <>
-struct type_caster<xmipp4::float16_t>
+struct type_caster<rexlib::float16_t>
 {
 public:
-	PYBIND11_TYPE_CASTER(xmipp4::float16_t, const_name("float16_t"));
+	PYBIND11_TYPE_CASTER(rexlib::float16_t, const_name("float16_t"));
 
 	bool load(handle src, bool convert)
 	{
@@ -36,12 +36,12 @@ public:
 			return false;
 		}
 
-		value = xmipp4::float16_t(static_cast<float>(PyFloat_AsDouble(tmp)));
+		value = rexlib::float16_t(static_cast<float>(PyFloat_AsDouble(tmp)));
 		Py_DECREF(tmp);
 		return true;
 	}
 
-	static handle cast(xmipp4::float16_t src, return_value_policy, handle)
+	static handle cast(rexlib::float16_t src, return_value_policy, handle)
 	{
 		return PyFloat_FromDouble(static_cast<double>(static_cast<float>(src)));
 	}

@@ -12,11 +12,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/core_version.hpp>
+#include <rexlib/core/library_version.hpp>
 
 #include <sstream>
 
-using namespace xmipp4;
+using namespace rexlib;
 
 static std::string version_to_string(version ver)
 {
@@ -25,8 +25,8 @@ static std::string version_to_string(version ver)
 	return oss.str();
 }
 
-PYBIND11_MODULE(_core_binding, m) {
-	m.attr("__version__") = version_to_string(get_core_version());
+PYBIND11_MODULE(_binding, m) {
+	m.attr("__version__") = version_to_string(get_library_version());
 
 	auto version = declare_version(m);
 	auto plugin = declare_plugin(m);

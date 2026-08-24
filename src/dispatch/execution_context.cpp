@@ -2,11 +2,11 @@
 
 #include "execution_context.hpp"
 
-#include <xmipp4/core/dispatch/execution_context.hpp>
-#include <xmipp4/core/dispatch/dispatcher.hpp>
-#include <xmipp4/core/hardware/device_context.hpp>
+#include <rexlib/core/dispatch/execution_context.hpp>
+#include <rexlib/core/dispatch/dispatcher.hpp>
+#include <rexlib/core/hardware/device_context.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -48,4 +48,4 @@ void define_execution_context(execution_context_class &c)
 	}
 }
  // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

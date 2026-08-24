@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from __future__ import annotations
-from .load_core import load_core
+from .load_library import load_library
 
-# Heuristically load the core library before importing the binding.
-__core_lib = load_core()
+# Heuristically load the shared library before importing the binding.
+__native_library = load_library()
 
-from ._core_binding import (
+from ._binding import (
 	__doc__ as __doc__, __version__ as __version__,
 	hardware as hardware,
 	numerical as numerical, dispatch as dispatch,

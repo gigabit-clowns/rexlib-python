@@ -2,13 +2,13 @@
 
 #include "device_backend.hpp"
 
-#include <xmipp4/core/hardware/device_backend.hpp>
-#include <xmipp4/core/hardware/device.hpp>
-#include <xmipp4/core/hardware/device_properties.hpp>
+#include <rexlib/core/hardware/device_backend.hpp>
+#include <rexlib/core/hardware/device.hpp>
+#include <rexlib/core/hardware/device_properties.hpp>
 
 #include <pybind11/stl.h> // Required for std::vector binding
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -55,4 +55,4 @@ void define_device_backend(device_backend_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

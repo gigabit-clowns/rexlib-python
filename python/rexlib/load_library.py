@@ -1,4 +1,4 @@
-"""Locate and load xmipp4-core's shared library at import time."""
+"""Locate and load rexlib's shared library at import time."""
 
 import ctypes
 import os
@@ -50,24 +50,26 @@ def _iter_distribution_library_paths(
 				yield path
 
 def __iter_possible_library_paths(
-		name: str,
+		distribution: str,
 		prefix: str,
 		filename: str,
 		system: str
 	) -> Generator[str, None, None]:
 	"""Iterate over possible paths for the library."""
 	yield filename
-	yield from _iter_distribution_library_paths(name, filename)
+	yield from _iter_distribution_library_paths(distribution, filename)
 	for libdir in __get_library_directory_names(system):
 		path = os.path.join(prefix, libdir, filename)
 		if os.path.exists(path):
 			yield path
 
-def __load_library(name: str) -> ctypes.CDLL:
+def __load_library(name: str, distribution: str) -> ctypes.CDLL:
 	"""Heuristically find and load a library with the specified name."""
 	system = platform.system()
 	filename = __get_library_filename(name, system)
-	paths = __iter_possible_library_paths(name, sys.prefix, filename, system)
+	paths = __iter_possible_library_paths(
+		distribution, sys.prefix, filename, system
+	)
 	for dynamic_lib in paths:
 		try:
 			return ctypes.CDLL(dynamic_lib)
@@ -76,14 +78,18 @@ def __load_library(name: str) -> ctypes.CDLL:
 	
 	raise OSError(f"Could not find {name}.")
 
-def load_core() -> ctypes.CDLL:
+def load_library() -> ctypes.CDLL:
 	"""
-	Load the core library for xmipp4.
+	Load rexlib's shared library.
 	
-	This function attempts to load the xmipp4 shared object from the system's
+	This function attempts to load the rexlib shared object from the system's
 	library directories. It raises an exception if the library cannot be found.
 	
+	The library and the distribution shipping it are named differently: the
+	shared object is librexlib.so, while the wheel carrying it is rexlib-native
+	(the plain rexlib name on PyPI belongs to this binding).
+	
 	Returns:
-		ctypes.CDLL: The loaded core library.
+		ctypes.CDLL: The loaded library.
 	"""
-	return __load_library("xmipp4-core")
+	return __load_library("rexlib", "rexlib-native")

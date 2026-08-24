@@ -4,11 +4,11 @@
 
 #include <pybind11/pybind11.h>
 
-#include <xmipp4/core/hardware/event.hpp>
+#include <rexlib/core/hardware/event.hpp>
 
 #include <memory>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -19,4 +19,4 @@ event_class declare_event(pybind11::module_ &m);
 void define_event(event_class &c);
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

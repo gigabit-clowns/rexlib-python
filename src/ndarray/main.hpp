@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace ndarray
 {
@@ -12,4 +12,4 @@ namespace ndarray
 void bind_ndarray(pybind11::module_ &m);
 
 } // namespace ndarray
-} // namespace xmipp4
+} // namespace rexlib

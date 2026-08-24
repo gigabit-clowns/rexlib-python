@@ -4,21 +4,21 @@
 
 #include "../numerical/float16_caster.hpp"
 
-#include <xmipp4/functional/creation.hpp>
-#include <xmipp4/core/ndarray/array.hpp>
-#include <xmipp4/core/ndarray/array_descriptor.hpp>
-#include <xmipp4/core/numerical/numerical_type.hpp>
-#include <xmipp4/core/numerical/numerical_type_dispatch.hpp>
-#include <xmipp4/core/numerical/scalar_value.hpp>
-#include <xmipp4/core/hardware/memory_resource_affinity.hpp>
-#include <xmipp4/core/dispatch/execution_context.hpp>
+#include <rexlib/functional/creation.hpp>
+#include <rexlib/core/ndarray/array.hpp>
+#include <rexlib/core/ndarray/array_descriptor.hpp>
+#include <rexlib/core/numerical/numerical_type.hpp>
+#include <rexlib/core/numerical/numerical_type_dispatch.hpp>
+#include <rexlib/core/numerical/scalar_value.hpp>
+#include <rexlib/core/hardware/memory_resource_affinity.hpp>
+#include <rexlib/core/dispatch/execution_context.hpp>
 
 #include <pybind11/stl.h>
 
 #include <optional>
 #include <string>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace functional
 {
@@ -62,7 +62,7 @@ static array py_empty(
 	std::optional<array*> out
 )
 {
-	return xmipp4::empty(
+	return rexlib::empty(
 		std::move(descriptor), affinity, context, out.value_or(nullptr)
 	);
 }
@@ -74,7 +74,7 @@ static array py_zeros(
 	std::optional<array*> out
 )
 {
-	return xmipp4::zeros(
+	return rexlib::zeros(
 		std::move(descriptor), affinity, context, out.value_or(nullptr)
 	);
 }
@@ -86,7 +86,7 @@ static array py_ones(
 	std::optional<array*> out
 )
 {
-	return xmipp4::ones(
+	return rexlib::ones(
 		std::move(descriptor), affinity, context, out.value_or(nullptr)
 	);
 }
@@ -100,7 +100,7 @@ static array py_full(
 )
 {
 	const auto scalar = make_scalar_value(descriptor.get_data_type(), fill_value);
-	return xmipp4::full(
+	return rexlib::full(
 		std::move(descriptor), affinity, scalar, context, out.value_or(nullptr)
 	);
 }
@@ -111,13 +111,13 @@ static array py_copy(
 	std::optional<array*> out
 )
 {
-	return xmipp4::copy(source, context, out.value_or(nullptr));
+	return rexlib::copy(source, context, out.value_or(nullptr));
 }
 
 static void py_fill(array &out, const py::object &fill_value, const execution_context &context)
 {
 	const auto scalar = make_scalar_value(out.get_descriptor().get_data_type(), fill_value);
-	xmipp4::fill(out, scalar, context);
+	rexlib::fill(out, scalar, context);
 }
 
 void bind_creation(pybind11::module_ &m)
@@ -153,4 +153,4 @@ void bind_creation(pybind11::module_ &m)
 }
 
 } // namespace functional
-} // namespace xmipp4
+} // namespace rexlib

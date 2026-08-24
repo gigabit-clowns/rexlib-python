@@ -4,10 +4,10 @@ import ctypes
 import pathlib
 from importlib import metadata
 
-# xmipp4.load_core is the re-exported function, so the module has to be
+# rexlib.load_library is the re-exported function, so the module has to be
 # reached explicitly.
-from xmipp4 import load_core
-from xmipp4.load_core import (
+from rexlib import load_library
+from rexlib.load_library import (
 	_iter_distribution_library_paths as iter_distribution_library_paths,
 )
 
@@ -19,8 +19,8 @@ class DistributionMock:
 	def locate_file(self, path):
 		return self.__root / path
 
-def test_loads_the_core_library():
-	assert isinstance(load_core(), ctypes.CDLL)
+def test_loads_the_library():
+	assert isinstance(load_library(), ctypes.CDLL)
 
 def test_finds_the_library_recorded_by_the_distribution(monkeypatch, tmp_path):
 	library = tmp_path / 'bin' / 'libmock.so'

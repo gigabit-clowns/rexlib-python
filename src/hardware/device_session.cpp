@@ -2,14 +2,14 @@
 
 #include "device_session.hpp"
 
-#include <xmipp4/core/hardware/device_session.hpp>
-#include <xmipp4/core/hardware/device.hpp>
-#include <xmipp4/core/hardware/device_properties.hpp>
-#include <xmipp4/core/hardware/memory_allocator.hpp>
-#include <xmipp4/core/hardware/memory_resource_affinity.hpp>
-#include <xmipp4/core/hardware/command_queue.hpp>
+#include <rexlib/core/hardware/device_session.hpp>
+#include <rexlib/core/hardware/device.hpp>
+#include <rexlib/core/hardware/device_properties.hpp>
+#include <rexlib/core/hardware/memory_allocator.hpp>
+#include <rexlib/core/hardware/memory_resource_affinity.hpp>
+#include <rexlib/core/hardware/command_queue.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -46,4 +46,4 @@ void define_device_session(device_session_class &c)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib

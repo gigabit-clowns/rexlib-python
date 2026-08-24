@@ -2,9 +2,9 @@
 
 #include "dispatcher.hpp"
 
-#include <xmipp4/core/dispatch/program_manager.hpp>
+#include <rexlib/core/dispatch/program_manager.hpp>
 
-namespace xmipp4
+namespace rexlib
 {
 namespace dispatch
 {
@@ -26,4 +26,4 @@ void define_dispatcher(pybind11::module_ &m)
 }
 
 } // namespace dispatch
-} // namespace xmipp4
+} // namespace rexlib

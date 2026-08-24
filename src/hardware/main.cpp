@@ -18,7 +18,7 @@
 #include "memory_resource_affinity.hpp"
 #include "memory_resource_kind.hpp"
 
-namespace xmipp4
+namespace rexlib
 {
 namespace hardware
 {
@@ -63,4 +63,4 @@ void bind_hardware(pybind11::module_ &m)
 }
 
 } // namespace hardware
-} // namespace xmipp4
+} // namespace rexlib
