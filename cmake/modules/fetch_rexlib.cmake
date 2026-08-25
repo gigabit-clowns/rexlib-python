@@ -13,11 +13,22 @@ include(FetchContent)
 # no special case on either side.
 function(fetch_rexlib)
 	set(options)
-	set(oneValueArgs COMMIT DESTINATION)
+	set(oneValueArgs VERSION COMMIT DESTINATION)
 	set(multiValueArgs)
 	cmake_parse_arguments(PARSE_ARGV 0 arg
 		"${options}" "${oneValueArgs}" "${multiValueArgs}"
 	)
+
+	# VERSION once rexlib cuts releases, COMMIT until then - the same
+	# split the other fetch modules use, where boost and eigen are pinned
+	# by version and pocketfft, which publishes none, by commit.
+	if(arg_VERSION)
+		set(REF "refs/tags/v${arg_VERSION}")
+	elseif(arg_COMMIT)
+		set(REF "${arg_COMMIT}")
+	else()
+		message(FATAL_ERROR "fetch_rexlib needs a VERSION or a COMMIT")
+	endif()
 
 	# GNUInstallDirs is what rexlib derives every install destination
 	# from, REXLIB_PLUGINS_INSTALL_DIR included, so redirecting these
@@ -34,7 +45,7 @@ function(fetch_rexlib)
 	cmake_policy(SET CMP0135 NEW) # To avoid warnings
 	FetchContent_Declare(
 		rexlib
-		URL https://github.com/gigabit-clowns/rexlib/archive/${arg_COMMIT}.tar.gz
+		URL https://github.com/gigabit-clowns/rexlib/archive/${REF}.tar.gz
 	)
 	FetchContent_MakeAvailable(rexlib)
 

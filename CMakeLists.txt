@@ -57,7 +57,16 @@ FetchContent_MakeAvailable(pybind11)
 # one; the core repository ships no Python packaging of its own.
 #
 # The guard leaves a superbuild that already provides the target alone.
-# TODO: re-pin to a commit on main once gigabit-clowns/rexlib#427 merges.
+#
+# Pinned by commit because rexlib publishes no release tags yet: its only
+# tag is "development", which its CI force-moves on every push to main, so
+# pinning it would mean the same wheel version silently containing
+# different libraries. Switch to VERSION once releases are cut - the
+# module already takes it, and Renovate can then track it the way it
+# tracks pybind11 below.
+#
+# TODO: re-pin once gigabit-clowns/rexlib#427 merges; this SHA is on a
+# branch and a squash-merge would orphan it.
 if (NOT TARGET rexlib::rexlib)
 	fetch_rexlib(
 		COMMIT 1d9a608fd1a1a35fc7b29ae2d041a42ccc6f1b6e
