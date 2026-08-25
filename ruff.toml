@@ -34,7 +34,6 @@ ignore = [
 ]
 "python/rexlib/__init__.py" = [
   "D104", # __doc__ is re-exported from the compiled extension, not written here
-  "E402", # imports must follow load_library() preloading rexlib.dll
 ]
 
 [lint.pydocstyle]

@@ -11,6 +11,11 @@ project(
 
 # Include CTest to provide BUILD_TESTING option
 include(CTest)
+
+# Several of Boost's sub-libraries write BUILD_TESTING into the cache, so
+# fetching rexlib turns this project's own tests off behind our back.
+# Capture what was asked for before that can happen.
+set(REXLIB_PYTHON_BUILD_TESTING ${BUILD_TESTING})
 include(FetchContent)
 include(GNUInstallDirs)
 
@@ -18,7 +23,9 @@ include(GNUInstallDirs)
 #option(REXLIB_PYTHON_BUILD_DOC "Build documentation" ON)
 
 # Set the module path
-#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
+include(fetch_rexlib)
 
 # Find Python
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
@@ -31,9 +38,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-# Find rexlib
+# Build rexlib and stage it inside the Python package. The wheel carries
+# the library it was built against rather than depending on a separate
+# one; the core repository ships no Python packaging of its own.
+#
+# The guard leaves a superbuild that already provides the target alone.
+# TODO: re-pin to a commit on main once gigabit-clowns/rexlib#427 merges.
 if (NOT TARGET rexlib::rexlib)
-	find_package(rexlib REQUIRED)
+	fetch_rexlib(
+		COMMIT 1d9a608fd1a1a35fc7b29ae2d041a42ccc6f1b6e
+		DESTINATION rexlib
+	)
 endif()
 
 if(SKBUILD_PLATLIB_DIR)
@@ -55,7 +70,7 @@ add_subdirectory(src)
 #endif()
 
 # Only build tests if it is the main project
-if(BUILD_TESTING)
+if(REXLIB_PYTHON_BUILD_TESTING)
 	add_subdirectory(tests)
 endif()
 

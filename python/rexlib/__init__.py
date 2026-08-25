@@ -1,10 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from __future__ import annotations
-from .load_library import load_library
-
-# Heuristically load the shared library before importing the binding.
-__native_library = load_library()
 
 from ._binding import (
 	__doc__ as __doc__, __version__ as __version__,
@@ -19,5 +15,6 @@ from ._binding import (
 from ._catalog import get_default_catalog as get_default_catalog
 from ._context import get_active_execution_context as get_active_execution_context
 from ._device import device as device
+from ._paths import get_cmake_dir as get_cmake_dir, get_include as get_include
 from . import functional as functional
 from . import ndarray as ndarray

@@ -17,11 +17,14 @@ target_link_libraries(
 		rexlib::rexlib
 )
 
-if(WIN32)
-    set(MODULE_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
-else()
-    set(MODULE_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
-endif()
+# Beside the real plugin directory rather than inside it, so these are
+# only ever found by a test that asks for them by path. Deriving from
+# REXLIB_PLUGINS_INSTALL_DIR keeps them there whatever the layout.
+get_filename_component(
+	MODULE_INSTALL_DIR
+	"${REXLIB_PLUGINS_INSTALL_DIR}"
+	DIRECTORY
+)
 install(
 	TARGETS ${TARGET_NAME}
 	LIBRARY DESTINATION ${MODULE_INSTALL_DIR}/rexlib-dummy-plugins/

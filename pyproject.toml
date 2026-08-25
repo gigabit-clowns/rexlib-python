@@ -1,7 +1,6 @@
 [build-system]
 requires = [
 	"scikit-build-core==1.0.3",
-	"librexlib==0.1.*",
 	"pybind11-stubgen==2.5.5"
 ]
 build-backend = "scikit_build_core.build"
@@ -35,9 +34,7 @@ readme = {file = "README.md", content-type = "text/markdown"}
 license = "GPL-3.0-only"
 
 requires-python = ">=3.9"
-dependencies = [
-    "librexlib==0.1.*"
-] 
+dependencies = []
 
 [project.optional-dependencies]
 test = [
@@ -51,8 +48,6 @@ Homepage = "https://github.com/gigabit-clowns/rexlib-python"
 Issues = "https://github.com/gigabit-clowns/rexlib-python/issues"
 
 [tool.scikit-build]
-experimental=true # For wheel.install-dir
-wheel.install-dir="/data"
 cmake.version = ">=3.18"
 cmake.args = []
 build.verbose = false
@@ -67,5 +62,5 @@ input = "VERSION"
 regex = "(?P<value>\\d+\\.\\d+\\.\\d+)"
 
 [tool.cibuildwheel]
-#test-command = "{project}/scripts/run_test.sh" # TODO add when rexlib is in PyPI
+#test-command = "{project}/scripts/run-tests.sh" # TODO add when rexlib is in PyPI
 #test-extras = ["test"]
