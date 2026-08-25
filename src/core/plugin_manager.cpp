@@ -43,10 +43,16 @@ void define_plugin_manager(plugin_manager_class &c, pybind11::module_ &m)
 				plugin_manager &manager,
 				const std::optional<std::string> &directory
 			) {
-				discover_plugins(
-					directory.value_or(get_plugin_directory()),
-					manager
-				);
+				if (directory)
+				{
+					discover_plugins(*directory, manager);
+				}
+				else
+				{
+					// Walks the whole search path rather than just its
+					// first entry.
+					discover_plugins(manager);
+				}
 			},
 			py::arg("directory") = py::none()
 		)
@@ -72,7 +78,7 @@ void define_plugin_manager(plugin_manager_class &c, pybind11::module_ &m)
 			}
 		);
 
-	m.def("get_plugin_directory", &get_plugin_directory);
+	m.def("get_plugin_search_path", &get_plugin_search_path);
 	m.def("get_default_plugin_directory", &get_default_plugin_directory);
 }
 

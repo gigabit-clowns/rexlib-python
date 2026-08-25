@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import os
-import platform
-import sys
 import uuid
 
 import pytest
@@ -21,11 +19,12 @@ def test_plugin_manager_discovers_no_plugins_in_an_empty_directory():
   pm.discover_plugins(f'/path/to/invalid/directory/{uuid.uuid4()}/')
   assert pm.plugins == []
   
-def test_plugin_manager_discovers_in_the_plugin_directory_by_default():
+def test_plugin_manager_discovers_the_whole_search_path_by_default():
   default = rexlib.PluginManager()
   default.discover_plugins()
   explicit = rexlib.PluginManager()
-  explicit.discover_plugins(rexlib.get_plugin_directory())
+  for directory in rexlib.get_plugin_search_path():
+    explicit.discover_plugins(directory)
   assert list(map(repr, default.plugins)) == list(map(repr, explicit.plugins))
 
 def test_plugin_manager_discovers_plugins():
@@ -55,8 +54,11 @@ def test_plugin_exposes_name_and_version():
   plugin = next(p for p in pm.plugins if p.name == 'dummy-plugin1')
   assert plugin.version == rexlib.Version(1, 2, 3)
 
-def test_returns_plugin_directory():
-  assert isinstance(rexlib.get_plugin_directory(), str)
+def test_returns_plugin_search_path():
+  path = rexlib.get_plugin_search_path()
+  assert isinstance(path, list)
+  assert all(isinstance(entry, str) for entry in path)
+  assert path[-1] == rexlib.get_default_plugin_directory()
 
 def test_returns_default_plugin_directory():
   assert isinstance(rexlib.get_default_plugin_directory(), str)
@@ -71,13 +73,7 @@ def test_service_catalog_registers_plugins_without_plugins():
   assert n_plugins == 0
 
 def __get_dummy_plugin_directory() -> str:
-  prefix = sys.prefix
-  DUMMY_PLUGIN_DIRECTORY_NAME = 'rexlib-dummy-plugins'
-  
-  if platform.system() == 'Windows':
-    return os.path.join(prefix, 'bin', DUMMY_PLUGIN_DIRECTORY_NAME)
-  if os.path.exists(os.path.join(prefix, 'lib')):
-    return os.path.join(prefix, 'lib', DUMMY_PLUGIN_DIRECTORY_NAME)
-  if os.path.exists(os.path.join(prefix, 'lib64')):
-    return os.path.join(prefix, 'lib64', DUMMY_PLUGIN_DIRECTORY_NAME)
-  raise OSError("Could not find the dummy plugin directory.")
+  # Installed beside the real plugin directory, so it is found the same
+  # way whatever prefix layout the package was built with.
+  parent = os.path.dirname(rexlib.get_default_plugin_directory())
+  return os.path.join(parent, 'rexlib-dummy-plugins')

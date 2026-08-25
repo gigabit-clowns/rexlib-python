@@ -8,7 +8,7 @@ from ._binding import (
 	numerical as numerical, dispatch as dispatch,
 	ServiceCatalog as ServiceCatalog,
 	PluginManager as PluginManager, Plugin as Plugin,
-	get_plugin_directory as get_plugin_directory,
+	get_plugin_search_path as get_plugin_search_path,
 	get_default_plugin_directory as get_default_plugin_directory,
 	Version as Version,
 )
