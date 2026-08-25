@@ -27,6 +27,20 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(fetch_rexlib)
 
+# Most of a build here is the C++ library, so use a compiler cache when one
+# is available. Detected rather than demanded: a missing ccache degrades to
+# an ordinary build instead of failing every compile, which is what setting
+# CMAKE_CXX_COMPILER_LAUNCHER from the outside would do. Set before rexlib
+# is added so the subproject inherits it.
+if(NOT DEFINED CMAKE_CXX_COMPILER_LAUNCHER)
+	find_program(REXLIB_PYTHON_CCACHE ccache)
+	if(REXLIB_PYTHON_CCACHE)
+		message(STATUS "Compiler cache: ${REXLIB_PYTHON_CCACHE}")
+		set(CMAKE_C_COMPILER_LAUNCHER "${REXLIB_PYTHON_CCACHE}")
+		set(CMAKE_CXX_COMPILER_LAUNCHER "${REXLIB_PYTHON_CCACHE}")
+	endif()
+endif()
+
 # Find Python
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
