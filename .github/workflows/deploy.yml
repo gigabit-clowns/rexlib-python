@@ -29,14 +29,14 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download development -R gigabit-clowns/rexlib -D local_deps/rexlib/dist -p '*.whl' --clobber
+      - name: Set up compiler cache
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
+        with:
+          key: stubs-ubuntu-latest
+          max-size: 1G
 
       - name: Install with pip
-        run: pip install . -v --find-links=local_deps/rexlib/dist
+        run: pip install . -v
 
       - name: Collect the generated stubs
         run: |
@@ -76,55 +76,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download development -R gigabit-clowns/rexlib -D local_deps/rexlib/dist -p '*.whl' --clobber
-
       - name: Download the type stubs
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: type-stubs
           path: stubs
 
-      - name: Locate MSVC ARM64 redistributable (for delvewheel)
-        # delvewheel resolves DLL dependencies via PATH, which never contains
-        # the arm64 CRT when cross-compiling from an x64 host, so
-        # msvcp140.dll etc. are "not found" for the arm64 wheel unless we
-        # point it there explicitly. See
-        # https://github.com/adang1345/delvewheel/issues/44
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          $crt = Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio\*\*\VC\Redist\MSVC\*\arm64\Microsoft.VC*.CRT" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-          if (-not $crt) { $crt = $env:RUNNER_TEMP }
-          Add-Content -Path $env:GITHUB_ENV -Value "ARM64_CRT_DIR=$crt"
-
-      - name: Stage rexlib for CMake (Windows)
-        # Bypasses pip: it refuses to install a wheel tagged for a different
-        # platform than the host (blocks ARM64 cross-compilation), and
-        # scikit-build-core's own CMAKE_PREFIX_PATH auto-detection doesn't
-        # account for rexlib's wheel.install-dir = "/data" layout.
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          $dest = python scripts/stage-rexlib-windows.py local_deps/rexlib/dist rexlib-prefix "${{ matrix.architectures }}"
-          Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$dest"
+      # Every interpreter on a platform rebuilds rexlib from source, so
+      # the cache is what keeps that to a link instead of a full build.
+      # CIBW_BEFORE_ALL warms it once, inside the build environment.
+      - name: Set up compiler cache
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
+        with:
+          key: wheels-${{ matrix.os }}-${{ matrix.architectures }}
+          max-size: 2G
 
       - name: Build wheels
         uses: pypa/cibuildwheel@1828c10ab37f080699c7b81cea34097c684a7074 # v4.2.0
         env:
           CIBW_ARCHS: "${{ matrix.architectures }}"
           CIBW_ENVIRONMENT: >-
-            PIP_FIND_LINKS=local_deps/rexlib/dist
             SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
-          # Windows skips build isolation entirely (CMAKE_PREFIX_PATH above
-          # already points at rexlib), it only needs the build backend.
-          CIBW_BUILD_FRONTEND_WINDOWS: "build; args: --no-isolation"
-          CIBW_BEFORE_BUILD_WINDOWS: pip install scikit-build-core==1.0.3
+            CMAKE_C_COMPILER_LAUNCHER=ccache
+            CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            CCACHE_DIR=/host${{ env.CCACHE_DIR }}
+            FETCHCONTENT_BASE_DIR=/tmp/rexlib-deps
+          # Warms the compiler cache and downloads the dependencies once
+          # per platform, so the per-interpreter builds that follow only
+          # link. Runs inside the manylinux container, which reaches the
+          # runner's cache through the /host mount.
+          CIBW_BEFORE_ALL_LINUX: >
+            yum install -y ccache || dnf install -y ccache || true
           CIBW_TEST_SKIP: "*-win_arm64" # Windows on ARM cannot be tested, raises warning
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
+          # librexlib now ships inside the wheel, put there by this
+          # project's install rules. auditwheel would otherwise re-vendor
+          # it under a hash-mangled SONAME, which breaks find_package for
+          # plugin authors and the sibling plugin directory lookup.
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel}
             --exclude "librexlib.so*"
@@ -132,10 +120,12 @@ jobs:
             delocate-wheel --require-archs {delocate_archs}
             -w {dest_dir} -v {wheel}
             --ignore-missing-dependencies
+          # rexlib.dll is placed beside the extension by this project's
+          # own install rules; letting delvewheel vendor it would mangle
+          # the name the plugin directory is resolved from.
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >
             delvewheel repair -w {dest_dir} -v {wheel}
             --exclude rexlib.dll
-            --add-path "${{ env.ARM64_CRT_DIR }}"
 
       - name: Upload wheels
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -149,20 +139,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Download rexlib binaries # TODO: Remove when rexlib is in Pypi
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib/dist" -p '*.whl' --clobber
-
-      - name: Install build tool # TODO: Remove when rexlib is in Pypi
-        run: pip install build
-
       - name: Build sdist
-        env: # TODO: Remove when rexlib is in Pypi
-          PIP_FIND_LINKS: "${{ github.workspace }}/../rexlib/dist"
-        run: python -m build --sdist # TODO: Remove when rexlib is in Pypi
-        # run: pipx run build --sdist # TODO: Enable when rexlib is in Pypi
+        run: pipx run build --sdist
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

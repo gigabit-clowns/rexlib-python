@@ -32,12 +32,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install rexlib
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib-dist" -p '*.whl' --clobber
-          pip install --no-index --find-links="${{ github.workspace }}/../rexlib-dist" librexlib
+      # rexlib is built from source as part of this project, so most of
+      # the wall clock here is the C++ library. Caching makes every run
+      # after the first a link.
+      - name: Set up compiler cache
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
+        with:
+          key: ${{ matrix.os }}-${{ matrix.compiler.cxx }}
+          max-size: 1G
 
       - name: Configure and build with CMake
         uses: threeal/cmake-action@725d1314ccf9ea922805d7e3f9d9bcbca892b406 # v2
@@ -48,6 +50,8 @@ jobs:
           cxx-compiler: ${{ matrix.compiler.cxx }}
           options: |
             CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+            CMAKE_C_COMPILER_LAUNCHER=ccache
+            CMAKE_CXX_COMPILER_LAUNCHER=ccache
           run-build: true
           build-args: --config ${{ env.BUILD_TYPE }}
 
@@ -85,15 +89,8 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
         run: python -m pip install --upgrade pip packaging
 
-      - name: Install rexlib
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download development -R gigabit-clowns/rexlib -D "${{ github.workspace }}/../rexlib/dist" -p '*.whl' --clobber
-          pip install --no-index --find-links="${{ github.workspace }}/../rexlib/dist" librexlib
-
       - name: Install with pip
-        run: pip install .[test] -v --find-links="${{ github.workspace }}/../rexlib/dist" -Ccmake.define.BUILD_TESTING=ON
+        run: pip install .[test] -v -Ccmake.define.BUILD_TESTING=ON
 
       - name: Run ruff
         run: ruff check .
