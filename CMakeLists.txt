@@ -54,16 +54,6 @@ FetchContent_MakeAvailable(pybind11)
 # Build rexlib and stage it inside the Python package. The wheel carries
 # the library it was built against rather than depending on a separate
 # one; the core repository ships no Python packaging of its own.
-#
-# The guard leaves a superbuild that already provides the target alone.
-#
-# Pinned by commit because rexlib publishes no release tags yet: its only
-# tag is "development", which its CI force-moves on every push to main, so
-# pinning it would mean the same wheel version silently containing
-# different libraries. Switch to VERSION once releases are cut - the
-# module already takes it, and Renovate can then track it the way it
-# tracks pybind11 below.
-
 if (NOT TARGET rexlib::rexlib)
 	fetch_rexlib(
 		COMMIT 474ba80d27c7ace6979b7193db53b3d481804885
