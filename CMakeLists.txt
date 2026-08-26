@@ -28,13 +28,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 include(fetch_rexlib)
 
 # Most of a build here is the C++ library, so use a compiler cache when one
-# is available. Detected rather than demanded: a missing ccache degrades to
-# an ordinary build instead of failing every compile, which is what setting
-# CMAKE_CXX_COMPILER_LAUNCHER from the outside would do. Set before rexlib
-# is added so the subproject inherits it.
+# is available.
 # Skipped for MSVC, where ccache needs the debug information format
-# pinned to work at all. The runners carry an unrelated ccache.exe in
-# Strawberry Perl's bin directory, which a plain search would find.
+# pinned to work at all.
 if(NOT DEFINED CMAKE_CXX_COMPILER_LAUNCHER AND NOT MSVC)
 	find_program(REXLIB_PYTHON_CCACHE ccache)
 	if(REXLIB_PYTHON_CCACHE)
