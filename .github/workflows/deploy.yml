@@ -97,6 +97,19 @@ jobs:
           key: wheels-${{ matrix.os }}-${{ matrix.architectures }}-${{ github.run_id }}
           restore-keys: wheels-${{ matrix.os }}-${{ matrix.architectures }}-
 
+      # delvewheel resolves DLL dependencies via PATH, which never contains
+      # the arm64 CRT when cross-compiling from an x64 host, so
+      # msvcp140.dll is "not found" for the arm64 wheel unless it is
+      # pointed there explicitly.
+      # See https://github.com/adang1345/delvewheel/issues/44
+      - name: Locate MSVC ARM64 redistributable (for delvewheel)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $crt = Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio\*\*\VC\Redist\MSVC\*\arm64\Microsoft.VC*.CRT" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $crt) { $crt = $env:RUNNER_TEMP }
+          Add-Content -Path $env:GITHUB_ENV -Value "ARM64_CRT_DIR=$crt"
+
       # macOS builds run on the runner itself, so the usual setup applies.
       # Windows is left out: ccache with MSVC needs the debug information
       # format pinned, and the build degrades to an uncached one anyway.
@@ -149,6 +162,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >
             delvewheel repair -w {dest_dir} -v {wheel}
             --exclude rexlib.dll
+            --add-path "${{ env.ARM64_CRT_DIR }}"
 
       - name: Upload wheels
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

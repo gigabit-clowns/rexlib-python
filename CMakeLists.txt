@@ -32,7 +32,10 @@ include(fetch_rexlib)
 # an ordinary build instead of failing every compile, which is what setting
 # CMAKE_CXX_COMPILER_LAUNCHER from the outside would do. Set before rexlib
 # is added so the subproject inherits it.
-if(NOT DEFINED CMAKE_CXX_COMPILER_LAUNCHER)
+# Skipped for MSVC, where ccache needs the debug information format
+# pinned to work at all. The runners carry an unrelated ccache.exe in
+# Strawberry Perl's bin directory, which a plain search would find.
+if(NOT DEFINED CMAKE_CXX_COMPILER_LAUNCHER AND NOT MSVC)
 	find_program(REXLIB_PYTHON_CCACHE ccache)
 	if(REXLIB_PYTHON_CCACHE)
 		message(STATUS "Compiler cache: ${REXLIB_PYTHON_CCACHE}")
