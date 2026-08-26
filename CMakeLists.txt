@@ -67,12 +67,10 @@ FetchContent_MakeAvailable(pybind11)
 # different libraries. Switch to VERSION once releases are cut - the
 # module already takes it, and Renovate can then track it the way it
 # tracks pybind11 below.
-#
-# TODO: re-pin once gigabit-clowns/rexlib#427 merges; this SHA is on a
-# branch and a squash-merge would orphan it.
+
 if (NOT TARGET rexlib::rexlib)
 	fetch_rexlib(
-		COMMIT 1d9a608fd1a1a35fc7b29ae2d041a42ccc6f1b6e
+		COMMIT 474ba80d27c7ace6979b7193db53b3d481804885
 		DESTINATION rexlib
 	)
 endif()
