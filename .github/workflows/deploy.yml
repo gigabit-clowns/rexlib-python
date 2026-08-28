@@ -38,7 +38,8 @@ jobs:
       - name: Install rexlib
         run: |
           python -m pip install "cmake>=3.21" ninja
-          python scripts/install_rexlib.py --prefix "${{ runner.temp }}/rexlib"
+          python scripts/install_rexlib.py --parallel 4 \
+            --prefix "${{ runner.temp }}/rexlib"
 
       - name: Install with pip
         env:
@@ -122,10 +123,10 @@ jobs:
           # GitHub's six hour ceiling.
           CIBW_BEFORE_ALL: >
             python -m pip install "cmake>=3.21" ninja &&
-            python {project}/scripts/install_rexlib.py --prefix /opt/rexlib
+            python {project}/scripts/install_rexlib.py --parallel 4 --prefix /opt/rexlib
           CIBW_BEFORE_ALL_WINDOWS: >
             python -m pip install "cmake>=3.21" ninja &&
-            python {project}/scripts/install_rexlib.py --prefix C:/rexlib
+            python {project}/scripts/install_rexlib.py --parallel 4 --prefix C:/rexlib
           # The build picks up ccache by itself when it finds one, so
           # nothing here forces a compiler launcher: doing that would make
           # every compile fail outright wherever ccache is missing.

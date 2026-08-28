@@ -44,7 +44,8 @@ jobs:
       - name: Install rexlib
         run: |
           python -m pip install "cmake>=3.21" ninja
-          python scripts/install_rexlib.py --prefix "${{ runner.temp }}/rexlib"
+          python scripts/install_rexlib.py --parallel 4 \
+            --prefix "${{ runner.temp }}/rexlib"
 
       - name: Configure and build with CMake
         uses: threeal/cmake-action@725d1314ccf9ea922805d7e3f9d9bcbca892b406 # v2
@@ -96,7 +97,8 @@ jobs:
       - name: Install rexlib
         run: |
           python -m pip install "cmake>=3.21" ninja
-          python scripts/install_rexlib.py --prefix "${{ runner.temp }}/rexlib"
+          python scripts/install_rexlib.py --parallel 4 \
+            --prefix "${{ runner.temp }}/rexlib"
 
       - name: Install with pip
         env:
