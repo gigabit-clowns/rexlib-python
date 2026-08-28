@@ -2,12 +2,23 @@
 
 from __future__ import annotations
 
+import os
 import pathlib
+import sys
 
-# The wheel nests a complete rexlib install prefix in the package
-# directory, so these are the same paths a standalone install exposes,
-# just rooted here.
+# The wheel nests a rexlib install prefix in the package directory, so
+# these are the paths a standalone install exposes, rooted here.
 __PREFIX = pathlib.Path(__file__).parent
+
+# Windows has no RPATH, and the shared library does not sit beside the
+# extension that needs it, so the loader has to be told where to look.
+# Kept alive for the life of the process: dropping the handle takes the
+# directory back off the search path.
+__dll_directories = [
+	os.add_dll_directory(str(directory))
+	for directory in (__PREFIX / "bin", __PREFIX / "lib")
+	if sys.platform == "win32" and directory.is_dir()
+]
 
 
 def get_cmake_dir() -> str:

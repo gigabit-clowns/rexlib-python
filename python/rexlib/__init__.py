@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+# Imported first: on Windows it puts the bundled library on the DLL
+# search path, which importing the extension depends on.
+from . import _paths as _paths
+
 from ._binding import (
 	__doc__ as __doc__, __version__ as __version__,
 	hardware as hardware,
