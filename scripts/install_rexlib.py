@@ -39,7 +39,7 @@ def download(commit: str, into: pathlib.Path) -> pathlib.Path:
 	archive = into / "rexlib.tar.gz"
 	urllib.request.urlretrieve(ARCHIVE.format(commit=commit), archive)
 	with tarfile.open(archive) as tar:
-		tar.extractall(into)  # noqa: S202 -- our own archive, from GitHub
+		tar.extractall(into)
 	return next(p for p in into.iterdir() if p.is_dir())
 
 
