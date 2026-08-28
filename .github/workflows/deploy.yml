@@ -123,7 +123,7 @@ jobs:
           # GitHub's six hour ceiling.
           CIBW_BEFORE_ALL: >
             python -m pip install "cmake>=3.21" ninja &&
-            python {project}/scripts/install_rexlib.py --parallel 4 --prefix /opt/rexlib
+            python {project}/scripts/install_rexlib.py --parallel 4 --prefix /tmp/rexlib
           CIBW_BEFORE_ALL_WINDOWS: >
             python -m pip install "cmake>=3.21" ninja &&
             python {project}/scripts/install_rexlib.py --parallel 4 --prefix C:/rexlib
@@ -135,7 +135,7 @@ jobs:
           # adding to it, so the shared part is repeated.
           CIBW_ENVIRONMENT: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
-            CMAKE_PREFIX_PATH=/opt/rexlib
+            CMAKE_PREFIX_PATH=/tmp/rexlib
           CIBW_ENVIRONMENT_WINDOWS: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
             CMAKE_PREFIX_PATH=C:/rexlib
