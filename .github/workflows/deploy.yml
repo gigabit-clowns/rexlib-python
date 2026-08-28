@@ -35,7 +35,14 @@ jobs:
           key: stubs-ubuntu-latest
           max-size: 1G
 
+      - name: Install rexlib
+        run: |
+          python -m pip install "cmake>=3.21" ninja
+          python scripts/install_rexlib.py --prefix "${{ runner.temp }}/rexlib"
+
       - name: Install with pip
+        env:
+          CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
         run: pip install . -v
 
       - name: Collect the generated stubs
@@ -82,21 +89,6 @@ jobs:
           name: type-stubs
           path: stubs
 
-      # Every interpreter on a platform rebuilds rexlib from source, so a
-      # compiler cache is what keeps that to a link instead of a full
-      # build. Linux builds happen inside a container, which reaches the
-      # runner's filesystem through cibuildwheel's /host mount, so the
-      # directory is cached directly rather than through ccache-action -
-      # the action would set up a cache on the runner that the container
-      # never writes to.
-      - name: Cache the compiler cache (Linux)
-        if: runner.os == 'Linux'
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ${{ github.workspace }}/.ccache
-          key: wheels-${{ matrix.os }}-${{ matrix.architectures }}-${{ github.run_id }}
-          restore-keys: wheels-${{ matrix.os }}-${{ matrix.architectures }}-
-
       # delvewheel resolves DLL dependencies via PATH, which never contains
       # the arm64 CRT when cross-compiling from an x64 host, so
       # msvcp140.dll is "not found" for the arm64 wheel unless it is
@@ -124,25 +116,28 @@ jobs:
         uses: pypa/cibuildwheel@1828c10ab37f080699c7b81cea34097c684a7074 # v4.2.0
         env:
           CIBW_ARCHS: "${{ matrix.architectures }}"
+          # rexlib is built and installed once per platform, before any
+          # wheel, so each interpreter only compiles the binding. Building
+          # it per wheel took ~22 minutes each and ran the x86_64 job into
+          # GitHub's six hour ceiling.
+          CIBW_BEFORE_ALL: >
+            python -m pip install "cmake>=3.21" ninja &&
+            python {project}/scripts/install_rexlib.py --prefix /opt/rexlib
+          CIBW_BEFORE_ALL_WINDOWS: >
+            python -m pip install "cmake>=3.21" ninja &&
+            python {project}/scripts/install_rexlib.py --prefix C:/rexlib
           # The build picks up ccache by itself when it finds one, so
           # nothing here forces a compiler launcher: doing that would make
           # every compile fail outright wherever ccache is missing.
           #
           # A platform-specific value replaces the general one rather than
-          # adding to it, so the shared part is repeated. /host and /tmp
-          # are container paths and belong to Linux alone.
+          # adding to it, so the shared part is repeated.
           CIBW_ENVIRONMENT: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
-          CIBW_ENVIRONMENT_LINUX: >-
+            CMAKE_PREFIX_PATH=/opt/rexlib
+          CIBW_ENVIRONMENT_WINDOWS: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
-            CCACHE_DIR=/host${{ github.workspace }}/.ccache
-            FETCHCONTENT_BASE_DIR=/tmp/rexlib-deps
-          # manylinux carries no ccache but does enable EPEL, and
-          # musllinux is Alpine. Failure is not fatal, since the build only
-          # uses a compiler cache if it finds one.
-          CIBW_BEFORE_ALL_LINUX: >
-            dnf install -y ccache || yum install -y ccache ||
-            apk add --no-cache ccache || echo "no ccache available"
+            CMAKE_PREFIX_PATH=C:/rexlib
           CIBW_TEST_SKIP: "*-win_arm64" # Windows on ARM cannot be tested, raises warning
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           # librexlib now ships inside the wheel, put there by this

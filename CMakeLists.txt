@@ -22,10 +22,20 @@ include(GNUInstallDirs)
 # Declare build options
 #option(REXLIB_PYTHON_BUILD_DOC "Build documentation" ON)
 
+# The version is the compatibility contract; the commit is only used by
+# the bootstrap, when nothing is installed.
+set(REXLIB_PYTHON_REXLIB_VERSION 0.1 CACHE STRING
+	"Version of rexlib this binding requires")
+set(REXLIB_PYTHON_REXLIB_COMMIT 474ba80d27c7ace6979b7193db53b3d481804885
+	CACHE STRING "Commit the bootstrap builds when rexlib is not installed")
+option(REXLIB_PYTHON_BOOTSTRAP
+	"Build and install rexlib into the build tree when it is not found" OFF)
+
 # Set the module path
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
-include(fetch_rexlib)
+include(find_rexlib)
+include(stage_rexlib)
 
 # Most of a build here is the C++ library, so use a compiler cache when one
 # is available.
@@ -51,13 +61,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-# Build rexlib and stage it inside the Python package. The wheel carries
-# the library it was built against rather than depending on a separate
-# one; the core repository ships no Python packaging of its own.
+# Find the rexlib installation this binding wraps and carry it inside
+# the wheel; the core repository ships no Python packaging of its own.
 if (NOT TARGET rexlib::rexlib)
-	fetch_rexlib(
-		COMMIT 474ba80d27c7ace6979b7193db53b3d481804885
-		DESTINATION rexlib
+	find_rexlib(
+		VERSION ${REXLIB_PYTHON_REXLIB_VERSION}
+		COMMIT ${REXLIB_PYTHON_REXLIB_COMMIT}
 	)
 endif()
 
@@ -66,6 +75,12 @@ if(SKBUILD_PLATLIB_DIR)
 else()
 	set(PYTHON_INSTALL_DIR "${Python_SITEARCH}")
 endif()
+
+# Anchors everything installed into the package, rexlib included.
+set(REXLIB_PYTHON_PACKAGE_DIR "${PYTHON_INSTALL_DIR}/rexlib")
+
+# Carry the rexlib installation inside the package.
+stage_rexlib("${REXLIB_PYTHON_PACKAGE_DIR}")
 
 # Set project-wide compilation options
 set(CMAKE_CXX_STANDARD 20)
@@ -87,7 +102,8 @@ endif()
 # Install python directory
 install(DIRECTORY
 	${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/
-	DESTINATION "${PYTHON_INSTALL_DIR}/rexlib"
+	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
+	PATTERN "__pycache__" EXCLUDE
 )
 
 # Type stubs are generated from the extension that was just installed, so
@@ -101,7 +117,7 @@ set(REXLIB_STUBS_DIR "" CACHE PATH
 	"Directory holding pre-generated stubs, for builds that cannot import \
 the extension they produce. Generated during the build when empty.")
 
-set(REXLIB_STUB_DESTINATION "${PYTHON_INSTALL_DIR}/rexlib/_binding")
+set(REXLIB_STUB_DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}/_binding")
 
 # Relative to the project, so that the same value works on a runner and
 # inside a build container, where the project is mounted elsewhere.

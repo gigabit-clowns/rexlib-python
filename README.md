@@ -6,7 +6,11 @@ To install this package, simply run:
 ```
 pip install rexlib
 ```
-The rexlib C++ library is built from source as part of this package and ships inside it, so there is nothing to install first. To install in development mode, from the root of this project, run:
+This package wraps an installation of the rexlib C++ library and ships a copy of it inside the wheel. Any installation will do; if you have none, `scripts/install_rexlib.py` builds one:
+```
+python scripts/install_rexlib.py --prefix ~/.local
+```
+To install in development mode, from the root of this project, run:
 ```
 CMAKE_BUILD_PARALLEL_LEVEL=$(nproc) pip install . --no-build-isolation -v -Ccmake.define.BUILD_TESTING=ON
 ```

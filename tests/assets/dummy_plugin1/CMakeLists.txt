@@ -27,5 +27,6 @@ get_filename_component(
 )
 install(
 	TARGETS ${TARGET_NAME}
-	LIBRARY DESTINATION ${MODULE_INSTALL_DIR}/rexlib-dummy-plugins/
+	LIBRARY DESTINATION
+		${REXLIB_PYTHON_PACKAGE_DIR}/${MODULE_INSTALL_DIR}/rexlib-dummy-plugins/
 )
