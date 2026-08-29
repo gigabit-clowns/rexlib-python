@@ -66,6 +66,7 @@ def build(
 	prefix: pathlib.Path,
 	build_dir: pathlib.Path,
 	parallel: int,
+	compiler_launcher: str | None,
 ) -> None:
 	"""Configure, build and install rexlib into the prefix."""
 	subprocess.run(
@@ -75,6 +76,14 @@ def build(
 			f"-DCMAKE_INSTALL_PREFIX={prefix}",
 			"-DCMAKE_INSTALL_LIBDIR=lib",  # never lib64, so staging is uniform
 			"-DBUILD_TESTING=OFF",
+			*(
+				[
+					f"-DCMAKE_C_COMPILER_LAUNCHER={compiler_launcher}",
+					f"-DCMAKE_CXX_COMPILER_LAUNCHER={compiler_launcher}",
+				]
+				if compiler_launcher
+				else []
+			),
 		],
 		check=True,
 	)
@@ -98,6 +107,10 @@ def main() -> None:
 		help="Compilers to run at once. Never unbounded; see the default.",
 	)
 	parser.add_argument(
+		"--compiler-launcher",
+		help="Wrapper for each compiler invocation, such as ccache.",
+	)
+	parser.add_argument(
 		"--build-dir", type=pathlib.Path,
 		help="Kept between runs so a compiler cache can be reused.",
 	)
@@ -114,7 +127,13 @@ def main() -> None:
 		source = download(commit, pathlib.Path(tmp))
 		build_dir = args.build_dir or pathlib.Path(tmp) / "build"
 		build_dir.mkdir(parents=True, exist_ok=True)
-		build(source, args.prefix.resolve(), build_dir, args.parallel)
+		build(
+			source,
+			args.prefix.resolve(),
+			build_dir,
+			args.parallel,
+			args.compiler_launcher,
+		)
 		if args.build_dir is None:
 			shutil.rmtree(build_dir, ignore_errors=True)
 

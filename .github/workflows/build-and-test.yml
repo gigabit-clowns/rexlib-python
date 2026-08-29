@@ -47,6 +47,7 @@ jobs:
         run: |
           python -m pip install "cmake>=3.21" ninja
           python scripts/install_rexlib.py --parallel 4 \
+            --compiler-launcher ccache \
             --prefix "${{ runner.temp }}/rexlib"
 
       - name: Configure and build with CMake
@@ -59,6 +60,8 @@ jobs:
           options: |
             CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
             CMAKE_PREFIX_PATH=${{ runner.temp }}/rexlib
+            CMAKE_C_COMPILER_LAUNCHER=ccache
+            CMAKE_CXX_COMPILER_LAUNCHER=ccache
           run-build: true
           build-args: --config ${{ env.BUILD_TYPE }}
 
@@ -113,7 +116,7 @@ jobs:
       - name: Install with pip
         env:
           CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
-        run: pip install .[test] -v -Ccmake.define.BUILD_TESTING=ON
+        run: pip install .[test] -v -Ccmake.define.REXLIB_PYTHON_BUILD_TESTING=ON
 
       - name: Run ruff
         run: ruff check .

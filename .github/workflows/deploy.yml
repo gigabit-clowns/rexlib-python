@@ -39,6 +39,7 @@ jobs:
         run: |
           python -m pip install "cmake>=3.21" ninja
           python scripts/install_rexlib.py --parallel 4 \
+            --compiler-launcher ccache \
             --prefix "${{ runner.temp }}/rexlib"
 
       - name: Install with pip
@@ -114,17 +115,13 @@ jobs:
           CIBW_BEFORE_ALL_WINDOWS: >
             python -m pip install "cmake>=3.21" ninja &&
             python {project}/scripts/install_rexlib.py --parallel 4 --prefix C:/rexlib
-          # The build picks up ccache by itself when it finds one, so
-          # nothing here forces a compiler launcher: doing that would make
-          # every compile fail outright wherever ccache is missing.
-          #
           # A platform-specific value replaces the general one rather than
           # adding to it, so the shared part is repeated.
           CIBW_ENVIRONMENT: >-
-            SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
+            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs"
             CMAKE_PREFIX_PATH=/tmp/rexlib
           CIBW_ENVIRONMENT_WINDOWS: >-
-            SKBUILD_CMAKE_DEFINE="REXLIB_STUBS_DIR=stubs"
+            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs"
             CMAKE_PREFIX_PATH=C:/rexlib
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           # librexlib now ships inside the wheel, put there by this
