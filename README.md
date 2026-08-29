@@ -6,9 +6,17 @@ To install this package, simply run:
 ```
 pip install rexlib
 ```
-This package wraps an installation of the rexlib C++ library and ships a copy of it inside the wheel. Any installation satisfying the version it asks for will do. If you have none, build one:
+This package wraps an installation of the rexlib C++ library and ships a copy of it inside the wheel. Any installation satisfying the version it asks for will do.
+
+The rexlib this repository is developed against is the `external/rexlib` submodule, so clone with it:
 ```
-python scripts/install_rexlib.py --prefix ~/.local
+git clone --recurse-submodules https://github.com/gigabit-clowns/rexlib-python.git
+```
+If you have no rexlib installed, build the submodule into a prefix:
+```
+cmake -S external/rexlib -B build/rexlib -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=~/.local -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF
+cmake --build build/rexlib --target install --parallel $(nproc)
 ```
 Then, to install in development mode from the root of this project:
 ```
