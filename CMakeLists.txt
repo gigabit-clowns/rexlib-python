@@ -53,10 +53,6 @@ requires importing the extension this build produces")
 
 set(REXLIB_PYTHON_REXLIB_VERSION 0.1 CACHE STRING
 	"Version of rexlib this binding requires")
-set(REXLIB_PYTHON_REXLIB_COMMIT 474ba80d27c7ace6979b7193db53b3d481804885
-	CACHE STRING "Commit the bootstrap builds when rexlib is not installed")
-option(REXLIB_PYTHON_BOOTSTRAP
-	"Build and install rexlib into the build tree when it is not found" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
@@ -81,10 +77,7 @@ FetchContent_MakeAvailable(pybind11)
 
 # The guard leaves a superbuild that already provides the target alone.
 if(NOT TARGET rexlib::rexlib)
-	find_rexlib(
-		VERSION ${REXLIB_PYTHON_REXLIB_VERSION}
-		COMMIT ${REXLIB_PYTHON_REXLIB_COMMIT}
-	)
+	find_rexlib(VERSION ${REXLIB_PYTHON_REXLIB_VERSION})
 endif()
 
 # ---------------------------------------------------------------------------

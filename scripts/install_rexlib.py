@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
@@ -22,16 +21,10 @@ import tempfile
 import urllib.request
 
 ARCHIVE = "https://github.com/gigabit-clowns/rexlib/archive/{commit}.tar.gz"
-COMMIT = re.compile(r"REXLIB_PYTHON_REXLIB_COMMIT\s+([0-9a-f]{7,40})")
 
-
-def read_pinned_commit(project: pathlib.Path) -> str:
-	"""Read the pinned rexlib commit out of the project's CMakeLists.txt."""
-	text = (project / "CMakeLists.txt").read_text()
-	match = COMMIT.search(text)
-	if not match:
-		raise SystemExit("No REXLIB_PYTHON_REXLIB_COMMIT in CMakeLists.txt")
-	return match.group(1)
+# The rexlib this binding is developed against. Only a default: any
+# installation satisfying the version CMakeLists.txt asks for will do.
+COMMIT = "474ba80d27c7ace6979b7193db53b3d481804885"
 
 
 def download(commit: str, into: pathlib.Path) -> pathlib.Path:
@@ -116,8 +109,7 @@ def main() -> None:
 	)
 	args = parser.parse_args()
 
-	project = pathlib.Path(__file__).resolve().parent.parent
-	commit = args.commit or read_pinned_commit(project)
+	commit = args.commit or COMMIT
 
 	if (args.prefix / "lib" / "cmake" / "rexlib").is_dir():
 		print(f"rexlib already installed in {args.prefix}", file=sys.stderr)
