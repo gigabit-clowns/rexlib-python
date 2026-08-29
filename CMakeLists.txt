@@ -11,7 +11,6 @@ project(
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(CTest)
-include(find_rexlib)
 include(stage_rexlib)
 include(python_stubs)
 
@@ -75,10 +74,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-# The guard leaves a superbuild that already provides the target alone.
-if(NOT TARGET rexlib::rexlib)
-	find_rexlib(VERSION ${REXLIB_PYTHON_REXLIB_VERSION})
-endif()
+find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} REQUIRED)
 
 # ---------------------------------------------------------------------------
 # The package
