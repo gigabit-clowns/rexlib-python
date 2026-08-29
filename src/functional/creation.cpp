@@ -25,6 +25,24 @@ namespace functional
 
 namespace py = pybind11;
 
+// Kept out of the dispatch below, which would otherwise build this message
+// once per numerical type. Nothing here depends on the type being cast to.
+[[noreturn]]
+static void throw_scalar_cast_error(numerical_type type, const py::object &value)
+{
+	const auto given =
+		py::str(py::type::of(value).attr("__name__")).cast<std::string>();
+	auto message =
+		"cannot use a '" + given + "' as a " + to_string(type) + " value";
+	if (type == numerical_type::char8)
+	{
+		message +=
+			"; char8 holds characters, so it takes a "
+			"single-character str or bytes";
+	}
+	throw py::type_error(message);
+}
+
 static scalar_value make_scalar_value(numerical_type type, const py::object &value)
 {
 	return dispatch_numerical_types(
@@ -37,18 +55,7 @@ static scalar_value make_scalar_value(numerical_type type, const py::object &val
 			}
 			catch (const py::cast_error&)
 			{
-				const auto given =
-					py::str(py::type::of(value).attr("__name__")).cast<std::string>();
-				auto message =
-					"cannot use a '" + given + "' as a " + to_string(type) +
-					" value";
-				if (type == numerical_type::char8)
-				{
-					message +=
-						"; char8 holds characters, so it takes a "
-						"single-character str or bytes";
-				}
-				throw py::type_error(message);
+				throw_scalar_cast_error(type, value);
 			}
 		},
 		type
