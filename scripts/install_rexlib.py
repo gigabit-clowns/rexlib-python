@@ -22,11 +22,6 @@ import urllib.request
 
 ARCHIVE = "https://github.com/gigabit-clowns/rexlib/archive/{commit}.tar.gz"
 
-# The rexlib this binding is developed against. Only a default: any
-# installation satisfying the version CMakeLists.txt asks for will do.
-COMMIT = "474ba80d27c7ace6979b7193db53b3d481804885"
-
-
 def download(commit: str, into: pathlib.Path) -> pathlib.Path:
 	"""Download and unpack a rexlib source archive, returning its root."""
 	archive = into / "rexlib.tar.gz"
@@ -34,24 +29,6 @@ def download(commit: str, into: pathlib.Path) -> pathlib.Path:
 	with tarfile.open(archive) as tar:
 		tar.extractall(into)
 	return next(p for p in into.iterdir() if p.is_dir())
-
-
-def default_parallelism() -> int:
-	"""How many compilers to run at once.
-
-	Never unbounded, which is what `cmake --build --parallel` without a
-	number means for a Makefile generator, and which exhausts a CI runner
-	here: rexlib's heaviest translation units peak around 2.5 GB each, so
-	memory runs out long before cores do.
-	"""
-	jobs = os.cpu_count() or 1
-	try:
-		gigabytes = (
-			os.sysconf("SC_PHYS_PAGES") * os.sysconf("SC_PAGE_SIZE") / 1e9
-		)
-	except (ValueError, OSError, AttributeError):
-		return jobs
-	return max(1, min(jobs, int(gigabytes // 2.5)))
 
 
 def build(
@@ -94,10 +71,10 @@ def main() -> None:
 	"""Parse the arguments and install rexlib."""
 	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument("--prefix", required=True, type=pathlib.Path)
-	parser.add_argument("--commit", help="Defaults to the CMakeLists pin.")
+	parser.add_argument("--commit", required=True)
 	parser.add_argument(
-		"--parallel", type=int, default=default_parallelism(),
-		help="Compilers to run at once. Never unbounded; see the default.",
+		"--parallel", type=int, default=4,
+		help="Compilers to run at once.",
 	)
 	parser.add_argument(
 		"--compiler-launcher",
@@ -109,7 +86,7 @@ def main() -> None:
 	)
 	args = parser.parse_args()
 
-	commit = args.commit or COMMIT
+	commit = args.commit
 
 	if (args.prefix / "lib" / "cmake" / "rexlib").is_dir():
 		print(f"rexlib already installed in {args.prefix}", file=sys.stderr)
