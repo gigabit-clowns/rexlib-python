@@ -72,10 +72,11 @@ void define_version(version_class &c, pybind11::module_ &m)
 			}
 		));
 
-	// The version of the rexlib shared library this binding is running
-	// against, which is versioned independently of the binding itself.
-	// rexlib.__version__ is the binding's own.
-	m.def("get_library_version", &get_library_version);
+	// The version of the rexlib shared library this binding runs against,
+	// which is versioned independently of the binding itself. The
+	// binding's own is rexlib.__version__. Read once: the library is
+	// loaded when this module is, and cannot change afterwards.
+	m.attr("rexlib_version") = get_library_version();
 }
 
 } // namespace rexlib

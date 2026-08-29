@@ -131,7 +131,9 @@ def test_binding_version_is_the_distribution_version():
     pytest.skip("rexlib is on the path but not installed")
   assert rexlib.__version__ == installed
 
-def test_reports_the_library_version():
-  v = rexlib.get_library_version()
+def test_reports_the_rexlib_version():
+  # The C++ library's, versioned independently of this binding.
+  v = rexlib.rexlib_version
   assert isinstance(v, rexlib.Version)
   assert (v.major, v.minor, v.patch) >= (0, 1, 0)
+  assert str(v) == f"{v.major}.{v.minor}.{v.patch}"
