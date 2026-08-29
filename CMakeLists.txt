@@ -104,6 +104,18 @@ install(DIRECTORY
 	${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/
 	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
 	PATTERN "__pycache__" EXCLUDE
+	PATTERN "*.in" EXCLUDE
+)
+
+# Same source as the wheel metadata, so the two cannot drift.
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/_version.py.in
+	${CMAKE_CURRENT_BINARY_DIR}/_version.py
+	@ONLY
+)
+install(
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/_version.py
+	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
 )
 
 # Type stubs are generated from the extension that was just installed, so

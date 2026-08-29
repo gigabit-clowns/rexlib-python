@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import pickle
+from importlib import metadata
 
 import pytest
 
@@ -119,3 +120,18 @@ def test_pickle():
   pickled = pickle.dumps(v)
   unpickled = pickle.loads(pickled)
   assert v == unpickled
+
+def test_binding_version_is_the_distribution_version():
+  # Not the C++ library's: the two are versioned independently.
+  assert isinstance(rexlib.__version__, str)
+
+  try:
+    installed = metadata.version("rexlib")
+  except metadata.PackageNotFoundError:
+    pytest.skip("rexlib is on the path but not installed")
+  assert rexlib.__version__ == installed
+
+def test_reports_the_library_version():
+  v = rexlib.get_library_version()
+  assert isinstance(v, rexlib.Version)
+  assert (v.major, v.minor, v.patch) >= (0, 1, 0)

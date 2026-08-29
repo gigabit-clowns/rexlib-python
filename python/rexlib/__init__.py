@@ -6,8 +6,10 @@ from __future__ import annotations
 # search path, which importing the extension depends on.
 from . import _paths as _paths
 
+from ._version import __version__ as __version__
+
 from ._binding import (
-	__doc__ as __doc__, __version__ as __version__,
+	__doc__ as __doc__,
 	hardware as hardware,
 	numerical as numerical, dispatch as dispatch,
 	ServiceCatalog as ServiceCatalog,
@@ -15,6 +17,7 @@ from ._binding import (
 	get_plugin_search_path as get_plugin_search_path,
 	get_default_plugin_directory as get_default_plugin_directory,
 	Version as Version,
+	get_library_version as get_library_version,
 )
 from ._catalog import get_default_catalog as get_default_catalog
 from ._context import get_active_execution_context as get_active_execution_context

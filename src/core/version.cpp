@@ -3,6 +3,7 @@
 #include "version.hpp"
 
 #include <rexlib/core/version.hpp>
+#include <rexlib/core/library_version.hpp>
 
 #include <sstream>
 
@@ -34,7 +35,7 @@ version_class declare_version(pybind11::module_ &m)
 	return version_class(m, "Version");
 }
 
-void define_version(version_class &c)
+void define_version(version_class &c, pybind11::module_ &m)
 {
 	c
 		.def(
@@ -70,6 +71,11 @@ void define_version(version_class &c)
 				);
 			}
 		));
+
+	// The version of the rexlib shared library this binding is running
+	// against, which is versioned independently of the binding itself.
+	// rexlib.__version__ is the binding's own.
+	m.def("get_library_version", &get_library_version);
 }
 
 } // namespace rexlib

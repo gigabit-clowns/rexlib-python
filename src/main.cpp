@@ -12,22 +12,9 @@
 
 #include <pybind11/pybind11.h>
 
-#include <rexlib/core/library_version.hpp>
-
-#include <sstream>
-
 using namespace rexlib;
 
-static std::string version_to_string(version ver)
-{
-	std::ostringstream oss;
-	oss << ver;
-	return oss.str();
-}
-
 PYBIND11_MODULE(_binding, m) {
-	m.attr("__version__") = version_to_string(get_library_version());
-
 	auto version = declare_version(m);
 	auto plugin = declare_plugin(m);
 	auto plugin_manager = declare_plugin_manager(m);
@@ -48,7 +35,7 @@ PYBIND11_MODULE(_binding, m) {
 	auto functional_module = m.def_submodule("functional");
 	functional::bind_functional(functional_module);
 
-	define_version(version);
+	define_version(version, m);
 	define_plugin(plugin);
 	define_plugin_manager(plugin_manager, m);
 	define_service_catalog(service_catalog);
