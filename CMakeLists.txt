@@ -53,6 +53,16 @@ endif()
 # Find Python
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
+# When cross-compiling, the interpreter that runs the build is not the one
+# the extension is for, so pybind11's suffix - taken from whichever Python
+# it finds - names the module for the host. cibuildwheel publishes the
+# target's suffix here. It is the whole extension, .pyd or .so included, so
+# this needs no per-platform case and covers every target, not just Windows
+# on ARM. Set before pybind11 is brought in, which is when it decides.
+if(DEFINED ENV{SETUPTOOLS_EXT_SUFFIX})
+	set(PYTHON_MODULE_EXTENSION "$ENV{SETUPTOOLS_EXT_SUFFIX}")
+endif()
+
 # Obtain pybind11
 FetchContent_Declare(
 	pybind11
