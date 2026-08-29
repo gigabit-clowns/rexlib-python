@@ -106,7 +106,7 @@ static array py_full(
 }
 
 static array py_copy(
-	array &source,
+	const array &source,
 	const execution_context &context,
 	std::optional<array*> out
 )

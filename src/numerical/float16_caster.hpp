@@ -19,7 +19,6 @@ namespace detail
 template <>
 struct type_caster<rexlib::float16_t>
 {
-public:
 	PYBIND11_TYPE_CASTER(rexlib::float16_t, const_name("float16_t"));
 
 	bool load(handle src, bool convert)

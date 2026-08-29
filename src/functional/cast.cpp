@@ -19,7 +19,7 @@ namespace functional
 namespace py = pybind11;
 
 static array py_cast_copy(
-	array &input,
+	const array &input,
 	numerical_type target_type,
 	const execution_context &context,
 	std::optional<array*> out

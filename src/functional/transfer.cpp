@@ -19,7 +19,7 @@ namespace functional
 namespace py = pybind11;
 
 static array py_transfer_copy(
-	array &input,
+	const array &input,
 	memory_resource_affinity affinity,
 	const execution_context &context,
 	std::optional<array*> out
@@ -28,12 +28,12 @@ static array py_transfer_copy(
 	return rexlib::transfer_copy(input, affinity, context, out.value_or(nullptr));
 }
 
-static array py_to_device_copy(array &input, const execution_context &context, std::optional<array*> out)
+static array py_to_device_copy(const array &input, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::to_device_copy(input, context, out.value_or(nullptr));
 }
 
-static array py_to_host_copy(array &input, const execution_context &context, std::optional<array*> out)
+static array py_to_host_copy(const array &input, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::to_host_copy(input, context, out.value_or(nullptr));
 }

@@ -17,37 +17,37 @@ namespace functional
 
 namespace py = pybind11;
 
-static array py_add(array &x, array &y, const execution_context &context, std::optional<array*> out)
+static array py_add(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::add(x, y, context, out.value_or(nullptr));
 }
 
-static array py_subtract(array &x, array &y, const execution_context &context, std::optional<array*> out)
+static array py_subtract(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::subtract(x, y, context, out.value_or(nullptr));
 }
 
-static array py_negate(array &x, const execution_context &context, std::optional<array*> out)
+static array py_negate(const array &x, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::negate(x, context, out.value_or(nullptr));
 }
 
-static array py_abs(array &x, const execution_context &context, std::optional<array*> out)
+static array py_abs(const array &x, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::abs(x, context, out.value_or(nullptr));
 }
 
-static array py_multiply(array &x, array &y, const execution_context &context, std::optional<array*> out)
+static array py_multiply(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::multiply(x, y, context, out.value_or(nullptr));
 }
 
-static array py_divide(array &x, array &y, const execution_context &context, std::optional<array*> out)
+static array py_divide(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::divide(x, y, context, out.value_or(nullptr));
 }
 
-static array py_modulo(array &x, array &y, const execution_context &context, std::optional<array*> out)
+static array py_modulo(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
 	return rexlib::modulo(x, y, context, out.value_or(nullptr));
 }
