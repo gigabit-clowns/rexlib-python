@@ -12,6 +12,18 @@ cmake_minimum_required(VERSION 3.21)
 # pip would turn each one into another full copy of a 50 MB file; the
 # extension links the SONAME, so the real file is enough.
 function(stage_rexlib DESTINATION)
+	# Only a rexlib found through find_package has a prefix to copy. A
+	# super-build supplies the target straight from its own build tree, and
+	# rexlib_DIR is what tells the two apart: without this, the install rule
+	# below expands to "/" and copies the filesystem root.
+	if(NOT rexlib_DIR)
+		message(STATUS
+			"rexlib did not come from find_package; not staging it into the "
+			"Python package"
+		)
+		return()
+	endif()
+
 	get_target_property(
 		INCLUDE_DIRS rexlib::rexlib INTERFACE_INCLUDE_DIRECTORIES
 	)
