@@ -11,7 +11,6 @@ project(
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(CTest)
-include(stage_rexlib)
 include(python_stubs)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
@@ -47,6 +46,24 @@ requires importing the extension this build produces")
 
 set(REXLIB_PYTHON_REXLIB_VERSION 0.1 CACHE STRING
 	"Version of rexlib this binding requires")
+
+# A prefix is copied in whole, so it must hold rexlib and nothing else, and
+# no symlinks - a wheel stores those as another copy of the file. rexlib's
+# rexlib_runtime and rexlib_development components produce exactly that.
+set(REXLIB_PYTHON_STAGE_PREFIX "" CACHE PATH
+	"rexlib installation to carry inside the package. Empty ships none, \
+leaving the package to find rexlib on the system")
+
+# Installing writes into an interpreter's site-packages, which a superbuild
+# that merely builds this project has no business doing.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+	set(REXLIB_PYTHON_INSTALL_DEFAULT ON)
+else()
+	set(REXLIB_PYTHON_INSTALL_DEFAULT OFF)
+endif()
+option(REXLIB_PYTHON_INSTALL "Generate install rules for the Python package"
+	${REXLIB_PYTHON_INSTALL_DEFAULT})
+unset(REXLIB_PYTHON_INSTALL_DEFAULT)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
@@ -85,33 +102,41 @@ if(REXLIB_PYTHON_BUILD_TESTING)
 	add_subdirectory(tests)
 endif()
 
-install(
-	DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/
-	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
-	PATTERN "__pycache__" EXCLUDE
-	PATTERN "*.in" EXCLUDE
-)
+if(REXLIB_PYTHON_INSTALL)
+	install(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/
+		DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
+		PATTERN "__pycache__" EXCLUDE
+		PATTERN "*.in" EXCLUDE
+	)
 
-# Same source as the wheel metadata, so the two cannot drift.
-configure_file(
-	${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/_version.py.in
-	${CMAKE_CURRENT_BINARY_DIR}/_version.py
-	@ONLY
-)
-install(
-	FILES ${CMAKE_CURRENT_BINARY_DIR}/_version.py
-	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
-)
+	# Same source as the wheel metadata, so the two cannot drift.
+	configure_file(
+		${CMAKE_CURRENT_SOURCE_DIR}/python/rexlib/_version.py.in
+		${CMAKE_CURRENT_BINARY_DIR}/_version.py
+		@ONLY
+	)
+	install(
+		FILES ${CMAKE_CURRENT_BINARY_DIR}/_version.py
+		DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
+	)
 
-# Carries the rexlib installation this was built against inside the
-# package, so the wheel is self-contained.
-stage_rexlib("${REXLIB_PYTHON_PACKAGE_DIR}")
+	# Carries a rexlib installation inside the package, so the wheel is
+	# self-contained. Mirroring the prefix keeps rexlib's own layout, which its
+	# package config resolves against and beside which plugins are discovered.
+	if(REXLIB_PYTHON_STAGE_PREFIX)
+		install(
+			DIRECTORY "${REXLIB_PYTHON_STAGE_PREFIX}/"
+			DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
+		)
+	endif()
 
-# After everything the import needs is in place.
-install_python_stubs(
-	MODULE rexlib._binding
-	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}/_binding"
-	SEARCH_PATH "${REXLIB_PYTHON_INSTALL_DIR}"
-	STUBS_DIR "${REXLIB_PYTHON_STUBS_DIR}"
-	GENERATOR "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py"
-)
+	# After everything the import needs is in place.
+	install_python_stubs(
+		MODULE rexlib._binding
+		DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}/_binding"
+		SEARCH_PATH "${REXLIB_PYTHON_INSTALL_DIR}"
+		STUBS_DIR "${REXLIB_PYTHON_STUBS_DIR}"
+		GENERATOR "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py"
+	)
+endif()

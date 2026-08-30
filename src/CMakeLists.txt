@@ -37,8 +37,10 @@ else()
 endif()
 
 # Install library's binary files and headers
-install(
-	TARGETS ${TARGET_NAME}
-	LIBRARY 
-	DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
-)
+if(REXLIB_PYTHON_INSTALL)
+	install(
+		TARGETS ${TARGET_NAME}
+		LIBRARY
+		DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}"
+	)
+endif()
