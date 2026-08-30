@@ -56,7 +56,12 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           cmake --build "${{ runner.temp }}/rexlib-build" \
-            --config Release --target install --parallel 4
+            --config Release --parallel 4
+          # Everything except the namelink, which a wheel cannot hold.
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_runtime
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_development
 
       - name: Configure and build with CMake
         uses: threeal/cmake-action@725d1314ccf9ea922805d7e3f9d9bcbca892b406 # v2
@@ -126,12 +131,20 @@ jobs:
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_TESTING=OFF
           cmake --build "${{ runner.temp }}/rexlib-build" \
-            --config Release --target install --parallel 4
+            --config Release --parallel 4
+          # Everything except the namelink, which a wheel cannot hold.
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_runtime
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_development
 
       - name: Install with pip
         env:
           CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
-        run: pip install .[test] -v -Ccmake.define.REXLIB_PYTHON_BUILD_TESTING=ON
+        run: |
+          pip install .[test] -v \
+            -Ccmake.define.REXLIB_PYTHON_BUILD_TESTING=ON \
+            -Ccmake.define.REXLIB_PYTHON_STAGE_PREFIX="${{ runner.temp }}/rexlib"
 
       - name: Run ruff
         run: ruff check .

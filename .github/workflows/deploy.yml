@@ -48,12 +48,19 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           cmake --build "${{ runner.temp }}/rexlib-build" \
-            --config Release --target install --parallel 4
+            --config Release --parallel 4
+          # Everything except the namelink, which a wheel cannot hold.
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_runtime
+          cmake --install "${{ runner.temp }}/rexlib-build" \
+            --config Release --component rexlib_development
 
       - name: Install with pip
         env:
           CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
-        run: pip install . -v
+        run: |
+          pip install . -v \
+            -Ccmake.define.REXLIB_PYTHON_STAGE_PREFIX="${{ runner.temp }}/rexlib"
 
       - name: Collect the generated stubs
         run: |
@@ -125,21 +132,29 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/rexlib
             -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF &&
             cmake --build /tmp/rexlib-build --config Release
-            --target install --parallel 4
+            --parallel 4 &&
+            cmake --install /tmp/rexlib-build --config Release
+            --component rexlib_runtime &&
+            cmake --install /tmp/rexlib-build --config Release
+            --component rexlib_development
           CIBW_BEFORE_ALL_WINDOWS: >
             python -m pip install "cmake>=3.18" ninja &&
             cmake -S {project}/external/rexlib -B C:/rexlib-build
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=C:/rexlib
             -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF &&
             cmake --build C:/rexlib-build --config Release
-            --target install --parallel 4
+            --parallel 4 &&
+            cmake --install C:/rexlib-build --config Release
+            --component rexlib_runtime &&
+            cmake --install C:/rexlib-build --config Release
+            --component rexlib_development
           # A platform-specific value replaces the general one rather than
           # adding to it, so the shared part is repeated.
           CIBW_ENVIRONMENT: >-
-            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs"
+            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs;REXLIB_PYTHON_STAGE_PREFIX=/tmp/rexlib"
             CMAKE_PREFIX_PATH=/tmp/rexlib
           CIBW_ENVIRONMENT_WINDOWS: >-
-            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs"
+            SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs;REXLIB_PYTHON_STAGE_PREFIX=C:/rexlib"
             CMAKE_PREFIX_PATH=C:/rexlib
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           # librexlib now ships inside the wheel, put there by this
