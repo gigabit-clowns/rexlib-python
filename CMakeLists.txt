@@ -18,11 +18,6 @@ find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 # ---------------------------------------------------------------------------
 # Options
-#
-# Everything a packaging tool, a CI job or a distributor needs to influence
-# is one of these. Nothing below asks who is driving the build. Where a
-# default is taken from the environment it is a default only, and setting
-# the option wins.
 # ---------------------------------------------------------------------------
 
 # Its own option rather than BUILD_TESTING: dependencies of dependencies
