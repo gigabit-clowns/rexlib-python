@@ -36,7 +36,7 @@ void define_device_backend(device_backend_class &c)
 		)
 		.def(
 			"get_device_properties",
-			[](const device_backend &self, std::size_t id) -> device_properties
+			[](const device_backend &self, std::size_t id)
 			{
 				device_properties props;
 				if (!self.get_device_properties(id, props)) {

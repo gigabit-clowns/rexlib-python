@@ -46,7 +46,7 @@ static void throw_scalar_cast_error(numerical_type type, const py::object &value
 static scalar_value make_scalar_value(numerical_type type, const py::object &value)
 {
 	return dispatch_numerical_types(
-		[&value, type](auto tag) -> scalar_value
+		[&value, type](auto tag)
 		{
 			using T = typename decltype(tag)::type;
 			try

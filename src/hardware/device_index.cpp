@@ -66,7 +66,7 @@ void define_device_index(device_index_class &c)
 		.def_property_readonly("backend", &device_index::get_backend_name)
 		.def_property_readonly("id", &device_index::get_device_id)
 		.def(py::pickle(
-			[](const device_index &l) -> pybind11::tuple // __getstate__
+			[](const device_index &l) // __getstate__
 			{
 				return py::make_tuple(
 					l.get_backend_name(),
@@ -74,7 +74,7 @@ void define_device_index(device_index_class &c)
 				);
 }
 ,
-			[](py::tuple t) -> device_index  // __setstate__
+			[](py::tuple t)  // __setstate__
 			{
 				return device_index(
 					t[0].cast<std::string>(),

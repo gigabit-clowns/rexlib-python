@@ -46,7 +46,7 @@ void define_device_properties(device_properties_class &c)
 			&device_properties::set_optimal_data_alignment
 		)
 		.def(py::pickle(
-			[](const device_properties &l) -> pybind11::tuple // __getstate__
+			[](const device_properties &l) // __getstate__
 			{
 				return py::make_tuple(
 					l.get_type(),
@@ -57,7 +57,7 @@ void define_device_properties(device_properties_class &c)
 				);
 }
 ,
-			[](py::tuple t) -> device_properties  // __setstate__
+			[](py::tuple t)  // __setstate__
 			{
 				device_properties result;
 				result.set_type(t[0].cast<device_type>());

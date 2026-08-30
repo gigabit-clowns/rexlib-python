@@ -47,7 +47,7 @@ void define_device_manager(device_manager_class &c, pybind11::module_ &m)
 		)
 		.def_property_readonly(
 			"devices",
-			[](const device_manager &self) -> std::vector<device_index>
+			[](const device_manager &self)
 			{
 				std::vector<device_index> indices;
 				self.enumerate_devices(indices);
@@ -56,7 +56,7 @@ void define_device_manager(device_manager_class &c, pybind11::module_ &m)
 		)
 		.def(
 			"get_device_properties",
-			[](const device_manager &self, const device_index &index) -> device_properties
+			[](const device_manager &self, const device_index &index)
 			{
 				device_properties desc;
 				if(!self.get_device_properties(index, desc)) {

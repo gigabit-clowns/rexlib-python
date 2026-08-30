@@ -62,7 +62,7 @@ void define_version(version_class &c, pybind11::module_ &m)
 					v.get_patch()
 				);
 			},
-			[](py::tuple t) -> version  // __setstate__
+			[](py::tuple t)  // __setstate__
 			{
 				return version(
 					t[0].cast<int>(),
