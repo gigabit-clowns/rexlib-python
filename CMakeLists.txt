@@ -54,16 +54,7 @@ set(REXLIB_PYTHON_STAGE_PREFIX "" CACHE PATH
 	"rexlib installation to carry inside the package. Empty ships none, \
 leaving the package to find rexlib on the system")
 
-# Installing writes into an interpreter's site-packages, which a superbuild
-# that merely builds this project has no business doing.
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-	set(REXLIB_PYTHON_INSTALL_DEFAULT ON)
-else()
-	set(REXLIB_PYTHON_INSTALL_DEFAULT OFF)
-endif()
-option(REXLIB_PYTHON_INSTALL "Generate install rules for the Python package"
-	${REXLIB_PYTHON_INSTALL_DEFAULT})
-unset(REXLIB_PYTHON_INSTALL_DEFAULT)
+option(REXLIB_PYTHON_INSTALL "Generate install rules for the Python package" ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
