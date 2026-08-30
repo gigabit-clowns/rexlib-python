@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.18)
 
 # Installs type stubs for an extension module.
 #
@@ -17,15 +17,18 @@ function(install_python_stubs)
 					--module \"${arg_MODULE}\"
 					--search-path \"${arg_SEARCH_PATH}\"
 					--output \"${arg_DESTINATION}\"
-				COMMAND_ERROR_IS_FATAL ANY
+				RESULT_VARIABLE RESULT
 			)
+			if(NOT RESULT EQUAL 0)
+				message(FATAL_ERROR \"Stub generation failed: \${RESULT}\")
+			endif()
 		")
 		return()
 	endif()
 
-	cmake_path(ABSOLUTE_PATH arg_STUBS_DIR
-		BASE_DIRECTORY "${PROJECT_SOURCE_DIR}"
-		NORMALIZE
+	get_filename_component(arg_STUBS_DIR
+		"${arg_STUBS_DIR}" ABSOLUTE
+		BASE_DIR "${PROJECT_SOURCE_DIR}"
 	)
 
 	# Shipping none of them would go unnoticed until somebody wondered why

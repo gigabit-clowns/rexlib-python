@@ -39,7 +39,7 @@ jobs:
 
       - name: Install rexlib
         run: |
-          python -m pip install "cmake>=3.21" ninja
+          python -m pip install "cmake>=3.18" ninja
           cmake -S external/rexlib -B "${{ runner.temp }}/rexlib-build" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/rexlib" \
@@ -120,14 +120,14 @@ jobs:
           # it per wheel took ~22 minutes each and ran the x86_64 job into
           # GitHub's six hour ceiling.
           CIBW_BEFORE_ALL: >
-            python -m pip install "cmake>=3.21" ninja &&
+            python -m pip install "cmake>=3.18" ninja &&
             cmake -S {project}/external/rexlib -B /tmp/rexlib-build
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/rexlib
             -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF &&
             cmake --build /tmp/rexlib-build --config Release
             --target install --parallel 4
           CIBW_BEFORE_ALL_WINDOWS: >
-            python -m pip install "cmake>=3.21" ninja &&
+            python -m pip install "cmake>=3.18" ninja &&
             cmake -S {project}/external/rexlib -B C:/rexlib-build
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=C:/rexlib
             -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF &&

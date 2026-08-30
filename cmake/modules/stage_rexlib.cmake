@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.18)
 
 # Copies the rexlib installation into the Python package, mirroring an
 # ordinary prefix one level down: lib/, lib/cmake/rexlib/, include/.
