@@ -72,7 +72,7 @@ jobs:
           cxx-compiler: ${{ matrix.compiler.cxx }}
           options: |
             CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-            CMAKE_PREFIX_PATH=${{ runner.temp }}/rexlib
+            rexlib_ROOT=${{ runner.temp }}/rexlib
             CMAKE_C_COMPILER_LAUNCHER=ccache
             CMAKE_CXX_COMPILER_LAUNCHER=ccache
           run-build: true
@@ -140,7 +140,7 @@ jobs:
 
       - name: Install with pip
         env:
-          CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
+          rexlib_ROOT: ${{ runner.temp }}/rexlib
         run: |
           pip install .[test] -v \
             -Ccmake.define.REXLIB_PYTHON_BUILD_TESTING=ON \

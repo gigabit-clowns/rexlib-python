@@ -57,7 +57,7 @@ jobs:
 
       - name: Install with pip
         env:
-          CMAKE_PREFIX_PATH: ${{ runner.temp }}/rexlib
+          rexlib_ROOT: ${{ runner.temp }}/rexlib
         run: |
           pip install . -v \
             -Ccmake.define.REXLIB_PYTHON_STAGE_PREFIX="${{ runner.temp }}/rexlib"
@@ -152,10 +152,10 @@ jobs:
           # adding to it, so the shared part is repeated.
           CIBW_ENVIRONMENT: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs;REXLIB_PYTHON_STAGE_PREFIX=/tmp/rexlib"
-            CMAKE_PREFIX_PATH=/tmp/rexlib
+            rexlib_ROOT=/tmp/rexlib
           CIBW_ENVIRONMENT_WINDOWS: >-
             SKBUILD_CMAKE_DEFINE="REXLIB_PYTHON_STUBS_DIR=stubs;REXLIB_PYTHON_STAGE_PREFIX=C:/rexlib"
-            CMAKE_PREFIX_PATH=C:/rexlib
+            rexlib_ROOT=C:/rexlib
           CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
           # librexlib now ships inside the wheel, put there by this
           # project's install rules. auditwheel would otherwise re-vendor
