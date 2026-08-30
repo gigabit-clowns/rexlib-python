@@ -74,7 +74,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} REQUIRED)
+if(NOT TARGET rexlib::rexlib)
+	find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} REQUIRED)
+endif()
 
 # ---------------------------------------------------------------------------
 # The package
