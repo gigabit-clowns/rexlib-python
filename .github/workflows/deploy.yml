@@ -76,9 +76,6 @@ jobs:
           - os: macos-latest
             architectures: "arm64"
             deployment-target: "11.0"
-          - os: macos-latest
-            architectures: "universal2"
-            deployment-target: "10.13"
           - os: windows-latest
             architectures: "AMD64"
           - os: windows-11-arm
@@ -206,8 +203,6 @@ jobs:
         with:
           python-version: 3.13
 
-      # No rexlib to find, no repository to fall back on: what a user gets.
-      # The archive carries rexlib's source, so this compiles it.
       - name: Install
         env:
           CMAKE_BUILD_PARALLEL_LEVEL: 4
