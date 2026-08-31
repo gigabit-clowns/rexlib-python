@@ -51,7 +51,6 @@ jobs:
           cmake -S external/rexlib -B "${{ runner.temp }}/rexlib-build" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/rexlib" \
-            -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_TESTING=OFF \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
@@ -128,7 +127,6 @@ jobs:
           cmake -S external/rexlib -B "${{ runner.temp }}/rexlib-build" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/rexlib" \
-            -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_TESTING=OFF
           cmake --build "${{ runner.temp }}/rexlib-build" \
             --config Release --parallel 4
