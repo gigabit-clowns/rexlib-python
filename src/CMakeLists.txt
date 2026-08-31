@@ -9,19 +9,19 @@ file(GLOB_RECURSE INLINE_SOURCES ${PROJECT_SOURCE_DIR}/include/*.inl)
 set(TARGET_NAME "_binding")
 pybind11_add_module(${TARGET_NAME} ${SOURCES})
 
-# librexlib ships in lib/ inside this package, so the loader resolves it
-# from the extension's own location. Windows needs nothing: the DLL sits
-# beside the .pyd and CPython loads extensions with
-# LOAD_WITH_ALTERED_SEARCH_PATH.
+# librexlib ships in the package's own library directory, whichever name
+# the platform gives it, so the loader resolves it from the extension's own
+# location. Windows needs nothing: the DLL sits beside the .pyd and CPython
+# loads extensions with LOAD_WITH_ALTERED_SEARCH_PATH.
 if(APPLE)
 	set_target_properties(
 		${TARGET_NAME}
-		PROPERTIES INSTALL_RPATH "@loader_path/lib"
+		PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}"
 	)
 elseif(UNIX)
 	set_target_properties(
 		${TARGET_NAME}
-		PROPERTIES INSTALL_RPATH "$ORIGIN/lib"
+		PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}"
 	)
 endif()
 

@@ -11,6 +11,9 @@ project(
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(CTest)
+# Names the library directory this platform uses, which the package
+# reproduces and the extension's RPATH points at.
+include(GNUInstallDirs)
 include(python_stubs)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
@@ -95,11 +98,6 @@ if(NOT TARGET rexlib::rexlib)
 	endif()
 
 	message(STATUS "No rexlib found; building the bundled one")
-
-	# The extension looks for it in "lib" beside itself. A package is not a
-	# system prefix, so the lib64 that GNUInstallDirs picks on 64-bit Red Hat
-	# would be both meaningless here and out of reach of that RPATH.
-	set(CMAKE_INSTALL_LIBDIR lib)
 	add_subdirectory(external/rexlib)
 else()
 	message(STATUS "Using rexlib from ${rexlib_DIR}")
