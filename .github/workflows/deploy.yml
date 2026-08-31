@@ -198,7 +198,7 @@ jobs:
           path: dist/*.tar.gz
 
   test_sdist:
-    name: Install the source distribution
+    name: Verify the source distribution
     needs: build_sdist
     runs-on: ubuntu-latest
     steps:
@@ -218,7 +218,7 @@ jobs:
           CMAKE_BUILD_PARALLEL_LEVEL: 4
         run: pip install --verbose dist/*.tar.gz
 
-      - name: Import it
+      - name: Test import
         run: |
           cd "$RUNNER_TEMP"
           python -c "import rexlib; print(rexlib.__version__, rexlib.rexlib_version)"
