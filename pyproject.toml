@@ -81,5 +81,11 @@ input = "VERSION"
 regex = "(?P<value>\\d+\\.\\d+\\.\\d+)"
 
 [tool.cibuildwheel]
-#test-command = "{project}/scripts/run-tests.sh" # TODO add when rexlib is in PyPI
+# Run from a temporary directory, so this imports the installed wheel rather
+# than the source tree beside it. It is the one check that the library the
+# wheel carries is found at run time, which no amount of building proves.
+test-command = "python -c \"import rexlib; print(rexlib.__version__, rexlib.rexlib_version)\""
+
+# The full suite is not run here; build-and-test already does that per
+# platform, and this has to stay cheap enough for every wheel.
 #test-extras = ["test"]
