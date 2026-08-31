@@ -78,7 +78,26 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 if(NOT TARGET rexlib::rexlib)
-	find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} REQUIRED)
+	find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} QUIET)
+endif()
+
+# A source distribution carries rexlib's own source, which is what makes it
+# installable without a rexlib to find. It installs into this build's prefix,
+# which for a wheel is the package directory, so a wheel built from source
+# has the same layout as one built against an installed rexlib.
+if(NOT TARGET rexlib::rexlib)
+	if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/external/rexlib/CMakeLists.txt)
+		message(FATAL_ERROR
+			"No rexlib found, and external/rexlib is empty. Install rexlib "
+			"and point rexlib_ROOT at it, or run:\n"
+			"  git submodule update --init --recursive"
+		)
+	endif()
+
+	message(STATUS "No rexlib found; building the bundled one")
+	add_subdirectory(external/rexlib)
+else()
+	message(STATUS "Using rexlib from ${rexlib_DIR}")
 endif()
 
 # ---------------------------------------------------------------------------

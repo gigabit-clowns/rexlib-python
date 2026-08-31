@@ -52,6 +52,21 @@ Issues = "https://github.com/gigabit-clowns/rexlib-python/issues"
 # has to be named explicitly or the sdist would carry an empty directory and
 # fail to build.
 sdist.include = ["external/rexlib/**"]
+
+# The wheel's install prefix is the package directory, so anything installed
+# relative to it - a rexlib built from this source distribution - lands beside
+# the extension under the ordinary lib/ and include/.
+wheel.install-dir = "rexlib"
+
+# Everything except rexlib's namelink, the unversioned librexlib.so. A wheel
+# cannot hold a symlink, so it would be stored as a second full copy of a
+# 50 MB library. "Unspecified" is this project's own rules, which name no
+# component; the other two are absent unless rexlib is built from source here.
+#
+# In this order: they are installed one at a time, and generating the type
+# stubs imports the extension, which does not load until rexlib is in place.
+install.components = ["rexlib_runtime", "rexlib_development", "Unspecified"]
+
 cmake.version = ">=3.18"
 cmake.args = []
 build.verbose = false

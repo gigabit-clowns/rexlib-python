@@ -197,9 +197,36 @@ jobs:
           name: cibw-sdist
           path: dist/*.tar.gz
 
+  test_sdist:
+    name: Install the source distribution
+    needs: build_sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: cibw-sdist
+          path: dist
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: 3.13
+
+      # No rexlib to find, no repository to fall back on: what a user gets.
+      # The archive carries rexlib's source, so this compiles it.
+      - name: Install
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: 4
+        run: pip install --verbose dist/*.tar.gz
+
+      - name: Import it
+        run: |
+          cd "$RUNNER_TEMP"
+          python -c "import rexlib; print(rexlib.__version__, rexlib.rexlib_version)"
+          python -c "import rexlib; rexlib.PluginManager().discover_plugins()"
+
   upload_pypi:
     name: Upload to PyPI
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, test_sdist]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
@@ -218,7 +245,7 @@ jobs:
 
   create_developer_release:
     name: Create development release
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, test_sdist]
     runs-on: ubuntu-latest
     permissions:
       contents: write
