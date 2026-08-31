@@ -68,8 +68,7 @@ jobs:
           - os: ubuntu-24.04-arm
             architectures: "aarch64"
           # 10.13 is the oldest a C++17 build supports; arm64 did not
-          # exist before 11.0. universal2 takes the older of the two, and
-          # the compiler raises its own slice to 11.0.
+          # exist before 11.0.
           - os: macos-latest
             architectures: "x86_64"
             deployment-target: "10.13"
