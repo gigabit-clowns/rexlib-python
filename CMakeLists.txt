@@ -95,6 +95,11 @@ if(NOT TARGET rexlib::rexlib)
 	endif()
 
 	message(STATUS "No rexlib found; building the bundled one")
+
+	# The extension looks for it in "lib" beside itself. A package is not a
+	# system prefix, so the lib64 that GNUInstallDirs picks on 64-bit Red Hat
+	# would be both meaningless here and out of reach of that RPATH.
+	set(CMAKE_INSTALL_LIBDIR lib)
 	add_subdirectory(external/rexlib)
 else()
 	message(STATUS "Using rexlib from ${rexlib_DIR}")
