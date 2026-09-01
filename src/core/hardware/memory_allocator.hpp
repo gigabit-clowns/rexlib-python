@@ -10,13 +10,10 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 using memory_allocator_class = pybind11::class_<memory_allocator, std::shared_ptr<memory_allocator>>;
 
 memory_allocator_class declare_memory_allocator(pybind11::module_ &m);
 void define_memory_allocator(memory_allocator_class &c);
 
-} // namespace hardware
 } // namespace rexlib

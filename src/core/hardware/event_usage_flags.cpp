@@ -10,8 +10,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -56,5 +54,4 @@ void define_event_usage_flags(event_usage_flags_class &c)
 		.def("__repr__", &to_repr);
 }
 
-} // namespace hardware
 } // namespace rexlib

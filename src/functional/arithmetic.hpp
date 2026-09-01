@@ -6,10 +6,7 @@
 
 namespace rexlib
 {
-namespace functional
-{
 
 void bind_arithmetic(pybind11::module_ &m);
 
-} // namespace functional
 } // namespace rexlib

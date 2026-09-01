@@ -10,8 +10,6 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 using program_manager_class =
 	pybind11::class_<program_manager, std::shared_ptr<program_manager>>;
@@ -19,5 +17,4 @@ using program_manager_class =
 program_manager_class declare_program_manager(pybind11::module_ &m);
 void define_program_manager(pybind11::module_ &m);
 
-} // namespace dispatch
 } // namespace rexlib

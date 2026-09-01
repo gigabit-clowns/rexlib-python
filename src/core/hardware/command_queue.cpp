@@ -7,8 +7,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -24,5 +22,4 @@ void define_command_queue(command_queue_class &c)
 		.def("wait", &command_queue::wait);
 }
 
-} // namespace hardware
 } // namespace rexlib

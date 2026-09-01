@@ -6,10 +6,7 @@
 
 namespace rexlib
 {
-namespace ndarray
-{
 
 void bind_ndarray(pybind11::module_ &m);
 
-} // namespace ndarray
 } // namespace rexlib

@@ -7,8 +7,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -28,5 +26,4 @@ void define_memory_allocator(memory_allocator_class &c)
 		.def_property_readonly("max_alignment", &memory_allocator::get_max_alignment);
 }
 
-} // namespace hardware
 } // namespace rexlib

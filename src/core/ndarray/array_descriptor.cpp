@@ -12,8 +12,6 @@
 
 namespace rexlib
 {
-namespace ndarray
-{
 
 namespace py = pybind11;
 
@@ -47,5 +45,4 @@ void define_array_descriptor(array_descriptor_class &c, pybind11::module_ &m)
 }
 
 
-} // namespace ndarray
 } // namespace rexlib

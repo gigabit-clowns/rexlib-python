@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace numerical
-{
 
 void bind_numerical(pybind11::module_ &m)
 {
@@ -15,5 +13,4 @@ void bind_numerical(pybind11::module_ &m)
 	define_numerical_type(numerical_type);
 }
 
-} // namespace numerical
 } // namespace rexlib

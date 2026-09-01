@@ -10,8 +10,6 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 using dispatcher_class =
 	pybind11::class_<dispatcher, std::shared_ptr<dispatcher>>;
@@ -19,5 +17,4 @@ using dispatcher_class =
 dispatcher_class declare_dispatcher(pybind11::module_ &m);
 void define_dispatcher(pybind11::module_ &m);
 
-} // namespace dispatch
 } // namespace rexlib

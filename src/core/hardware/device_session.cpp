@@ -11,8 +11,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -45,5 +43,4 @@ void define_device_session(device_session_class &c)
 		);
 }
 
-} // namespace hardware
 } // namespace rexlib

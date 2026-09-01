@@ -20,8 +20,6 @@
 
 namespace rexlib
 {
-namespace functional
-{
 
 namespace py = pybind11;
 
@@ -159,5 +157,4 @@ void bind_creation(pybind11::module_ &m)
 	);
 }
 
-} // namespace functional
 } // namespace rexlib

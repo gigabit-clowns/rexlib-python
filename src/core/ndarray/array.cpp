@@ -4,13 +4,10 @@
 
 namespace rexlib
 {
-namespace ndarray
-{
 
 array_class declare_array(pybind11::module_ &m)
 {
 	return array_class(m, "Array");
 }
 
-} // namespace ndarray
 } // namespace rexlib

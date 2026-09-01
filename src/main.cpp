@@ -21,19 +21,19 @@ PYBIND11_MODULE(_binding, m) {
 	auto service_catalog = declare_service_catalog(m);
 
 	auto numerical_module = m.def_submodule("numerical");
-	numerical::bind_numerical(numerical_module);
+	bind_numerical(numerical_module);
 
 	auto ndarray_module = m.def_submodule("ndarray");
-	ndarray::bind_ndarray(ndarray_module);
+	bind_ndarray(ndarray_module);
 
 	auto hardware_module = m.def_submodule("hardware");
-	hardware::bind_hardware(hardware_module);
+	bind_hardware(hardware_module);
 
 	auto dispatch_module = m.def_submodule("dispatch");
-	dispatch::bind_dispatch(dispatch_module);
+	bind_dispatch(dispatch_module);
 
 	auto functional_module = m.def_submodule("functional");
-	functional::bind_functional(functional_module);
+	bind_functional(functional_module);
 
 	define_version(version, m);
 	define_plugin(plugin);

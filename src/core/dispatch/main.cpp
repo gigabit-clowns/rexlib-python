@@ -8,8 +8,6 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 void bind_dispatch(pybind11::module_ &m)
 {
@@ -22,5 +20,4 @@ void bind_dispatch(pybind11::module_ &m)
 	define_program_manager(m);
 }
 
-} // namespace dispatch
 } // namespace rexlib

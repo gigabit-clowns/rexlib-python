@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -23,5 +21,4 @@ void define_memory_resource_affinity(memory_resource_affinity_class &c)
 		.value("device", memory_resource_affinity::device);
 }
 
-} // namespace hardware
 } // namespace rexlib

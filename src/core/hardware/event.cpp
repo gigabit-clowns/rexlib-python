@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -24,5 +22,4 @@ void define_event(event_class &c)
 		.def_property_readonly("is_signaled", &event::is_signaled);
 }
 
-} // namespace hardware
 } // namespace rexlib

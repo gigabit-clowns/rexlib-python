@@ -6,10 +6,7 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 void bind_dispatch(pybind11::module_ &m);
 
-} // namespace dispatch
 } // namespace rexlib

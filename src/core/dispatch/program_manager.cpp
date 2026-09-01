@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 static std::shared_ptr<program_manager> get_program_manager(service_catalog &catalog)
 {
@@ -24,5 +22,4 @@ void define_program_manager(pybind11::module_ &m)
 	m.def("get_program_manager", &get_program_manager);
 }
 
-} // namespace dispatch
 } // namespace rexlib

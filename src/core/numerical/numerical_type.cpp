@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace numerical
-{
 
 namespace py = pybind11;
 
@@ -37,6 +35,4 @@ void define_numerical_type(numerical_type_class &c)
 		.value("complex_float64", numerical_type::complex_float64);
 
 	}
-}
- // namespace numerical
 } // namespace rexlib

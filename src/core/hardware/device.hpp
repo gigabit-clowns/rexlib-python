@@ -15,8 +15,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 /**
  * Lets device be implemented in Python: each override forwards the call
@@ -64,5 +62,4 @@ using device_class = pybind11::class_<device, PyDevice, std::shared_ptr<device>>
 device_class declare_device(pybind11::module_ &m);
 void define_device(device_class &c);
 
-} // namespace hardware
 } // namespace rexlib

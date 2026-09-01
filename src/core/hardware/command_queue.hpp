@@ -10,13 +10,10 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 using command_queue_class = pybind11::class_<command_queue, std::shared_ptr<command_queue>>;
 
 command_queue_class declare_command_queue(pybind11::module_ &m);
 void define_command_queue(command_queue_class &c);
 
-} // namespace hardware
 } // namespace rexlib

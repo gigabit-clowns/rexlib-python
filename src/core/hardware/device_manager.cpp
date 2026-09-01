@@ -12,8 +12,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 static std::shared_ptr<device_manager> get_device_manager(service_catalog &catalog)
 {
@@ -75,5 +73,4 @@ void define_device_manager(device_manager_class &c, pybind11::module_ &m)
 
 }
 
-} // namespace hardware
 } // namespace rexlib

@@ -9,8 +9,6 @@
 
 namespace rexlib
 {
-namespace functional
-{
 
 void bind_functional(pybind11::module_ &m)
 {
@@ -20,5 +18,4 @@ void bind_functional(pybind11::module_ &m)
 	bind_transfer(m);
 }
 
-} // namespace functional
 } // namespace rexlib

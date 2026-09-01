@@ -6,10 +6,7 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 void bind_hardware(pybind11::module_ &m);
 
-} // namespace hardware
 } // namespace rexlib

@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -29,5 +27,4 @@ void define_device_type(device_type_class &c)
 	add_value(c, device_type::integrated_gpu);
 }
 
-} // namespace hardware
 } // namespace rexlib

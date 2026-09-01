@@ -7,8 +7,6 @@
 
 namespace rexlib
 {
-namespace ndarray
-{
 
 void bind_ndarray(pybind11::module_ &m)
 {
@@ -18,5 +16,4 @@ void bind_ndarray(pybind11::module_ &m)
 	define_array_descriptor(array_descriptor, m);
 }
 
-} // namespace ndarray
 } // namespace rexlib

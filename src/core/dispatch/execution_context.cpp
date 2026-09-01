@@ -8,8 +8,6 @@
 
 namespace rexlib
 {
-namespace dispatch
-{
 
 namespace py = pybind11;
 
@@ -46,6 +44,4 @@ void define_execution_context(execution_context_class &c)
 		);
 
 	}
-}
- // namespace dispatch
 } // namespace rexlib

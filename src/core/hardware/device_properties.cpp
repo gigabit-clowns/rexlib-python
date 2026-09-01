@@ -6,8 +6,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -71,5 +69,4 @@ void define_device_properties(device_properties_class &c)
 
 }
 
-} // namespace hardware
 } // namespace rexlib

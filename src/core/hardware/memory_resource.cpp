@@ -7,8 +7,6 @@
 
 namespace rexlib
 {
-namespace hardware
-{
 
 namespace py = pybind11;
 
@@ -30,5 +28,4 @@ void define_memory_resource(memory_resource_class &c, pybind11::module_ &m)
 	);
 }
 
-} // namespace hardware
 } // namespace rexlib
