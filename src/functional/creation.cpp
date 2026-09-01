@@ -2,7 +2,7 @@
 
 #include "creation.hpp"
 
-#include "../numerical/float16_caster.hpp"
+#include "../core/numerical/float16_caster.hpp"
 
 #include <rexlib/functional/creation.hpp>
 #include <rexlib/core/ndarray/array.hpp>

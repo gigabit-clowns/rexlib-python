@@ -1,8 +1,8 @@
 
-#include "hardware/main.hpp"
-#include "ndarray/main.hpp"
-#include "numerical/main.hpp"
-#include "dispatch/main.hpp"
+#include "core/hardware/main.hpp"
+#include "core/ndarray/main.hpp"
+#include "core/numerical/main.hpp"
+#include "core/dispatch/main.hpp"
 #include "functional/main.hpp"
 
 #include "core/service_catalog.hpp"
