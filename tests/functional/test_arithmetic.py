@@ -7,36 +7,36 @@ import rexlib
 @pytest.mark.parametrize(
 	"operation",
 	[
-		rexlib.functional.add,
-		rexlib.functional.subtract,
-		rexlib.functional.multiply,
-		rexlib.functional.divide,
-		rexlib.functional.modulo,
+		rexlib.add,
+		rexlib.subtract,
+		rexlib.multiply,
+		rexlib.divide,
+		rexlib.modulo,
 	]
 )
 def test_binary_operation_returns_array(__setup_context, operation):
 	x = __setup_array(__setup_context)
 	y = __setup_array(__setup_context)
 	result = operation(x, y, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 @pytest.mark.parametrize(
 	"operation",
 	[
-		rexlib.functional.negate,
-		rexlib.functional.abs,
+		rexlib.negate,
+		rexlib.abs,
 	]
 )
 def test_unary_operation_returns_array(__setup_context, operation):
 	x = __setup_array(__setup_context)
 	result = operation(x, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def __setup_array(context):
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 3], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.float32
 	)
-	return rexlib.functional.ones(
+	return rexlib.ones(
 		descriptor, rexlib.hardware.MemoryResourceAffinity.host, context
 	)
 

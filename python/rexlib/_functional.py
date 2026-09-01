@@ -10,12 +10,12 @@ order, but `context` defaults to the active one (see
 from __future__ import annotations
 from typing import Any
 
-from .._binding import functional as _raw
-from .._binding.ndarray import Array, ArrayDescriptor
-from .._binding.numerical import NumericalType
-from .._binding.hardware import MemoryResourceAffinity
-from .._binding.dispatch import ExecutionContext
-from .._context import get_active_execution_context
+from ._binding import functional as _raw
+from ._binding.ndarray import Array, ArrayDescriptor
+from ._binding.numerical import NumericalType
+from ._binding.hardware import MemoryResourceAffinity
+from ._binding.dispatch import ExecutionContext
+from ._context import get_active_execution_context
 
 def _resolve_context(context: ExecutionContext | None) -> ExecutionContext:
 	if context is None:

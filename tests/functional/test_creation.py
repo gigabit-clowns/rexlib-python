@@ -5,70 +5,70 @@ import pytest
 import rexlib
 
 def test_empty_returns_array(__setup_context):
-	result = rexlib.functional.empty(
+	result = rexlib.empty(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_zeros_returns_array(__setup_context):
-	result = rexlib.functional.zeros(
+	result = rexlib.zeros(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_ones_returns_array(__setup_context):
-	result = rexlib.functional.ones(
+	result = rexlib.ones(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_full_returns_array(__setup_context):
-	result = rexlib.functional.full(
+	result = rexlib.full(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		3.5,
 		__setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_full_supports_float16(__setup_context):
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float16
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float16
 	)
-	result = rexlib.functional.full(
+	result = rexlib.full(
 		descriptor,
 		rexlib.hardware.MemoryResourceAffinity.host,
 		1.5,
 		__setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_copy_returns_array(__setup_context):
-	source = rexlib.functional.zeros(
+	source = rexlib.zeros(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	result = rexlib.functional.copy(source, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	result = rexlib.copy(source, __setup_context)
+	assert isinstance(result, rexlib.Array)
 
 def test_fill_does_not_raise(__setup_context):
-	target = rexlib.functional.empty(
+	target = rexlib.empty(
 		__setup_descriptor(),
 		rexlib.hardware.MemoryResourceAffinity.host,
 		__setup_context
 	)
-	rexlib.functional.fill(target, 7.0, __setup_context)
+	rexlib.fill(target, 7.0, __setup_context)
 
 def __setup_descriptor():
-	return rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 3], rexlib.numerical.NumericalType.float32
+	return rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.float32
 	)
 
 @pytest.fixture

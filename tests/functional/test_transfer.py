@@ -6,43 +6,43 @@ import rexlib
 
 def test_transfer_to_host_affinity_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.transfer(
+	result = rexlib.transfer(
 		x, rexlib.hardware.MemoryResourceAffinity.host, __setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_transfer_copy_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.transfer_copy(
+	result = rexlib.transfer_copy(
 		x, rexlib.hardware.MemoryResourceAffinity.host, __setup_context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_to_host_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.to_host(x, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	result = rexlib.to_host(x, __setup_context)
+	assert isinstance(result, rexlib.Array)
 
 def test_to_host_copy_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.to_host_copy(x, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	result = rexlib.to_host_copy(x, __setup_context)
+	assert isinstance(result, rexlib.Array)
 
 def test_to_device_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.to_device(x, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	result = rexlib.to_device(x, __setup_context)
+	assert isinstance(result, rexlib.Array)
 
 def test_to_device_copy_returns_array(__setup_context):
 	x = __setup_array(__setup_context)
-	result = rexlib.functional.to_device_copy(x, __setup_context)
-	assert isinstance(result, rexlib.ndarray.Array)
+	result = rexlib.to_device_copy(x, __setup_context)
+	assert isinstance(result, rexlib.Array)
 
 def __setup_array(context):
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 3], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.float32
 	)
-	return rexlib.functional.ones(
+	return rexlib.ones(
 		descriptor, rexlib.hardware.MemoryResourceAffinity.host, context
 	)
 

@@ -88,14 +88,14 @@ def test_arrays_can_be_created_on_a_python_device(
 	session = rexlib.hardware.DeviceSession(
 		__setup_mock_device, __setup_properties
 	)
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
 	with rexlib.device(session):
-		result = rexlib.functional.zeros(
+		result = rexlib.zeros(
 			descriptor, rexlib.hardware.MemoryResourceAffinity.host
 		)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 @pytest.fixture
 def __setup_queue():

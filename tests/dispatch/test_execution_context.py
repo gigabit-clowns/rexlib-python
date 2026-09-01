@@ -24,13 +24,13 @@ def test_eager_dispatcher_is_a_dispatcher():
 
 def test_context_usable_for_array_creation(__setup_context):
 	_, _, ctx = __setup_context
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
-	array = rexlib.functional.zeros(
+	array = rexlib.zeros(
 		descriptor, rexlib.hardware.MemoryResourceAffinity.host, ctx
 	)
-	assert isinstance(array, rexlib.ndarray.Array)
+	assert isinstance(array, rexlib.Array)
 
 def test_with_dispatcher_returns_updated_copy(__setup_context):
 	device_context, dispatcher, ctx = __setup_context

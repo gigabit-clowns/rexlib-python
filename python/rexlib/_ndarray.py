@@ -4,7 +4,7 @@
 
 Wraps `rexlib._binding.ndarray`, adding operators to `Array`.
 Operators cannot take an execution context, so they go through
-`rexlib.functional`, which falls back to the active one (see
+`rexlib`, which falls back to the active one (see
 `rexlib.get_active_execution_context`).
 
 The operators are installed onto the bound `Array` rather than onto a
@@ -14,13 +14,8 @@ seen by callers that construct one by hand.
 
 from __future__ import annotations
 
-from .. import functional as _functional
-from .._binding.ndarray import (
-	Array as Array,
-	ArrayDescriptor as ArrayDescriptor,
-	is_initialized as is_initialized,
-	make_contiguous_array_descriptor as make_contiguous_array_descriptor,
-)
+from . import _functional
+from ._binding.ndarray import Array
 
 def _binary_operator(function):
 	def operator(self: Array, other: Array) -> Array:

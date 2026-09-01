@@ -5,21 +5,21 @@ import pytest
 import rexlib
 
 def test_raises_without_context_and_without_active_device():
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
 	with pytest.raises(RuntimeError):
-		rexlib.functional.zeros(descriptor, rexlib.hardware.MemoryResourceAffinity.host)
+		rexlib.zeros(descriptor, rexlib.hardware.MemoryResourceAffinity.host)
 
 def test_uses_active_context_when_none_given():
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
 	with rexlib.device('cpu'):
-		result = rexlib.functional.zeros(
+		result = rexlib.zeros(
 			descriptor, rexlib.hardware.MemoryResourceAffinity.host
 		)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_explicit_context_still_works_outside_a_with_block():
 	catalog = rexlib.ServiceCatalog()
@@ -30,13 +30,13 @@ def test_explicit_context_still_works_outside_a_with_block():
 	dispatcher = rexlib.dispatch.make_eager_dispatcher(program_manager)
 	context = rexlib.dispatch.ExecutionContext(device_context, dispatcher)
 
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
-	result = rexlib.functional.zeros(
+	result = rexlib.zeros(
 		descriptor, rexlib.hardware.MemoryResourceAffinity.host, context
 	)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
 
 def test_explicit_context_overrides_active_context():
 	catalog = rexlib.ServiceCatalog()
@@ -47,11 +47,11 @@ def test_explicit_context_overrides_active_context():
 	dispatcher = rexlib.dispatch.make_eager_dispatcher(program_manager)
 	explicit_context = rexlib.dispatch.ExecutionContext(device_context, dispatcher)
 
-	descriptor = rexlib.ndarray.make_contiguous_array_descriptor(
-		[2, 2], rexlib.numerical.NumericalType.float32
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 2], rexlib.NumericalType.float32
 	)
 	with rexlib.device('cpu'):
-		result = rexlib.functional.zeros(
+		result = rexlib.zeros(
 			descriptor, rexlib.hardware.MemoryResourceAffinity.host, explicit_context
 		)
-	assert isinstance(result, rexlib.ndarray.Array)
+	assert isinstance(result, rexlib.Array)
