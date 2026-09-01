@@ -1,0 +1,46 @@
+name: Clean up caches
+permissions: {}
+
+on:
+  pull_request:
+    types:
+      - closed
+
+  workflow_run:
+    workflows:
+      - Deploy release
+    types:
+      - completed
+
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch whose caches are all deleted
+        required: true
+        type: string
+
+jobs:
+  delete_every_cache_of_a_ref:
+    name: Delete every cache of a ref
+    # A fork's token is read only, so the deletion would fail rather than
+    # leave anything behind. Those caches expire on their own after 7 days.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    uses: gigabit-clowns/.github/.github/workflows/clean-up-caches.yml@main
+    with:
+      scope: every
+      # A closed pull request's caches are reachable from its own ref
+      # alone, so none of them can ever be restored again.
+      ref: >-
+        ${{ github.event_name == 'pull_request'
+            && format('refs/pull/{0}/merge', github.event.pull_request.number)
+            || format('refs/heads/{0}', inputs.branch) }}
+
+  delete_superseded_caches:
+    name: Delete the caches a newer run has replaced
+    if: github.event_name == 'workflow_run'
+    uses: gigabit-clowns/.github/.github/workflows/clean-up-caches.yml@main
+    with:
+      scope: superseded
