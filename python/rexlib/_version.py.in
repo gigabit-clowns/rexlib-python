@@ -1,5 +1,0 @@
-"""Version of this distribution, filled in at build time."""
-
-# The binding is versioned independently of the rexlib C++ library it
-# wraps; see get_library_version() for that one.
-__version__ = "@PROJECT_VERSION@"

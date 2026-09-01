@@ -30,6 +30,15 @@ static std::string to_repr(const version &v)
 	return oss.str();
 }
 
+static version get_binding_version() noexcept
+{
+	return version(
+		REXLIB_PYTHON_VERSION_MAJOR,
+		REXLIB_PYTHON_VERSION_MINOR,
+		REXLIB_PYTHON_VERSION_PATCH
+	);
+}
+
 version_class declare_version(pybind11::module_ &m)
 {
 	return version_class(m, "Version");
@@ -72,11 +81,8 @@ void define_version(version_class &c, pybind11::module_ &m)
 			}
 		));
 
-	// The version of the rexlib shared library this binding runs against,
-	// which is versioned independently of the binding itself. The
-	// binding's own is rexlib.__version__. Read once: the library is
-	// loaded when this module is, and cannot change afterwards.
 	m.attr("rexlib_version") = get_library_version();
+	m.attr("rexlib_binding_version") = get_binding_version();
 }
 
 } // namespace rexlib

@@ -9,6 +9,14 @@ file(GLOB_RECURSE INLINE_SOURCES ${PROJECT_SOURCE_DIR}/include/*.inl)
 set(TARGET_NAME "_binding")
 pybind11_add_module(${TARGET_NAME} ${SOURCES})
 
+target_compile_definitions(
+	${TARGET_NAME}
+	PRIVATE
+		REXLIB_PYTHON_VERSION_MAJOR=${CMAKE_PROJECT_VERSION_MAJOR}
+		REXLIB_PYTHON_VERSION_MINOR=${CMAKE_PROJECT_VERSION_MINOR}
+		REXLIB_PYTHON_VERSION_PATCH=${CMAKE_PROJECT_VERSION_PATCH}
+)
+
 # librexlib ships in the package's own library directory, whichever name
 # the platform gives it, so the loader resolves it from the extension's own
 # location. Windows needs nothing: the DLL sits beside the .pyd and CPython
