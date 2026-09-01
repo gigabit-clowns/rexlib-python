@@ -121,8 +121,7 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: >
             command -v ccache ||
             dnf install -y ccache ||
-            yum install -y ccache ||
-            apk add --no-cache ccache
+            yum install -y ccache
           # A platform-specific value replaces the general one rather than
           # adding to it, so the shared part is repeated.
           #
@@ -147,7 +146,13 @@ jobs:
             CCACHE_BASEDIR=C:/
             CCACHE_NOHASHDIR=1
             CCACHE_SLOPPINESS=time_macros,include_file_mtime,include_file_ctime,locale
-          CIBW_SKIP: "cp3??t-win*" # Skip Python free-threaded builds on Windows
+          # No musllinux: NVIDIA ships no CUDA for musl, so rexlib-cuda is
+          # manylinux only and an Alpine install could never reach the GPU
+          # backend. torch and cupy skip it for the same reason. Alpine can
+          # still build from the source distribution.
+          CIBW_SKIP: >-
+            cp3??t-win*
+            *-musllinux_*
           # librexlib now ships inside the wheel, put there by this
           # project's install rules. auditwheel would otherwise re-vendor
           # it under a hash-mangled SONAME, which breaks find_package for
