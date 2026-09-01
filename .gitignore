@@ -44,3 +44,6 @@ tests/__pycache__
 
 # Type stubs, generated when the bindings are built
 python/rexlib/_binding
+
+# CCache
+ccache*
