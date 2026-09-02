@@ -11,8 +11,8 @@
     "enabled": false
   },
   "git-submodules": {
-    "description": "Bump the pinned rexlib commit through a PR, so CI vets it.",
-    "enabled": true
+    "description": "Off while rexlib has no releases: main moves several times a day, and every push opened a pull request. CI moves the submodule itself instead; turn this back on and drop that step once rexlib tags versions worth pinning to.",
+    "enabled": false
   },
   "customManagers": [
     {
@@ -41,11 +41,6 @@
     {
       "description": "Security advisories bypass the 14-day delay",
       "matchUpdateTypes": ["security"],
-      "minimumReleaseAge": "0 days"
-    },
-    {
-      "description": "rexlib is first-party and every job here builds it from source, so a commit need not settle before being bumped.",
-      "matchManagers": ["git-submodules"],
       "minimumReleaseAge": "0 days"
     }
   ]
