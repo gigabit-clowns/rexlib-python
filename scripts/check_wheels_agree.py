@@ -21,6 +21,7 @@ TOLERANCE = 64
 
 
 def library_of(wheel: Path) -> tuple[str, bytes]:
+    """Return the name and bytes of the one rexlib library a wheel carries."""
     with zipfile.ZipFile(wheel) as z:
         names = [
             n
@@ -34,8 +35,9 @@ def library_of(wheel: Path) -> tuple[str, bytes]:
 
 
 def main(directory: str) -> int:
+    """Compare every wheel in the directory against the first."""
     wheels = sorted(Path(directory).glob("*.whl"))
-    if len(wheels) < 2:
+    if not wheels[1:]:
         print(f"{len(wheels)} wheel(s), nothing to compare.")
         return 0
 
