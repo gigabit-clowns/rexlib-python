@@ -40,6 +40,7 @@ dependencies = []
 test = [
 	"pytest==8.4.2; python_version < '3.10'",
 	"pytest==9.1.1; python_version >= '3.10'",
+	"pytest-cov==7.0.0",
     "ruff==0.16.4",
 ]
 
@@ -79,6 +80,11 @@ REXLIB_PYTHON_BUILD_TESTING = "OFF"
 provider = "scikit_build_core.metadata.regex"
 input = "VERSION"
 regex = "(?P<value>\\d+\\.\\d+\\.\\d+)"
+
+[tool.coverage.paths]
+# The tests import the installed package, so the report names site-packages.
+# Sonar can only match what the repository has.
+source = ["python/rexlib", "*/site-packages/rexlib"]
 
 [tool.cibuildwheel]
 # Run from a temporary directory, so this imports the installed wheel rather

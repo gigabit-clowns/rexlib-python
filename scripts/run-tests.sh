@@ -8,7 +8,7 @@ ROOT_DIR="$CURRENT_DIR/.."
 pushd "${ROOT_DIR}" > /dev/null
 
     echo "Running tests..."
-    python -m pytest -v --cache-clear --rootdir="${ROOT_DIR}"
+    python -m pytest -v --cache-clear --rootdir="${ROOT_DIR}" "$@"
     PYTEST_EXIT_CODE=$?
     if [ $PYTEST_EXIT_CODE -ne 0 ]; then
         exit $PYTEST_EXIT_CODE
