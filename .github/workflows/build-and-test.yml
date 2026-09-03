@@ -198,16 +198,10 @@ jobs:
         run: ruff check .
 
       - name: Run tests
-        env:
-          COVERAGE: ${{ matrix.os == 'ubuntu-latest'
-            && matrix.python-version == '3.13' && '1' || '' }}
         run: |
           chmod +x ./scripts/run-tests.sh
-          if [ -n "$COVERAGE" ]; then
-            ./scripts/run-tests.sh --cov=rexlib --cov-report=xml:coverage.xml
-          else
-            ./scripts/run-tests.sh
-          fi
+          ./scripts/run-tests.sh ${{ matrix.os == 'ubuntu-latest'
+            && matrix.python-version == '3.13' && '--coverage' || '' }}
 
       - name: Upload coverage report
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13'
