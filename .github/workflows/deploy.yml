@@ -24,6 +24,10 @@ jobs:
   generate_stubs:
     name: Generate type stubs
     runs-on: ubuntu-latest
+    env:
+      CCACHE_BASEDIR: /
+      CCACHE_NOHASHDIR: 1
+      CCACHE_SLOPPINESS: time_macros,include_file_mtime,include_file_ctime,locale
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -225,6 +229,10 @@ jobs:
     name: Verify the source distribution
     needs: build_sdist
     runs-on: ubuntu-latest
+    env:
+      CCACHE_BASEDIR: /
+      CCACHE_NOHASHDIR: 1
+      CCACHE_SLOPPINESS: time_macros,include_file_mtime,include_file_ctime,locale
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
