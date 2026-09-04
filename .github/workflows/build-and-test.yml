@@ -63,6 +63,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.compiler.cxx }}
           max-size: 1G
           evict-old-files: 7d
+          save: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Install rexlib
         env:
@@ -166,6 +167,7 @@ jobs:
           key: pip-${{ matrix.os }}
           max-size: 500M
           evict-old-files: 7d
+          save: ${{ github.ref == 'refs/heads/main' && matrix.python-version == '3.14' }}
 
       - name: Install rexlib
         env:
