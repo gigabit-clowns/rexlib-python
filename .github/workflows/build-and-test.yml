@@ -62,6 +62,7 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.compiler.cxx }}
           max-size: 1G
+          evict-old-files: 7d
 
       - name: Install rexlib
         env:
@@ -164,6 +165,7 @@ jobs:
         with:
           key: pip-${{ matrix.os }}
           max-size: 500M
+          evict-old-files: 7d
 
       - name: Install rexlib
         env:

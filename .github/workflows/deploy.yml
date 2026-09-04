@@ -44,6 +44,7 @@ jobs:
         with:
           key: stubs-ubuntu-latest
           max-size: 1G
+          evict-old-files: 7d
 
       # Nothing points at a rexlib, so this builds the one in
       # external/rexlib, the same way a wheel does.
@@ -111,6 +112,7 @@ jobs:
         with:
           key: wheels-${{ matrix.os }}-${{ matrix.architectures }}
           max-size: 2G
+          evict-old-files: 7d
           variant: ccache
 
       # The container's CCACHE_DIR, seen from the runner.
@@ -238,6 +240,7 @@ jobs:
         with:
           key: sdist-ubuntu-latest
           max-size: 1G
+          evict-old-files: 7d
           variant: ccache
 
       - name: Install
