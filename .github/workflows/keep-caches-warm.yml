@@ -1,0 +1,53 @@
+name: Keep caches warm
+
+permissions: {}
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+
+  pull_request:
+    paths:
+      - '.github/workflows/keep-caches-warm.yml'
+
+  workflow_dispatch:
+
+concurrency:
+  group: keep-caches-warm-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  touch:
+    name: Touch ${{ matrix.prefix }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        prefix:
+          - ccache-ubuntu-latest-g++
+          - ccache-ubuntu-latest-clang++
+          - ccache-macos-latest-clang++
+          - ccache-windows-latest-cl
+          - ccache-windows-11-arm-cl
+          - ccache-pip-ubuntu-latest
+          - ccache-pip-ubuntu-22.04
+          - ccache-pip-macos-latest
+          - ccache-pip-windows-latest
+          - ccache-pip-windows-11-arm
+          - ccache-stubs-ubuntu-latest
+          - ccache-sdist-ubuntu-latest
+          - ccache-wheels-ubuntu-latest-x86_64
+          - ccache-wheels-ubuntu-24.04-arm-aarch64
+          - ccache-wheels-macos-latest-arm64
+          - ccache-wheels-macos-latest-x86_64
+          - ccache-wheels-windows-latest-AMD64
+          - ccache-wheels-windows-11-arm-ARM64
+          - wheels-ubuntu-latest-x86_64
+          - wheels-ubuntu-24.04-arm-aarch64
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: unused
+          key: ${{ matrix.prefix }}-none
+          restore-keys: ${{ matrix.prefix }}-
+          lookup-only: true
