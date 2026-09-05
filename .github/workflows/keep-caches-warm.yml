@@ -1,0 +1,48 @@
+name: Keep caches warm
+
+permissions: {}
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/keep-caches-warm.yml'
+
+  workflow_dispatch:
+
+concurrency:
+  group: keep-caches-warm-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  address:
+    name: Address ccache-action by ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: workspace
+            path: ${{ github.workspace }}/.ccache
+          - variant: home
+            path: ~/.cache/ccache
+          - variant: relative
+            path: .ccache
+          - variant: literal
+            path: /home/runner/work/rexlib-python/rexlib-python/.ccache
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ matrix.path }}
+          key: ccache-pip-ubuntu-latest-none
+          restore-keys: ccache-pip-ubuntu-latest-
+          lookup-only: true
+
+  restore:
+    name: Restore in full, to see whether that counts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /tmp/ccache
+          key: wheels-ubuntu-latest-x86_64-none
+          restore-keys: wheels-ubuntu-latest-x86_64-
