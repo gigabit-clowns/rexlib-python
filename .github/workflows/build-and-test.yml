@@ -1,9 +1,17 @@
 name: Build and test
 
 on:
+  push:
+    branches:
+      - main
+
   pull_request:
 
   workflow_dispatch:
+
+concurrency:
+  group: build-and-test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build_with_cmake:
@@ -54,6 +62,8 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.compiler.cxx }}
           max-size: 1G
+          evict-old-files: 7d
+          save: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Install rexlib
         env:
@@ -84,11 +94,18 @@ jobs:
           generator: "Ninja"
           options: |
             CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+            CMAKE_EXPORT_COMPILE_COMMANDS=ON
             rexlib_ROOT=${{ runner.temp }}/rexlib
             CMAKE_C_COMPILER_LAUNCHER=ccache
             CMAKE_CXX_COMPILER_LAUNCHER=ccache
           run-build: true
           build-args: --config ${{ env.BUILD_TYPE }}
+
+      - name: Upload build files for sonar
+        if: matrix.os == 'ubuntu-latest' && matrix.compiler.cc == 'gcc'
+        uses: gigabit-clowns/.github/.github/composites/upload-sonar-build-files@main
+        with:
+          build-artifact-name: sonar-build-files
 
   build_with_pip:
     name: pip
@@ -149,6 +166,8 @@ jobs:
         with:
           key: pip-${{ matrix.os }}
           max-size: 500M
+          evict-old-files: 7d
+          save: ${{ github.ref == 'refs/heads/main' && matrix.python-version == '3.14' }}
 
       - name: Install rexlib
         env:
@@ -189,4 +208,26 @@ jobs:
       - name: Run tests
         run: |
           chmod +x ./scripts/run-tests.sh
-          ./scripts/run-tests.sh
+          ./scripts/run-tests.sh ${{ matrix.os == 'ubuntu-latest'
+            && matrix.python-version == '3.14' && '--coverage' || '' }}
+
+      - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: python-coverage
+          path: coverage.xml
+
+  sonar_scan:
+    name: SonarQube scan
+    needs: [build_with_cmake, build_with_pip]
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: SonarQube Scan
+        uses: gigabit-clowns/.github/.github/composites/sonar-scan@main
+        with:
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          build-artifact-name: "sonar-build-files"
+          coverage-artifact-name: "python-coverage"
