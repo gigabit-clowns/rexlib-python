@@ -89,11 +89,19 @@ jobs:
         with:
           key: stubs-ubuntu-latest
 
+      # A submodule holding submodules of its own is a directory of stubs,
+      # not one file, so the tree is copied rather than a flat glob of it.
       - name: Collect the generated stubs
         run: |
-          mkdir -p stubs
-          cp "$(python -c 'import rexlib, pathlib; print(pathlib.Path(rexlib.__file__).parent)')"/_binding/*.pyi stubs/
-          ls -l stubs
+          python - <<'PY'
+          import pathlib, shutil, rexlib
+          source = pathlib.Path(rexlib.__file__).parent / "_binding"
+          for stub in source.rglob("*.pyi"):
+              target = pathlib.Path("stubs") / stub.relative_to(source)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(stub, target)
+          PY
+          find stubs -name '*.pyi' | sort
 
       - name: Upload stubs
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
