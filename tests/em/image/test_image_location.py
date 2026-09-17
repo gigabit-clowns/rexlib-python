@@ -24,7 +24,9 @@ def test_position_is_kept_as_given():
 	assert location.position_in_stack == 2
 
 def test_equal_locations_compare_equal():
-	assert ImageLocation('stack.mrc', 2) == ImageLocation('stack.mrc', 2)
+	first = ImageLocation('stack.mrc', 2)
+	second = ImageLocation('stack.mrc', 2)
+	assert first == second
 
 @pytest.mark.parametrize(
 	"other",
