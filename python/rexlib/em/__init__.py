@@ -2,10 +2,10 @@
 
 """Electron microscopy file formats.
 
-One module per area of `rexlib::em`, named after the directory the area
-occupies in rexlib rather than after a C++ namespace, which is how every
-other module here is named. Each one carries the vocabulary of its area,
-so the areas that come after images never have to rename anything.
+One module per area of `rexlib::em`, named after the directory that area
+occupies in rexlib, the way every module here is named. Each carries the
+vocabulary of its own area, so `read` and `write` mean one thing apiece
+and the areas arriving after images rename nothing.
 """
 
 from __future__ import annotations

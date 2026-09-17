@@ -89,8 +89,8 @@ jobs:
         with:
           key: stubs-ubuntu-latest
 
-      # A submodule holding submodules of its own is a directory of stubs,
-      # not one file, so the tree is copied rather than a flat glob of it.
+      # pybind11-stubgen renders a submodule holding submodules of its own as
+      # a directory of stubs rather than as one file.
       - name: Collect the generated stubs
         run: |
           python - <<'PY'
