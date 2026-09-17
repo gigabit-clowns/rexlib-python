@@ -89,25 +89,14 @@ jobs:
         with:
           key: stubs-ubuntu-latest
 
-      # pybind11-stubgen renders a submodule holding submodules of its own as
-      # a directory of stubs rather than as one file.
       - name: Collect the generated stubs
-        run: |
-          python - <<'PY'
-          import pathlib, shutil, rexlib
-          source = pathlib.Path(rexlib.__file__).parent / "_binding"
-          for stub in source.rglob("*.pyi"):
-              target = pathlib.Path("stubs") / stub.relative_to(source)
-              target.parent.mkdir(parents=True, exist_ok=True)
-              shutil.copyfile(stub, target)
-          PY
-          find stubs -name '*.pyi' | sort
+        run: python scripts/collect_stubs.py --module rexlib._binding --output stubs
 
       - name: Upload stubs
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: type-stubs
-          path: stubs/*.pyi
+          path: stubs/
 
   build_wheels:
     needs: generate_stubs

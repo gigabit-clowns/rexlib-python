@@ -18,7 +18,7 @@ the same pull request that causes it.
 | `python/rexlib/` | The Python package, 10 `.py`: everything the binding cannot express |
 | `tests/` | pytest suites, mirroring the binding's module structure |
 | `tests/assets/` | Two dummy plugins, built by CMake, that the plugin tests discover |
-| `scripts/` | Development tools: the test runner, the stub generator, the wheel check |
+| `scripts/` | Development tools: the test runner, the stub generator and collector, the wheel check |
 | `cmake/modules/` | `python_stubs.cmake`, which installs the type stubs |
 | `conf/` | `coverage.ini` |
 | `external/rexlib` | The rexlib the repository is developed against, a submodule |
@@ -174,10 +174,11 @@ signatures is a change to the stubs, generated for free, and a change to
 
 A submodule that holds submodules of its own becomes a directory of stubs
 rather than one file: `em` is `_binding/em/__init__.pyi` beside
-`_binding/em/image.pyi`. Anything that moves stubs around has to carry the
-tree, which is why `deploy.yml` copies it rather than globbing `*.pyi` flat —
-a flat glob drops the nested ones and yields a wheel that is typed everywhere
-except the area that was just added.
+`_binding/em/image.pyi`. Every step that moves stubs has to carry that tree,
+so `scripts/collect_stubs.py` copies it and the artifact holding it is
+uploaded as a directory. A flat `*.pyi` glob at either step takes the top
+level and drops the rest, which fails nothing and publishes wheels typed
+everywhere except the area that was just added.
 
 ## Conventions
 
