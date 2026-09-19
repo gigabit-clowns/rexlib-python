@@ -6,7 +6,10 @@ import rexlib
 
 def test_reports_its_shape(__setup_context):
 	array = __setup_array([4, 6], __setup_context)
-	assert array.shape == [4, 6]
+	assert array.shape == (4, 6)
+
+def test_shape_is_a_tuple(__setup_context):
+	assert isinstance(__setup_array([4, 6], __setup_context).shape, tuple)
 
 def test_reports_its_data_type(__setup_context):
 	array = __setup_array([4, 6], __setup_context)
@@ -33,12 +36,12 @@ def test_shape_survives_the_descriptor_going_out_of_scope(__setup_context):
 	# The descriptor is handed out by reference into the array, so the array
 	# has to outlive it rather than the other way round.
 	descriptor = __setup_array([2, 3], __setup_context).descriptor
-	assert descriptor.shape == [2, 3]
+	assert descriptor.shape == (2, 3)
 
 def test_an_operation_keeps_the_shape(__setup_context):
 	x = __setup_array([4, 6], __setup_context)
 	y = __setup_array([4, 6], __setup_context)
-	assert rexlib.add(x, y, __setup_context).shape == [4, 6]
+	assert rexlib.add(x, y, __setup_context).shape == (4, 6)
 
 def __setup_array(shape, context):
 	descriptor = rexlib.make_contiguous_array_descriptor(

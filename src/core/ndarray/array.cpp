@@ -15,11 +15,22 @@ namespace rexlib
 
 namespace py = pybind11;
 
-static std::vector<std::size_t> get_shape(const array &self)
+static std::vector<std::size_t> get_extents(const array &self)
 {
 	std::vector<std::size_t> extents;
 	self.get_descriptor().get_layout().get_extents(extents);
 	return extents;
+}
+
+static py::tuple get_shape(const array &self)
+{
+	const auto extents = get_extents(self);
+	py::tuple shape(extents.size());
+	for (std::size_t i = 0; i < extents.size(); ++i)
+	{
+		shape[i] = extents[i];
+	}
+	return shape;
 }
 
 static numerical_type get_data_type(const array &self)
@@ -29,7 +40,7 @@ static numerical_type get_data_type(const array &self)
 
 static std::size_t py_len(const array &self)
 {
-	const auto extents = get_shape(self);
+	const auto extents = get_extents(self);
 	if (extents.empty())
 	{
 		throw py::type_error("len() of an array with no dimensions");
