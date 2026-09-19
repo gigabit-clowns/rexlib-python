@@ -30,3 +30,41 @@ def test_different_descriptors_compare_not_equal():
 		[3, 2], rexlib.NumericalType.int32
 	)
 	assert d1 != d2
+
+def test_reports_the_shape_it_was_made_with():
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 3, 4], rexlib.NumericalType.float32
+	)
+	assert descriptor.shape == [2, 3, 4]
+
+def test_default_descriptor_has_no_shape():
+	assert rexlib.ArrayDescriptor().shape == []
+
+def test_equal_descriptors_hash_equal():
+	d1 = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.int32
+	)
+	d2 = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.int32
+	)
+	assert hash(d1) == hash(d2)
+
+def test_usable_as_a_dictionary_key():
+	table = {
+		rexlib.make_contiguous_array_descriptor(
+			[2, 3], rexlib.NumericalType.int32
+		): 'value'
+	}
+	key = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.int32
+	)
+	assert table[key] == 'value'
+
+def test_repr_names_the_type():
+	descriptor = rexlib.make_contiguous_array_descriptor(
+		[2, 3], rexlib.NumericalType.int32
+	)
+	assert repr(descriptor).startswith('ArrayDescriptor(')
+
+def test_repr_of_a_default_descriptor():
+	assert repr(rexlib.ArrayDescriptor()) == 'ArrayDescriptor()'
