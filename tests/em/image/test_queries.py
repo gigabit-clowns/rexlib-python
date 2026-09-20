@@ -41,13 +41,13 @@ def test_accepts_an_explicit_manager(__written_file):
 @pytest.mark.parametrize(
 	"query",
 	[
-		pytest.param('query_extents', id="Whole file"),
-		pytest.param('query_core_extents', id="One image"),
+		pytest.param(image.query_extents, id="Whole file"),
+		pytest.param(image.query_core_extents, id="One image"),
 	]
 )
 def test_raises_on_a_file_no_format_recognizes(query):
 	with pytest.raises(RuntimeError):
-		getattr(image, query)('/path/to/no/such/file.mrc')
+		query('/path/to/no/such/file.mrc')
 
 @pytest.fixture
 def __written_file(tmp_path, __setup_context):
