@@ -9,10 +9,10 @@ image = rexlib.em.image
 def test_crops_patches_given_as_a_list_of_centres(
 	__written_image, __setup_context
 ):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((2, 8, 8), __setup_context)
 	image.read_patches_async(
-		source, destination, image.ImageLocation(__written_image),
+		loader, destination, image.ImageLocation(__written_image),
 		[(10, 10), (20, 30)]
 	).get()
 	assert destination.shape == (2, 8, 8)
@@ -20,21 +20,21 @@ def test_crops_patches_given_as_a_list_of_centres(
 def test_crops_patches_given_as_an_index_table(
 	__written_image, __setup_context
 ):
-	source = image.source()
+	loader = image.loader()
 	centres = image.IndexTable(2)
 	centres.add((10, 10))
 	centres.add((20, 30))
 	destination = __setup_array((2, 8, 8), __setup_context)
 	image.read_patches_async(
-		source, destination, image.ImageLocation(__written_image), centres
+		loader, destination, image.ImageLocation(__written_image), centres
 	).get()
 	assert destination.shape == (2, 8, 8)
 
 def test_the_destination_survives_the_read(__written_image, __setup_context):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
 	image.read_patches_async(
-		source, destination, image.ImageLocation(__written_image), [(10, 10)]
+		loader, destination, image.ImageLocation(__written_image), [(10, 10)]
 	).get()
 	assert destination.shape == (1, 8, 8)
 
@@ -49,61 +49,61 @@ def test_the_destination_survives_the_read(__written_image, __setup_context):
 def test_a_patch_over_a_border_is_clipped_rather_than_refused(
 	centre, __written_image, __setup_context
 ):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
 	completion = image.read_patches_async(
-		source, destination, image.ImageLocation(__written_image), [centre]
+		loader, destination, image.ImageLocation(__written_image), [centre]
 	)
 	completion.get()
 	assert completion.is_ready
 
 def test_crops_out_of_one_image_of_a_stack(__written_stack, __setup_context):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((1, 4, 4), __setup_context)
 	image.read_patches_async(
-		source, destination, image.ImageLocation(__written_stack, 1),
+		loader, destination, image.ImageLocation(__written_stack, 1),
 		[(2, 3)]
 	).get()
 	assert destination.shape == (1, 4, 4)
 
 def test_an_empty_batch_is_already_done(__written_image, __setup_context):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((0, 8, 8), __setup_context)
 	completion = image.read_patches_async(
-		source, destination, image.ImageLocation(__written_image), []
+		loader, destination, image.ImageLocation(__written_image), []
 	)
 	assert completion.is_ready
 
 def test_a_destination_of_the_wrong_batch_size_is_refused(
 	__written_image, __setup_context
 ):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((3, 8, 8), __setup_context)
 	with pytest.raises(ValueError):
 		image.read_patches_async(
-			source, destination, image.ImageLocation(__written_image),
+			loader, destination, image.ImageLocation(__written_image),
 			[(10, 10), (20, 30)]
 		)
 
 def test_a_centre_of_another_rank_is_refused(__written_image, __setup_context):
-	source = image.source()
+	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
 	with pytest.raises(ValueError):
 		image.read_patches_async(
-			source, destination, image.ImageLocation(__written_image),
+			loader, destination, image.ImageLocation(__written_image),
 			[(10, 10, 10)]
 		)
 
 def test_an_index_table_of_another_rank_is_refused(
 	__written_image, __setup_context
 ):
-	source = image.source()
+	loader = image.loader()
 	centres = image.IndexTable(3)
 	centres.add((10, 10, 10))
 	destination = __setup_array((1, 8, 8), __setup_context)
 	with pytest.raises(ValueError):
 		image.read_patches_async(
-			source, destination, image.ImageLocation(__written_image),
+			loader, destination, image.ImageLocation(__written_image),
 			centres
 		)
 

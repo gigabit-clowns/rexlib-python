@@ -71,7 +71,7 @@ name that names them. See #143.
 | `_binding.dispatch` | `src/core/dispatch/` | `ExecutionContext`, `Dispatcher`, `ProgramManager` |
 | `_binding.concurrency` | `src/core/concurrency/` | `Executor` and its two kinds, `Completion` |
 | `_binding.functional` | `src/functional/` | The operations, each taking an explicit context |
-| `_binding.em.image` | `src/em/image/` | `ImageLocation`, `ImageDescriptor`, `IndexTable`, the format managers, the reader and writer providers, the source and the sink, and the functions of `image_read.hpp` and `image_write.hpp` |
+| `_binding.em.image` | `src/em/image/` | `ImageLocation`, `ImageDescriptor`, `IndexTable`, the format managers, the reader and writer providers, the loader and the saver, and the functions of `image_read.hpp` and `image_write.hpp` |
 
 A submodule is created by the `main.cpp` above it, which then hands it to the
 `bind_` function of the directory it stands for: `src/main.cpp` creates `em`
@@ -89,7 +89,7 @@ the order the declarations need.
 | `_device.py` | `rexlib.device(...)`, the `with` block that activates one |
 | `_functional.py` | The operations again, with `context` defaulting to the active one |
 | `_ndarray.py` | Installs the Python operators onto `Array` |
-| `em/` | The electron microscopy areas, one module each; `em/image/` defaults the formats, the reader provider and the context, and assembles sources and sinks |
+| `em/` | The electron microscopy areas, one module each; `em/image/` defaults the formats, the reader provider and the context, and assembles loaders and savers |
 
 `_paths` is imported first in `__init__.py`, and the order matters: on Windows
 nothing else imports until the bundled library is findable. `_ndarray` is
@@ -105,8 +105,8 @@ stated in their docstrings, since a caller has no other way to find out.
 
 Only what the functions of `image_read.hpp` and `image_write.hpp` need is
 bound. A reader, a writer, a format, a transfer plan and a sanitizer have no
-Python counterpart, so `ImageSource` and `ImageSink` are bound without the
-`read` and `write` that take them, and `ManagedImageWriterProvider` without
+Python counterpart, so `ImageLoader` and `ImageSaver` are bound without the
+`load` and `save` that take them, and `ManagedImageWriterProvider` without
 `acquire`.
 
 A collaborator the package defaults moves behind the arguments it does not:
@@ -116,7 +116,7 @@ default is re-exported as the binding has it, which is how
 `read_batch_async` and `write_batch_async` arrive.
 
 The helpers that assemble collaborators are nouns: `reader_provider`,
-`writer_provider`, `source` and `sink`. `sink` takes its writer provider
+`writer_provider`, `loader` and `saver`. `saver` takes its writer provider
 rather than assembling one, since whoever writes keeps it to declare the
 files and to close them.
 

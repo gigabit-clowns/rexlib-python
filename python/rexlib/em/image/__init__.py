@@ -13,13 +13,13 @@ out of an `Array`. They take their formats from the default catalog and
 `read` its execution context from the active one.
 
 `read_batch_async` and `read_patches_async` fill an array a caller
-already has, through an `ImageSource`, and return a completion rather
-than wait. `source` assembles one over a thread pool.
+already has, through an `ImageLoader`, and return a completion rather
+than wait. `loader` assembles one over a thread pool.
 
-`write_batch_async` is their counterpart, through an `ImageSink`, into
+`write_batch_async` is their counterpart, through an `ImageSaver`, into
 files whose shape is already settled: each is declared on a
 `ManagedImageWriterProvider` with the descriptor it is created as, and
-closed there once it is finished. `writer_provider` and `sink` assemble
+closed there once it is finished. `writer_provider` and `saver` assemble
 the two.
 
 A string is never parsed into an `ImageLocation` on its way anywhere: a
@@ -34,14 +34,14 @@ from __future__ import annotations
 from ..._binding.em.image import (
 	CachingImageReaderProvider as CachingImageReaderProvider,
 	DirectImageReaderProvider as DirectImageReaderProvider,
-	ExecutorImageSink as ExecutorImageSink,
-	ExecutorImageSource as ExecutorImageSource,
+	ExecutorImageLoader as ExecutorImageLoader,
+	ExecutorImageSaver as ExecutorImageSaver,
 	ImageDescriptor as ImageDescriptor,
+	ImageLoader as ImageLoader,
 	ImageLocation as ImageLocation,
 	ImageReaderProvider as ImageReaderProvider,
-	ImageSink as ImageSink,
-	ImageSource as ImageSource,
 	ImageReadFormatManager as ImageReadFormatManager,
+	ImageSaver as ImageSaver,
 	ImageWriteFormatManager as ImageWriteFormatManager,
 	ImageWriterProvider as ImageWriterProvider,
 	IndexTable as IndexTable,
@@ -53,12 +53,12 @@ from ..._binding.em.image import (
 	write_batch_async as write_batch_async,
 )
 from ._functions import (
+	loader as loader,
 	query_descriptor as query_descriptor,
 	read as read,
 	read_patches_async as read_patches_async,
 	reader_provider as reader_provider,
-	sink as sink,
-	source as source,
+	saver as saver,
 	write as write,
 	write_single as write_single,
 	write_stack as write_stack,
@@ -68,14 +68,14 @@ from ._functions import (
 __all__ = [
 	"CachingImageReaderProvider",
 	"DirectImageReaderProvider",
-	"ExecutorImageSink",
-	"ExecutorImageSource",
+	"ExecutorImageLoader",
+	"ExecutorImageSaver",
 	"ImageDescriptor",
+	"ImageLoader",
 	"ImageLocation",
 	"ImageReadFormatManager",
 	"ImageReaderProvider",
-	"ImageSink",
-	"ImageSource",
+	"ImageSaver",
 	"ImageWriteFormatManager",
 	"ImageWriterProvider",
 	"IndexTable",
@@ -83,13 +83,13 @@ __all__ = [
 	"get_core_extents",
 	"get_image_read_format_manager",
 	"get_image_write_format_manager",
+	"loader",
 	"query_descriptor",
 	"read",
 	"read_batch_async",
 	"read_patches_async",
 	"reader_provider",
-	"sink",
-	"source",
+	"saver",
 	"write",
 	"write_batch_async",
 	"write_single",

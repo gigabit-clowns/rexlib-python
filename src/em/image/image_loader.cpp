@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "image_source.hpp"
+#include "image_loader.hpp"
 
 #include <rexlib/core/concurrency/executor.hpp>
 #include <rexlib/em/image/image_reader_provider.hpp>
@@ -12,18 +12,18 @@ namespace rexlib
 
 namespace py = pybind11;
 
-image_source_class declare_image_source(pybind11::module_ &m)
+image_loader_class declare_image_loader(pybind11::module_ &m)
 {
-	return image_source_class(m, "ImageSource");
+	return image_loader_class(m, "ImageLoader");
 }
 
-executor_image_source_class
-declare_executor_image_source(pybind11::module_ &m)
+executor_image_loader_class
+declare_executor_image_loader(pybind11::module_ &m)
 {
-	return executor_image_source_class(m, "ExecutorImageSource");
+	return executor_image_loader_class(m, "ExecutorImageLoader");
 }
 
-void define_executor_image_source(executor_image_source_class &c)
+void define_executor_image_loader(executor_image_loader_class &c)
 {
 	c.def(
 		py::init<

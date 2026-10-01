@@ -3,12 +3,12 @@
 #include "main.hpp"
 
 #include "image_descriptor.hpp"
+#include "image_loader.hpp"
 #include "image_location.hpp"
 #include "image_read.hpp"
 #include "image_read_format_manager.hpp"
 #include "image_reader_provider.hpp"
-#include "image_sink.hpp"
-#include "image_source.hpp"
+#include "image_saver.hpp"
 #include "image_write.hpp"
 #include "image_write_format_manager.hpp"
 #include "image_writer_provider.hpp"
@@ -25,12 +25,12 @@ void bind_image(pybind11::module_ &m)
 	declare_image_reader_provider(m);
 	auto direct_provider = declare_direct_image_reader_provider(m);
 	auto caching_provider = declare_caching_image_reader_provider(m);
-	declare_image_source(m);
-	auto executor_source = declare_executor_image_source(m);
+	declare_image_loader(m);
+	auto executor_loader = declare_executor_image_loader(m);
 	auto writer_provider = declare_image_writer_provider(m);
 	auto managed_provider = declare_managed_image_writer_provider(m);
-	auto image_sink = declare_image_sink(m);
-	auto executor_sink = declare_executor_image_sink(m);
+	auto image_saver = declare_image_saver(m);
+	auto executor_saver = declare_executor_image_saver(m);
 	declare_image_read_format_manager(m);
 	declare_image_write_format_manager(m);
 
@@ -40,11 +40,11 @@ void bind_image(pybind11::module_ &m)
 	define_image_reader_provider(m);
 	define_direct_image_reader_provider(direct_provider);
 	define_caching_image_reader_provider(caching_provider);
-	define_executor_image_source(executor_source);
+	define_executor_image_loader(executor_loader);
 	define_image_writer_provider(writer_provider);
 	define_managed_image_writer_provider(managed_provider);
-	define_image_sink(image_sink);
-	define_executor_image_sink(executor_sink);
+	define_image_saver(image_saver);
+	define_executor_image_saver(executor_saver);
 	define_image_read_format_manager(m);
 	define_image_write_format_manager(m);
 

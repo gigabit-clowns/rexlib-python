@@ -7,7 +7,7 @@ lives in [BACKLOG.md](BACKLOG.md).
 
 Reviewed 1 Oct 2026. Nothing is currently waiting on an answer.
 
-## Sources and sinks
+## Loaders and savers
 
 ### A destination's data type is chosen, not discovered
 
@@ -26,10 +26,10 @@ and reading into the file's own type would avoid it.
 
 ### The thread pool is per instance
 
-Sharing an executor between sources is the caller's responsibility rather than
-the binding's; most clients hold a single source and a single sink. A default
+Sharing an executor between loaders is the caller's responsibility rather than
+the binding's; most clients hold a single loader and a single saver. A default
 is still provided, and per instance is the one chosen, with an explicit
-executor accepted as an override. `source()` and `sink()` both follow it.
+executor accepted as an override. `loader()` and `saver()` both follow it.
 
 Per instance rather than process-wide because the choice is meant to be
 revisited once there is evidence of how clients use it, and this is the

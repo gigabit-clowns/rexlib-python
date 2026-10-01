@@ -20,13 +20,13 @@ from ..._binding.em import image as _raw
 from ..._binding.em.image import (
 	CachingImageReaderProvider,
 	DirectImageReaderProvider,
-	ExecutorImageSink,
-	ExecutorImageSource,
+	ExecutorImageLoader,
+	ExecutorImageSaver,
 	ImageDescriptor,
+	ImageLoader,
 	ImageLocation,
 	ImageReaderProvider,
 	ImageReadFormatManager,
-	ImageSource,
 	ImageWriteFormatManager,
 	ImageWriterProvider,
 	IndexTable,
@@ -95,21 +95,21 @@ def reader_provider(
 		readers = CachingImageReaderProvider(readers, cache)
 	return readers
 
-def source(
+def loader(
 	workers: int | None = None,
 	cache: int | None = None,
 	manager: ImageReadFormatManager | None = None,
 	executor: Executor | None = None
-) -> ExecutorImageSource:
+) -> ExecutorImageLoader:
 	"""
-	Assemble an image source over a thread pool.
+	Assemble an image loader over a thread pool.
 
-	Wires the four objects a source stands on — the formats, a reader
-	provider, an executor and the source itself — so that a caller
+	Wires the four objects a loader stands on — the formats, a reader
+	provider, an executor and the loader itself — so that a caller
 	reaches `read_batch_async` and `read_patches_async` without naming
 	them.
 
-	Each source built this way owns its executor. Two of them means two
+	Each loader built this way owns its executor. Two of them means two
 	thread pools, each sized to the machine, which is worth avoiding by
 	passing one executor to both.
 
@@ -124,9 +124,9 @@ def source(
 		executor: Where reads run. Defaults to a thread pool of its own.
 
 	Returns:
-		ExecutorImageSource: The assembled source.
+		ExecutorImageLoader: The assembled loader.
 	"""
-	return ExecutorImageSource(
+	return ExecutorImageLoader(
 		reader_provider(cache, manager),
 		_resolve_executor(executor, workers)
 	)
@@ -151,19 +151,19 @@ def writer_provider(
 	"""
 	return ManagedImageWriterProvider(_resolve_write_manager(manager))
 
-def sink(
+def saver(
 	writers: ImageWriterProvider,
 	workers: int | None = None,
 	executor: Executor | None = None
-) -> ExecutorImageSink:
+) -> ExecutorImageSaver:
 	"""
-	Assemble an image sink over a thread pool.
+	Assemble an image saver over a thread pool.
 
 	The provider is taken rather than assembled, since whoever writes
 	keeps it to declare the files and to close them.
 
-	Each sink built this way owns its executor, as each source built by
-	`source` does.
+	Each saver built this way owns its executor, as each loader built by
+	`loader` does.
 
 	Args:
 		writers: Where a path becomes an open writer.
@@ -172,9 +172,9 @@ def sink(
 		executor: Where writes run. Defaults to a thread pool of its own.
 
 	Returns:
-		ExecutorImageSink: The assembled sink.
+		ExecutorImageSaver: The assembled saver.
 	"""
-	return ExecutorImageSink(writers, _resolve_executor(executor, workers))
+	return ExecutorImageSaver(writers, _resolve_executor(executor, workers))
 
 def query_descriptor(
 	path: str,
@@ -241,7 +241,7 @@ def read(
 	)
 
 def read_patches_async(
-	source: ImageSource,
+	loader: ImageLoader,
 	destination: Array,
 	location: ImageLocation,
 	centres: IndexTable | Sequence[Sequence[int]]
@@ -256,7 +256,7 @@ def read_patches_async(
 	what `destination` held beforehand.
 
 	Args:
-		source: Where the reads are dispatched.
+		loader: Where the reads are dispatched.
 		destination: Where the patches land. Its leading extent is the
 			batch size and the rest are the shape of one patch.
 		location: The image every patch is cropped from.
@@ -271,7 +271,7 @@ def read_patches_async(
 		for centre in centres:
 			table.add(centre)
 		centres = table
-	return _raw.read_patches_async(source, destination, location, centres)
+	return _raw.read_patches_async(loader, destination, location, centres)
 
 def write_single(
 	array: Array,

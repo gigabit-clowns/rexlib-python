@@ -10,7 +10,7 @@
 #include <rexlib/core/span.hpp>
 #include <rexlib/em/image/image_descriptor.hpp>
 #include <rexlib/em/image/image_location.hpp>
-#include <rexlib/em/image/image_sink.hpp>
+#include <rexlib/em/image/image_saver.hpp>
 #include <rexlib/em/image/image_write_format_manager.hpp>
 
 #include <pybind11/stl.h>
@@ -68,13 +68,13 @@ static void py_write(
 // write_batch_async takes its source by value, so the caller's array is
 // shared rather than moved out of.
 static std::shared_ptr<completion> py_write_batch_async(
-	const em::image_sink &sink,
+	const em::image_saver &saver,
 	const array &source,
 	const std::vector<em::image_location> &locations
 )
 {
 	return em::write_batch_async(
-		sink,
+		saver,
 		source.share_const(),
 		make_span(locations)
 	);
@@ -102,7 +102,7 @@ void bind_image_write(pybind11::module_ &m)
 	);
 	m.def(
 		"write_batch_async", &py_write_batch_async,
-		py::arg("sink"), py::arg("source"), py::arg("locations"),
+		py::arg("saver"), py::arg("source"), py::arg("locations"),
 		py::call_guard<py::gil_scoped_release>()
 	);
 }

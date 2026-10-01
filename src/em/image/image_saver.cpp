@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "image_sink.hpp"
+#include "image_saver.hpp"
 
 #include <rexlib/core/concurrency/executor.hpp>
 #include <rexlib/em/image/image_writer_provider.hpp>
@@ -12,25 +12,25 @@ namespace rexlib
 
 namespace py = pybind11;
 
-image_sink_class declare_image_sink(pybind11::module_ &m)
+image_saver_class declare_image_saver(pybind11::module_ &m)
 {
-	return image_sink_class(m, "ImageSink");
+	return image_saver_class(m, "ImageSaver");
 }
 
-executor_image_sink_class declare_executor_image_sink(pybind11::module_ &m)
+executor_image_saver_class declare_executor_image_saver(pybind11::module_ &m)
 {
-	return executor_image_sink_class(m, "ExecutorImageSink");
+	return executor_image_saver_class(m, "ExecutorImageSaver");
 }
 
-void define_image_sink(image_sink_class &c)
+void define_image_saver(image_saver_class &c)
 {
 	c.def(
-		"flush", &em::image_sink::flush,
+		"flush", &em::image_saver::flush,
 		py::call_guard<py::gil_scoped_release>()
 	);
 }
 
-void define_executor_image_sink(executor_image_sink_class &c)
+void define_executor_image_saver(executor_image_saver_class &c)
 {
 	c.def(
 		py::init<

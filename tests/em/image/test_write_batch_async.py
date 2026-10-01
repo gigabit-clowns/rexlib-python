@@ -16,14 +16,14 @@ def test_a_stack_written_a_batch_at_a_time_reads_back(
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((2, 4, 6), __setup_context)
 	for first in (0, 2):
 		locations = [
 			image.ImageLocation(path, first),
 			image.ImageLocation(path, first + 1),
 		]
-		image.write_batch_async(sink, batch, locations).get()
+		image.write_batch_async(saver, batch, locations).get()
 	writers.close(path)
 	assert image.query_descriptor(path) == STACK_DESCRIPTOR
 
@@ -33,19 +33,19 @@ def test_the_source_survives_the_write(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((2, 4, 6), __setup_context)
-	image.write_batch_async(sink, batch, __setup_locations(path, 2)).get()
+	image.write_batch_async(saver, batch, __setup_locations(path, 2)).get()
 	assert batch.shape == (2, 4, 6)
 
 def test_a_completion_reports_when_it_is_done(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((2, 4, 6), __setup_context)
 	completion = image.write_batch_async(
-		sink, batch, __setup_locations(path, 2)
+		saver, batch, __setup_locations(path, 2)
 	)
 	completion.wait()
 	assert completion.is_ready
@@ -56,21 +56,21 @@ def test_a_batch_spans_several_files(tmp_path, __setup_context):
 	writers = image.writer_provider()
 	writers.declare(first, STACK_DESCRIPTOR)
 	writers.declare(second, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((2, 4, 6), __setup_context)
 	locations = [
 		image.ImageLocation(first, 0),
 		image.ImageLocation(second, 3),
 	]
-	image.write_batch_async(sink, batch, locations).get()
-	sink.flush()
+	image.write_batch_async(saver, batch, locations).get()
+	saver.flush()
 	assert image.query_descriptor(first) == STACK_DESCRIPTOR
 	assert image.query_descriptor(second) == STACK_DESCRIPTOR
 
 def test_an_empty_batch_is_already_done(tmp_path, __setup_context):
-	sink = image.sink(image.writer_provider())
+	saver = image.saver(image.writer_provider())
 	batch = __setup_array((0, 4, 6), __setup_context)
-	assert image.write_batch_async(sink, batch, []).is_ready
+	assert image.write_batch_async(saver, batch, []).is_ready
 
 def test_a_source_of_the_wrong_batch_size_is_refused(
 	tmp_path, __setup_context
@@ -78,17 +78,17 @@ def test_a_source_of_the_wrong_batch_size_is_refused(
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((3, 4, 6), __setup_context)
 	with pytest.raises(ValueError):
-		image.write_batch_async(sink, batch, __setup_locations(path, 2))
+		image.write_batch_async(saver, batch, __setup_locations(path, 2))
 
 def test_a_path_that_was_not_declared_is_reported(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
-	sink = image.sink(image.writer_provider())
+	saver = image.saver(image.writer_provider())
 	batch = __setup_array((2, 4, 6), __setup_context)
 	completion = image.write_batch_async(
-		sink, batch, __setup_locations(path, 2)
+		saver, batch, __setup_locations(path, 2)
 	)
 	with pytest.raises(IndexError):
 		completion.get()
@@ -99,13 +99,13 @@ def test_an_index_past_the_end_of_a_stack_is_reported(
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(writers)
+	saver = image.saver(writers)
 	batch = __setup_array((2, 4, 6), __setup_context)
 	locations = [
 		image.ImageLocation(path, 0),
 		image.ImageLocation(path, 4),
 	]
-	completion = image.write_batch_async(sink, batch, locations)
+	completion = image.write_batch_async(saver, batch, locations)
 	with pytest.raises(IndexError):
 		completion.get()
 
@@ -113,18 +113,18 @@ def test_runs_on_a_synchronous_executor_too(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, STACK_DESCRIPTOR)
-	sink = image.sink(
+	saver = image.saver(
 		writers, executor=rexlib.concurrency.SynchronousExecutor()
 	)
 	batch = __setup_array((2, 4, 6), __setup_context)
-	image.write_batch_async(sink, batch, __setup_locations(path, 2)).get()
+	image.write_batch_async(saver, batch, __setup_locations(path, 2)).get()
 	writers.close(path)
 	assert image.query_descriptor(path) == STACK_DESCRIPTOR
 
-def test_sink_returns_an_image_sink():
-	sink = image.sink(image.writer_provider(), workers=2)
-	assert isinstance(sink, image.ExecutorImageSink)
-	assert isinstance(sink, image.ImageSink)
+def test_saver_returns_an_image_saver():
+	saver = image.saver(image.writer_provider(), workers=2)
+	assert isinstance(saver, image.ExecutorImageSaver)
+	assert isinstance(saver, image.ImageSaver)
 
 def test_assembled_by_hand(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
@@ -134,9 +134,9 @@ def test_assembled_by_hand(tmp_path, __setup_context):
 	)
 	writers.declare(path, STACK_DESCRIPTOR)
 	executor = rexlib.concurrency.ThreadPoolExecutor(2)
-	sink = image.ExecutorImageSink(writers, executor)
+	saver = image.ExecutorImageSaver(writers, executor)
 	batch = __setup_array((2, 4, 6), __setup_context)
-	image.write_batch_async(sink, batch, __setup_locations(path, 2)).get()
+	image.write_batch_async(saver, batch, __setup_locations(path, 2)).get()
 	writers.close(path)
 	assert image.query_descriptor(path) == STACK_DESCRIPTOR
 
