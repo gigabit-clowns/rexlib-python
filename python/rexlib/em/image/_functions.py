@@ -20,6 +20,7 @@ from ..._binding.em import image as _raw
 from ..._binding.em.image import (
 	CachingImageReaderProvider,
 	DirectImageReaderProvider,
+	ExecutorImageSink,
 	ExecutorImageSource,
 	ImageDescriptor,
 	ImageLocation,
@@ -27,7 +28,9 @@ from ..._binding.em.image import (
 	ImageReadFormatManager,
 	ImageSource,
 	ImageWriteFormatManager,
+	ImageWriterProvider,
 	IndexTable,
+	ManagedImageWriterProvider,
 	get_image_read_format_manager,
 	get_image_write_format_manager,
 )
@@ -127,6 +130,51 @@ def source(
 		reader_provider(cache, manager),
 		_resolve_executor(executor, workers)
 	)
+
+def writer_provider(
+	manager: ImageWriteFormatManager | None = None
+) -> ManagedImageWriterProvider:
+	"""
+	Assemble a writer provider over the formats a manager holds.
+
+	A file has to be declared on it, with the descriptor it is created
+	as, before anything can be written to it, and closed once it is
+	finished.
+
+	Args:
+		manager: The formats to create files with. Defaults to the ones
+			the default catalog holds.
+
+	Returns:
+		ManagedImageWriterProvider: The assembled provider, with no file
+		declared.
+	"""
+	return ManagedImageWriterProvider(_resolve_write_manager(manager))
+
+def sink(
+	writers: ImageWriterProvider,
+	workers: int | None = None,
+	executor: Executor | None = None
+) -> ExecutorImageSink:
+	"""
+	Assemble an image sink over a thread pool.
+
+	The provider is taken rather than assembled, since whoever writes
+	keeps it to declare the files and to close them.
+
+	Each sink built this way owns its executor, as each source built by
+	`source` does.
+
+	Args:
+		writers: Where a path becomes an open writer.
+		workers: How many threads to run writes on. Defaults to what the
+			machine reports. Ignored when `executor` is given.
+		executor: Where writes run. Defaults to a thread pool of its own.
+
+	Returns:
+		ExecutorImageSink: The assembled sink.
+	"""
+	return ExecutorImageSink(writers, _resolve_executor(executor, workers))
 
 def query_descriptor(
 	path: str,

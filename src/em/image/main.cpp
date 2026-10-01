@@ -7,9 +7,11 @@
 #include "image_read.hpp"
 #include "image_read_format_manager.hpp"
 #include "image_reader_provider.hpp"
+#include "image_sink.hpp"
 #include "image_source.hpp"
 #include "image_write.hpp"
 #include "image_write_format_manager.hpp"
+#include "image_writer_provider.hpp"
 #include "index_table.hpp"
 
 namespace rexlib
@@ -25,6 +27,10 @@ void bind_image(pybind11::module_ &m)
 	auto caching_provider = declare_caching_image_reader_provider(m);
 	declare_image_source(m);
 	auto executor_source = declare_executor_image_source(m);
+	auto writer_provider = declare_image_writer_provider(m);
+	auto managed_provider = declare_managed_image_writer_provider(m);
+	auto image_sink = declare_image_sink(m);
+	auto executor_sink = declare_executor_image_sink(m);
 	declare_image_read_format_manager(m);
 	declare_image_write_format_manager(m);
 
@@ -35,6 +41,10 @@ void bind_image(pybind11::module_ &m)
 	define_direct_image_reader_provider(direct_provider);
 	define_caching_image_reader_provider(caching_provider);
 	define_executor_image_source(executor_source);
+	define_image_writer_provider(writer_provider);
+	define_managed_image_writer_provider(managed_provider);
+	define_image_sink(image_sink);
+	define_executor_image_sink(executor_sink);
 	define_image_read_format_manager(m);
 	define_image_write_format_manager(m);
 

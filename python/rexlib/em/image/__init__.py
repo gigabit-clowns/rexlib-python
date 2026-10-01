@@ -16,6 +16,12 @@ out of an `Array`. They take their formats from the default catalog and
 already has, through an `ImageSource`, and return a completion rather
 than wait. `source` assembles one over a thread pool.
 
+`write_batch_async` is their counterpart, through an `ImageSink`, into
+files whose shape is already settled: each is declared on a
+`ManagedImageWriterProvider` with the descriptor it is created as, and
+closed there once it is finished. `writer_provider` and `sink` assemble
+the two.
+
 A string is never parsed into an `ImageLocation` on its way anywhere: a
 path handed to the constructor, or to `read`, is a path, and
 `ImageLocation.from_string` is the one thing that reads `"3@stack.mrc"`
@@ -28,41 +34,52 @@ from __future__ import annotations
 from ..._binding.em.image import (
 	CachingImageReaderProvider as CachingImageReaderProvider,
 	DirectImageReaderProvider as DirectImageReaderProvider,
+	ExecutorImageSink as ExecutorImageSink,
 	ExecutorImageSource as ExecutorImageSource,
 	ImageDescriptor as ImageDescriptor,
 	ImageLocation as ImageLocation,
 	ImageReaderProvider as ImageReaderProvider,
+	ImageSink as ImageSink,
 	ImageSource as ImageSource,
 	ImageReadFormatManager as ImageReadFormatManager,
 	ImageWriteFormatManager as ImageWriteFormatManager,
+	ImageWriterProvider as ImageWriterProvider,
 	IndexTable as IndexTable,
+	ManagedImageWriterProvider as ManagedImageWriterProvider,
 	get_core_extents as get_core_extents,
 	get_image_read_format_manager as get_image_read_format_manager,
 	get_image_write_format_manager as get_image_write_format_manager,
 	read_batch_async as read_batch_async,
+	write_batch_async as write_batch_async,
 )
 from ._functions import (
 	query_descriptor as query_descriptor,
 	read as read,
 	read_patches_async as read_patches_async,
 	reader_provider as reader_provider,
+	sink as sink,
 	source as source,
 	write as write,
 	write_single as write_single,
 	write_stack as write_stack,
+	writer_provider as writer_provider,
 )
 
 __all__ = [
 	"CachingImageReaderProvider",
 	"DirectImageReaderProvider",
+	"ExecutorImageSink",
 	"ExecutorImageSource",
 	"ImageDescriptor",
 	"ImageLocation",
 	"ImageReadFormatManager",
 	"ImageReaderProvider",
+	"ImageSink",
 	"ImageSource",
 	"ImageWriteFormatManager",
+	"ImageWriterProvider",
 	"IndexTable",
+	"ManagedImageWriterProvider",
 	"get_core_extents",
 	"get_image_read_format_manager",
 	"get_image_write_format_manager",
@@ -71,8 +88,11 @@ __all__ = [
 	"read_batch_async",
 	"read_patches_async",
 	"reader_provider",
+	"sink",
 	"source",
 	"write",
+	"write_batch_async",
 	"write_single",
 	"write_stack",
+	"writer_provider",
 ]
