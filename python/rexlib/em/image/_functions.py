@@ -11,16 +11,23 @@ collaborator that takes a default comes after the arguments that do not.
 
 from __future__ import annotations
 
+import os
+from collections.abc import Sequence
+
+from ..._binding.concurrency import Completion, Executor, ThreadPoolExecutor
 from ..._binding.dispatch import ExecutionContext
 from ..._binding.em import image as _raw
 from ..._binding.em.image import (
 	CachingImageReaderProvider,
 	DirectImageReaderProvider,
+	ExecutorImageSource,
 	ImageDescriptor,
 	ImageLocation,
 	ImageReaderProvider,
 	ImageReadFormatManager,
+	ImageSource,
 	ImageWriteFormatManager,
+	IndexTable,
 	get_image_read_format_manager,
 	get_image_write_format_manager,
 )
@@ -28,6 +35,19 @@ from ..._binding.ndarray import Array
 from ..._binding.numerical import NumericalType
 from ..._catalog import get_default_catalog
 from ..._functional import _resolve_context
+
+def _default_worker_count() -> int:
+	return os.cpu_count() or 1
+
+def _resolve_executor(
+	executor: Executor | None,
+	workers: int | None
+) -> Executor:
+	if executor is None:
+		executor = ThreadPoolExecutor(
+			workers if workers is not None else _default_worker_count()
+		)
+	return executor
 
 def _resolve_read_manager(
 	manager: ImageReadFormatManager | None
@@ -71,6 +91,42 @@ def reader_provider(
 	if cache is not None:
 		readers = CachingImageReaderProvider(readers, cache)
 	return readers
+
+def source(
+	workers: int | None = None,
+	cache: int | None = None,
+	manager: ImageReadFormatManager | None = None,
+	executor: Executor | None = None
+) -> ExecutorImageSource:
+	"""
+	Assemble an image source over a thread pool.
+
+	Wires the four objects a source stands on — the formats, a reader
+	provider, an executor and the source itself — so that a caller
+	reaches `read_batch_async` and `read_patches_async` without naming
+	them.
+
+	Each source built this way owns its executor. Two of them means two
+	thread pools, each sized to the machine, which is worth avoiding by
+	passing one executor to both.
+
+	Args:
+		workers: How many threads to run reads on. Defaults to what the
+			machine reports. Ignored when `executor` is given.
+		cache: How many open readers to keep between reads. Defaults to
+			opening a file every time it is asked for, which is what
+			suits reads that do not revisit a file.
+		manager: The formats to recognize files with. Defaults to the
+			ones the default catalog holds.
+		executor: Where reads run. Defaults to a thread pool of its own.
+
+	Returns:
+		ExecutorImageSource: The assembled source.
+	"""
+	return ExecutorImageSource(
+		reader_provider(cache, manager),
+		_resolve_executor(executor, workers)
+	)
 
 def query_descriptor(
 	path: str,
@@ -135,6 +191,39 @@ def read(
 		_resolve_context(context),
 		data_type
 	)
+
+def read_patches_async(
+	source: ImageSource,
+	destination: Array,
+	location: ImageLocation,
+	centres: IndexTable | Sequence[Sequence[int]]
+) -> Completion:
+	"""
+	Crop a batch of equally sized patches out of one image.
+
+	Returns before the reads are done. Each slot of `destination`
+	receives the patch around one centre, which lands at index
+	`extent // 2` within it. A patch reaching past the edge of the image
+	is read as far as the image goes, and the rest of its slot keeps
+	what `destination` held beforehand.
+
+	Args:
+		source: Where the reads are dispatched.
+		destination: Where the patches land. Its leading extent is the
+			batch size and the rest are the shape of one patch.
+		location: The image every patch is cropped from.
+		centres: The centre of each patch, as an `IndexTable` or as any
+			sequence of sequences of the rank of one patch.
+
+	Returns:
+		Completion: Ready once every patch has been read or has failed.
+	"""
+	if not isinstance(centres, IndexTable):
+		table = IndexTable(max(len(destination.shape) - 1, 0))
+		for centre in centres:
+			table.add(centre)
+		centres = table
+	return _raw.read_patches_async(source, destination, location, centres)
 
 def write_single(
 	array: Array,
