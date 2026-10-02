@@ -25,7 +25,6 @@ image_writer_provider_class
 declare_image_writer_provider(pybind11::module_ &m);
 managed_image_writer_provider_class
 declare_managed_image_writer_provider(pybind11::module_ &m);
-void define_image_writer_provider(image_writer_provider_class &c);
 void define_managed_image_writer_provider(
 	managed_image_writer_provider_class &c
 );

@@ -63,7 +63,7 @@ def test_a_batch_spans_several_files(tmp_path, __setup_context):
 		image.ImageLocation(second, 3),
 	]
 	image.write_batch_async(saver, batch, locations).get()
-	saver.flush()
+	writers.flush()
 	assert image.query_descriptor(first) == STACK_DESCRIPTOR
 	assert image.query_descriptor(second) == STACK_DESCRIPTOR
 

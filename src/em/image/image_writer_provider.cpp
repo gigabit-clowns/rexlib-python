@@ -38,14 +38,6 @@ declare_managed_image_writer_provider(pybind11::module_ &m)
 	);
 }
 
-void define_image_writer_provider(image_writer_provider_class &c)
-{
-	c.def(
-		"flush", &em::image_writer_provider::flush,
-		py::call_guard<py::gil_scoped_release>()
-	);
-}
-
 void define_managed_image_writer_provider(
 	managed_image_writer_provider_class &c
 )
@@ -62,6 +54,10 @@ void define_managed_image_writer_provider(
 		.def(
 			"close", &em::managed_image_writer_provider::close,
 			py::arg("path"),
+			py::call_guard<py::gil_scoped_release>()
+		)
+		.def(
+			"flush", &em::managed_image_writer_provider::flush,
 			py::call_guard<py::gil_scoped_release>()
 		)
 		.def_property_readonly(

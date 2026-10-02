@@ -22,14 +22,6 @@ executor_image_saver_class declare_executor_image_saver(pybind11::module_ &m)
 	return executor_image_saver_class(m, "ExecutorImageSaver");
 }
 
-void define_image_saver(image_saver_class &c)
-{
-	c.def(
-		"flush", &em::image_saver::flush,
-		py::call_guard<py::gil_scoped_release>()
-	);
-}
-
 void define_executor_image_saver(executor_image_saver_class &c)
 {
 	c.def(

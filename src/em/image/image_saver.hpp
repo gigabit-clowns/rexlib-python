@@ -22,7 +22,6 @@ using executor_image_saver_class = pybind11::class_<
 
 image_saver_class declare_image_saver(pybind11::module_ &m);
 executor_image_saver_class declare_executor_image_saver(pybind11::module_ &m);
-void define_image_saver(image_saver_class &c);
 void define_executor_image_saver(executor_image_saver_class &c);
 
 } // namespace rexlib
