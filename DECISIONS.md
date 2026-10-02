@@ -88,11 +88,49 @@ both halves, including the round trip: a shape this reports is one it accepts.
 `read_patches_async` takes an `index_table` in rexlib, so the binding takes an
 `IndexTable` and nothing else. The package accepts any sequence of sequences
 beside it and builds the table, with the rank the destination implies, which
-is what keeps an empty list of centres meaningful.
+is what keeps an empty list of centres meaningful. It also accepts a numpy
+array, which it hands to `IndexTable.from_array`.
 
 The table is bound as a class rather than hidden behind a caster because a
 caller cropping many batches can fill one and reuse it, which a conversion on
 every call would not allow.
+
+### An `IndexTable` and a numpy array convert into each other in C++
+
+`IndexTable.from_array(indices)` takes an array of integers with one row per
+index, and `numpy.asarray(table)` gives one back through `__array__`. Neither
+has a counterpart in rexlib. They are in the binding because that is the only
+place where the rows are copied without crossing into C++ once per index,
+which is some thirty times slower for a table filled from Python with `add`.
+
+It is a static method rather than a constructor because the constructor
+already gives a lone argument the meaning "this rank". An overload told apart
+only by the type of that argument is the reason `ImageLocation` has
+`from_string`.
+
+`from_array` takes a `numpy.ndarray` and nothing that merely converts to one:
+not a list, not a buffer, not an object with `__array__`. Converting is one
+`numpy.asarray` away, and for some of those objects it moves data off a
+device or runs a deferred computation, which this package never does on a
+caller's behalf. It is also what pybind11 can state: the stub says
+`numpy.ndarray`, and that is exactly what is accepted. An array that does not
+hold integers is refused, and so is one holding a negative index, which would
+otherwise wrap around into a huge one.
+
+**Revisit when** callers routinely hold their centres in something else, a
+torch tensor or a data frame, and the `numpy.asarray` is noise.
+
+The array a table becomes is a copy, of `numpy.uintp` unless another type is
+asked for. A view would be left dangling by the next index added, so
+`copy=False` is refused.
+
+numpy is not a dependency of the package: it is reached only when a caller
+hands an array over or asks for one, and whoever does has it. It is a build
+requirement, since pybind11-stubgen has to import it to name it in the stubs,
+and a test requirement.
+
+**Revisit when** `Array` exchanges data with numpy, which would make numpy a
+dependency in its own right.
 
 ### Only what the high-level functions need is bound
 

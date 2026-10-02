@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
+import numpy
 import pytest
 
 import rexlib
@@ -24,6 +25,17 @@ def test_crops_patches_given_as_an_index_table(
 	centres = rexlib.IndexTable(2)
 	centres.add((10, 10))
 	centres.add((20, 30))
+	destination = __setup_array((2, 8, 8), __setup_context)
+	image.read_patches_async(
+		loader, destination, image.ImageLocation(__written_image), centres
+	).get()
+	assert destination.shape == (2, 8, 8)
+
+def test_crops_patches_given_as_an_array_of_centres(
+	__written_image, __setup_context
+):
+	loader = image.loader()
+	centres = numpy.array([[10, 10], [20, 30]])
 	destination = __setup_array((2, 8, 8), __setup_context)
 	image.read_patches_async(
 		loader, destination, image.ImageLocation(__written_image), centres
@@ -105,6 +117,27 @@ def test_an_index_table_of_another_rank_is_refused(
 		image.read_patches_async(
 			loader, destination, image.ImageLocation(__written_image),
 			centres
+		)
+
+def test_an_array_of_centres_of_another_rank_is_refused(
+	__written_image, __setup_context
+):
+	loader = image.loader()
+	destination = __setup_array((1, 8, 8), __setup_context)
+	with pytest.raises(ValueError):
+		image.read_patches_async(
+			loader, destination, image.ImageLocation(__written_image),
+			numpy.array([[10, 10, 10]])
+		)
+
+def test_centres_that_are_neither_table_array_nor_sequence_are_refused(
+	__written_image, __setup_context
+):
+	loader = image.loader()
+	destination = __setup_array((1, 8, 8), __setup_context)
+	with pytest.raises(TypeError):
+		image.read_patches_async(
+			loader, destination, image.ImageLocation(__written_image), 10
 		)
 
 def __setup_array(shape, context):

@@ -66,7 +66,7 @@ name that names them. See #143.
 |---|---|---|
 | `_binding` | `src/core/*.cpp` | `Version`, `Plugin`, `PluginManager`, `ServiceCatalog`, `rexlib_version`, `rexlib_binding_version` |
 | `_binding.numerical` | `src/core/numerical/` | `NumericalType`, and the `float16_t` type caster |
-| `_binding.layout` | `src/core/layout/` | `IndexTable` |
+| `_binding.layout` | `src/core/layout/` | `IndexTable`, and its conversion from and to a numpy array |
 | `_binding.ndarray` | `src/core/ndarray/` | `Array`, `ArrayDescriptor` |
 | `_binding.hardware` | `src/core/hardware/` | Devices, sessions, queues, events, memory resources |
 | `_binding.dispatch` | `src/core/dispatch/` | `ExecutionContext`, `Dispatcher`, `ProgramManager` |
@@ -201,6 +201,11 @@ The extension's `.pyi` files are generated while it is built, by
 `rexlib/_binding/` beside it. They are not in the repository and there is
 nothing to run by hand.
 
+The signatures of `IndexTable` name numpy, which pybind11-stubgen has to
+import to write `import numpy` into the stub. That is why numpy is in
+`build-system.requires` although nothing is compiled against it: without it
+the stubs are still written, with the name left unresolved.
+
 Generating them imports the extension, which a cross-compiling build cannot
 do. Those builds are handed stubs made elsewhere through
 `REXLIB_PYTHON_STUBS_DIR`; stubs describe the Python API, so the same ones are
@@ -286,6 +291,9 @@ that signature rather than adding to it. `from_string` is the inverse of
 `__str__` and raises `ValueError`, which is what the `bool` of rexlib's
 `parse_*` becomes on this side.
 
+`IndexTable.from_array` is a static method for the same reason: the
+constructor already takes a lone argument, the rank.
+
 Lifetimes are stated: `py::keep_alive` where an object borrows from another,
 `py::return_value_policy::reference_internal` where a getter hands out a
 reference into its owner. Getting this wrong does not fail a test, it crashes
@@ -364,7 +372,7 @@ Tests for what `_binding` exposes at its top level stay at the root.
 |---|---|
 | `tests/` | `Version`, `PluginManager`, `ServiceCatalog` |
 | `tests/numerical/` | `NumericalType` |
-| `tests/layout/` | `IndexTable` |
+| `tests/layout/` | `IndexTable`, and its conversion from and to a numpy array |
 | `tests/ndarray/` | `ArrayDescriptor`, and the operators installed onto `Array` |
 | `tests/hardware/` | Devices, sessions, events, memory resources, the session pool |
 | `tests/dispatch/` | `ExecutionContext`, the active context, `rexlib.device(...)` |

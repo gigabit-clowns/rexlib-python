@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from ..._binding.concurrency import Completion, Executor, ThreadPoolExecutor
 from ..._binding.dispatch import ExecutionContext
@@ -38,6 +39,9 @@ from ..._binding.ndarray import Array
 from ..._binding.numerical import NumericalType
 from ..._catalog import get_default_catalog
 from ..._functional import _resolve_context
+
+if TYPE_CHECKING:
+	import numpy
 
 def _default_worker_count() -> int:
 	return os.cpu_count() or 1
@@ -244,7 +248,7 @@ def read_patches_async(
 	loader: ImageLoader,
 	destination: Array,
 	location: ImageLocation,
-	centres: IndexTable | Sequence[Sequence[int]]
+	centres: IndexTable | numpy.ndarray | Sequence[Sequence[int]]
 ) -> Completion:
 	"""
 	Crop a batch of equally sized patches out of one image.
@@ -260,17 +264,20 @@ def read_patches_async(
 		destination: Where the patches land. Its leading extent is the
 			batch size and the rest are the shape of one patch.
 		location: The image every patch is cropped from.
-		centres: The centre of each patch, as an `IndexTable` or as any
-			sequence of sequences of the rank of one patch.
+		centres: The centre of each patch: an `IndexTable`, a numpy
+			array of integers with one row per centre, or any sequence
+			of homogeneous sequences. Each centre has the rank of one patch.
 
 	Returns:
 		Completion: Ready once every patch has been read or has failed.
 	"""
-	if not isinstance(centres, IndexTable):
+	if isinstance(centres, Sequence):
 		table = IndexTable(max(len(destination.shape) - 1, 0))
 		for centre in centres:
 			table.add(centre)
 		centres = table
+	elif not isinstance(centres, IndexTable):
+		centres = IndexTable.from_array(centres)
 	return _raw.read_patches_async(loader, destination, location, centres)
 
 def write_single(
