@@ -66,12 +66,13 @@ name that names them. See #143.
 |---|---|---|
 | `_binding` | `src/core/*.cpp` | `Version`, `Plugin`, `PluginManager`, `ServiceCatalog`, `rexlib_version`, `rexlib_binding_version` |
 | `_binding.numerical` | `src/core/numerical/` | `NumericalType`, and the `float16_t` type caster |
+| `_binding.layout` | `src/core/layout/` | `IndexTable` |
 | `_binding.ndarray` | `src/core/ndarray/` | `Array`, `ArrayDescriptor` |
 | `_binding.hardware` | `src/core/hardware/` | Devices, sessions, queues, events, memory resources |
 | `_binding.dispatch` | `src/core/dispatch/` | `ExecutionContext`, `Dispatcher`, `ProgramManager` |
 | `_binding.concurrency` | `src/core/concurrency/` | `Executor` and its two kinds, `Completion` |
 | `_binding.functional` | `src/functional/` | The operations, each taking an explicit context |
-| `_binding.em.image` | `src/em/image/` | `ImageLocation`, `ImageDescriptor`, `IndexTable`, the format managers, the reader and writer providers, the loader and the saver, and the functions of `image_read.hpp` and `image_write.hpp` |
+| `_binding.em.image` | `src/em/image/` | `ImageLocation`, `ImageDescriptor`, the format managers, the reader and writer providers, the loader and the saver, and the functions of `image_read.hpp` and `image_write.hpp` |
 
 A submodule is created by the `main.cpp` above it, which then hands it to the
 `bind_` function of the directory it stands for: `src/main.cpp` creates `em`
@@ -363,11 +364,12 @@ Tests for what `_binding` exposes at its top level stay at the root.
 |---|---|
 | `tests/` | `Version`, `PluginManager`, `ServiceCatalog` |
 | `tests/numerical/` | `NumericalType` |
+| `tests/layout/` | `IndexTable` |
 | `tests/ndarray/` | `ArrayDescriptor`, and the operators installed onto `Array` |
 | `tests/hardware/` | Devices, sessions, events, memory resources, the session pool |
 | `tests/dispatch/` | `ExecutionContext`, the active context, `rexlib.device(...)` |
 | `tests/functional/` | The operations |
-| `tests/em/image/` | `ImageLocation`, `ImageDescriptor`, `IndexTable`, the format managers, the providers, the synchronous reads and writes and the asynchronous ones |
+| `tests/em/image/` | `ImageLocation`, `ImageDescriptor`, the format managers, the providers, the synchronous reads and writes and the asynchronous ones |
 
 There are no `__init__.py` files and no `conftest.py`. Test module names are
 therefore unique across the whole tree, and a fixture belongs to the file that

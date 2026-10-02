@@ -4,7 +4,7 @@ Work whose shape is settled and only waits to be scheduled. Everything here
 has a known method; nothing here is waiting on a judgement call. Open
 questions live in [DECISIONS.md](DECISIONS.md).
 
-Reviewed 1 Oct 2026, against rexlib-python `e4e61b2` and rexlib `e244dc0c`.
+Reviewed 1 Oct 2026, against rexlib-python `b779150` and rexlib `273b7aeb`.
 
 ## 1. Bind the rest of `functional`
 

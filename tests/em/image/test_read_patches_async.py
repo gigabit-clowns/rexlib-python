@@ -21,7 +21,7 @@ def test_crops_patches_given_as_an_index_table(
 	__written_image, __setup_context
 ):
 	loader = image.loader()
-	centres = image.IndexTable(2)
+	centres = rexlib.IndexTable(2)
 	centres.add((10, 10))
 	centres.add((20, 30))
 	destination = __setup_array((2, 8, 8), __setup_context)
@@ -98,7 +98,7 @@ def test_an_index_table_of_another_rank_is_refused(
 	__written_image, __setup_context
 ):
 	loader = image.loader()
-	centres = image.IndexTable(3)
+	centres = rexlib.IndexTable(3)
 	centres.add((10, 10, 10))
 	destination = __setup_array((1, 8, 8), __setup_context)
 	with pytest.raises(ValueError):

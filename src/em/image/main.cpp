@@ -12,7 +12,6 @@
 #include "image_write.hpp"
 #include "image_write_format_manager.hpp"
 #include "image_writer_provider.hpp"
-#include "index_table.hpp"
 
 namespace rexlib
 {
@@ -21,7 +20,6 @@ void bind_image(pybind11::module_ &m)
 {
 	auto image_location = declare_image_location(m);
 	auto image_descriptor = declare_image_descriptor(m);
-	auto index_table = declare_index_table(m);
 	declare_image_reader_provider(m);
 	auto direct_provider = declare_direct_image_reader_provider(m);
 	auto caching_provider = declare_caching_image_reader_provider(m);
@@ -36,7 +34,6 @@ void bind_image(pybind11::module_ &m)
 
 	define_image_location(image_location);
 	define_image_descriptor(image_descriptor, m);
-	define_index_table(index_table);
 	define_image_reader_provider(m);
 	define_direct_image_reader_provider(direct_provider);
 	define_caching_image_reader_provider(caching_provider);

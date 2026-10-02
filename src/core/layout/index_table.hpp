@@ -4,12 +4,12 @@
 
 #include <pybind11/pybind11.h>
 
-#include <rexlib/em/image/index_table.hpp>
+#include <rexlib/core/layout/index_table.hpp>
 
 namespace rexlib
 {
 
-using index_table_class = pybind11::class_<em::index_table>;
+using index_table_class = pybind11::class_<index_table>;
 
 index_table_class declare_index_table(pybind11::module_ &m);
 void define_index_table(index_table_class &c);

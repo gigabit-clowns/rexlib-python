@@ -6,13 +6,13 @@
 
 #include <rexlib/core/concurrency/completion.hpp>
 #include <rexlib/core/dispatch/execution_context.hpp>
+#include <rexlib/core/layout/index_table.hpp>
 #include <rexlib/core/ndarray/array.hpp>
 #include <rexlib/core/numerical/numerical_type.hpp>
 #include <rexlib/core/span.hpp>
 #include <rexlib/em/image/image_loader.hpp>
 #include <rexlib/em/image/image_location.hpp>
 #include <rexlib/em/image/image_reader_provider.hpp>
-#include <rexlib/em/image/index_table.hpp>
 
 #include <pybind11/stl.h>
 
@@ -76,7 +76,7 @@ static std::shared_ptr<completion> py_read_patches_async(
 	const em::image_loader &loader,
 	array &destination,
 	const em::image_location &location,
-	const em::index_table &centres
+	const index_table &centres
 )
 {
 	return em::read_patches_async(

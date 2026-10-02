@@ -4,7 +4,7 @@ import pytest
 
 import rexlib
 
-IndexTable = rexlib.em.image.IndexTable
+IndexTable = rexlib.IndexTable
 
 def test_default_holds_indices_of_no_coordinates():
 	table = IndexTable()

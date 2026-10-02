@@ -29,11 +29,11 @@ from ..._binding.em.image import (
 	ImageReadFormatManager,
 	ImageWriteFormatManager,
 	ImageWriterProvider,
-	IndexTable,
 	ManagedImageWriterProvider,
 	get_image_read_format_manager,
 	get_image_write_format_manager,
 )
+from ..._binding.layout import IndexTable
 from ..._binding.ndarray import Array
 from ..._binding.numerical import NumericalType
 from ..._catalog import get_default_catalog
