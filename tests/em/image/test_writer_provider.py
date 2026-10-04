@@ -39,7 +39,7 @@ def test_a_path_declared_twice_is_refused(tmp_path):
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
 	writers.declare(path, __setup_descriptor())
-	with pytest.raises(RuntimeError):
+	with pytest.raises(ValueError):
 		writers.declare(path, __setup_descriptor())
 
 def test_closing_forgets_the_file(tmp_path):
