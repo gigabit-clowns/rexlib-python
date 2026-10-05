@@ -38,9 +38,10 @@ def test_declaring_creates_no_file(tmp_path):
 def test_a_path_declared_twice_is_refused(tmp_path):
 	path = str(tmp_path / 'stack.mrcs')
 	writers = image.writer_provider()
-	writers.declare(path, __setup_descriptor())
+	descriptor = __setup_descriptor()
+	writers.declare(path, descriptor)
 	with pytest.raises(ValueError):
-		writers.declare(path, __setup_descriptor())
+		writers.declare(path, descriptor)
 
 def test_closing_forgets_the_file(tmp_path):
 	path = str(tmp_path / 'stack.mrcs')

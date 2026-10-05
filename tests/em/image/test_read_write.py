@@ -30,8 +30,9 @@ def test_an_array_written_as_a_stack_is_a_stack(tmp_path, __setup_context):
 
 def test_a_stack_needs_an_axis_to_stack_along(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
+	array = __setup_array((6,), __setup_context)
 	with pytest.raises(ValueError):
-		image.write_stack(__setup_array((6,), __setup_context), path)
+		image.write_stack(array, path)
 
 def test_writes_the_type_it_is_asked_for(tmp_path, __setup_context):
 	path = str(tmp_path / 'image.mrc')
@@ -55,10 +56,9 @@ def test_a_descriptor_of_another_shape_is_refused(tmp_path, __setup_context):
 	descriptor = image.ImageDescriptor(
 		(2, 4, 6), 2, rexlib.NumericalType.float32
 	)
+	array = __setup_array((3, 4, 6), __setup_context)
 	with pytest.raises(ValueError):
-		image.write(
-			__setup_array((3, 4, 6), __setup_context), path, descriptor
-		)
+		image.write(array, path, descriptor)
 
 def test_reads_the_type_the_file_holds(tmp_path, __setup_context):
 	path = str(tmp_path / 'image.mrc')

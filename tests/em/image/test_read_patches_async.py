@@ -91,19 +91,19 @@ def test_a_destination_of_the_wrong_batch_size_is_refused(
 ):
 	loader = image.loader()
 	destination = __setup_array((3, 8, 8), __setup_context)
+	location = image.ImageLocation(__written_image)
 	with pytest.raises(ValueError):
 		image.read_patches_async(
-			loader, destination, image.ImageLocation(__written_image),
-			[(10, 10), (20, 30)]
+			loader, destination, location, [(10, 10), (20, 30)]
 		)
 
 def test_a_centre_of_another_rank_is_refused(__written_image, __setup_context):
 	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
+	location = image.ImageLocation(__written_image)
 	with pytest.raises(ValueError):
 		image.read_patches_async(
-			loader, destination, image.ImageLocation(__written_image),
-			[(10, 10, 10)]
+			loader, destination, location, [(10, 10, 10)]
 		)
 
 def test_an_index_table_of_another_rank_is_refused(
@@ -113,32 +113,28 @@ def test_an_index_table_of_another_rank_is_refused(
 	centres = rexlib.IndexTable(3)
 	centres.add((10, 10, 10))
 	destination = __setup_array((1, 8, 8), __setup_context)
+	location = image.ImageLocation(__written_image)
 	with pytest.raises(ValueError):
-		image.read_patches_async(
-			loader, destination, image.ImageLocation(__written_image),
-			centres
-		)
+		image.read_patches_async(loader, destination, location, centres)
 
 def test_an_array_of_centres_of_another_rank_is_refused(
 	__written_image, __setup_context
 ):
 	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
+	location = image.ImageLocation(__written_image)
+	centres = numpy.array([[10, 10, 10]])
 	with pytest.raises(ValueError):
-		image.read_patches_async(
-			loader, destination, image.ImageLocation(__written_image),
-			numpy.array([[10, 10, 10]])
-		)
+		image.read_patches_async(loader, destination, location, centres)
 
 def test_centres_that_are_neither_table_array_nor_sequence_are_refused(
 	__written_image, __setup_context
 ):
 	loader = image.loader()
 	destination = __setup_array((1, 8, 8), __setup_context)
+	location = image.ImageLocation(__written_image)
 	with pytest.raises(TypeError):
-		image.read_patches_async(
-			loader, destination, image.ImageLocation(__written_image), 10
-		)
+		image.read_patches_async(loader, destination, location, 10)
 
 def __setup_array(shape, context):
 	descriptor = rexlib.make_contiguous_array_descriptor(

@@ -80,8 +80,9 @@ def test_a_source_of_the_wrong_batch_size_is_refused(
 	writers.declare(path, STACK_DESCRIPTOR)
 	saver = image.saver(writers)
 	batch = __setup_array((3, 4, 6), __setup_context)
+	locations = __setup_locations(path, 2)
 	with pytest.raises(ValueError):
-		image.write_batch_async(saver, batch, __setup_locations(path, 2))
+		image.write_batch_async(saver, batch, locations)
 
 def test_a_path_that_was_not_declared_is_reported(tmp_path, __setup_context):
 	path = str(tmp_path / 'stack.mrcs')
