@@ -13,7 +13,6 @@ HOST = rexlib.hardware.MemoryResourceAffinity.host
 	('data_type', 'dtype'),
 	[
 		(rexlib.NumericalType.boolean, numpy.bool_),
-		(rexlib.NumericalType.char8, numpy.dtype('S1')),
 		(rexlib.NumericalType.int8, numpy.int8),
 		(rexlib.NumericalType.uint8, numpy.uint8),
 		(rexlib.NumericalType.int16, numpy.int16),
@@ -32,6 +31,14 @@ HOST = rexlib.hardware.MemoryResourceAffinity.host
 def test_numpy_sees_the_data_type(data_type, dtype, __setup_context):
 	array = __setup_empty([2, 3], data_type, __setup_context)
 	assert numpy.asarray(array).dtype == dtype
+
+def test_numpy_sees_a_character_as_an_8_bit_integer(__setup_context):
+	array = __setup_empty(
+		[2, 3], rexlib.NumericalType.char8, __setup_context
+	)
+	dtype = numpy.asarray(array).dtype
+	assert dtype.kind in 'iu'
+	assert dtype.itemsize == 1
 
 def test_numpy_sees_the_shape(__setup_context):
 	array = __setup_ones([4, 6], __setup_context)
@@ -123,7 +130,9 @@ def __setup_full(shape, value, context):
 def __setup_context():
 	catalog = rexlib.ServiceCatalog()
 	manager = rexlib.hardware.get_device_manager(catalog)
-	session = manager.create_device_session(rexlib.hardware.DeviceIndex('cpu', 0))
+	session = manager.create_device_session(
+		rexlib.hardware.DeviceIndex('cpu', 0)
+	)
 	device_context = rexlib.hardware.DeviceContext(session)
 	program_manager = rexlib.dispatch.get_program_manager(catalog)
 	dispatcher = rexlib.dispatch.make_eager_dispatcher(program_manager)
