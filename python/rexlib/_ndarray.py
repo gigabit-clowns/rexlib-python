@@ -10,6 +10,11 @@ Operators cannot take an execution context, so they go through
 The operators are installed onto the bound `Array` rather than onto a
 subclass: every array is built in C++, so a subclass would only ever be
 seen by callers that construct one by hand.
+
+`Array` exposes its memory through the buffer protocol, which is what
+`numpy.asarray` uses. `__array__` is here for the arrays that cannot: numpy
+asks it last, and would otherwise wrap such an array in an object array
+instead of failing.
 """
 
 from __future__ import annotations
@@ -40,6 +45,10 @@ def _unary_operator(function):
 def _deep_copy(self: Array, memo: dict) -> Array:
 	return _functional.copy(self)
 
+def _to_numpy(self: Array, dtype=None, copy=None):
+	import numpy  # noqa: PLC0415
+	return numpy.array(memoryview(self), dtype=dtype, copy=copy)
+
 Array.__add__ = _binary_operator(_functional.add)
 Array.__sub__ = _binary_operator(_functional.subtract)
 Array.__mul__ = _binary_operator(_functional.multiply)
@@ -58,3 +67,5 @@ Array.__pos__ = _unary_operator(_functional.copy)
 
 Array.__copy__ = _unary_operator(_functional.copy)
 Array.__deepcopy__ = _deep_copy
+
+Array.__array__ = _to_numpy
