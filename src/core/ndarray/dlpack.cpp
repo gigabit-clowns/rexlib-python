@@ -276,8 +276,31 @@ py::capsule make_capsule(array &source, void *data, std::uint64_t flags)
 	return result;
 }
 
+/**
+ * Refuses an array whose memory can not be handed out through DLPack: one
+ * that is not initialized, or whose storage the host can not reach.
+ */
+void check_exportable(const array &source)
+{
+	const auto *storage = source.get_storage();
+	if (storage == nullptr)
+	{
+		throw py::buffer_error("The array is not initialized.");
+	}
+
+	if (!is_host_accessible(storage->get_memory_resource().get_kind()))
+	{
+		throw py::buffer_error(
+			"The storage of the array can not be reached from the host, and "
+			"only host memory is exchanged through DLPack."
+		);
+	}
+}
+
 py::capsule to_dlpack(array &source, bool versioned, bool copied)
 {
+	check_exportable(source);
+
 	void *data = nullptr;
 	{
 		const py::gil_scoped_release release;
@@ -298,20 +321,7 @@ py::capsule to_dlpack(array &source, bool versioned, bool copied)
 
 py::tuple get_dlpack_device(const array &source)
 {
-	const auto *storage = source.get_storage();
-	if (storage == nullptr)
-	{
-		throw py::buffer_error("The array is not initialized.");
-	}
-
-	if (!is_host_accessible(storage->get_memory_resource().get_kind()))
-	{
-		throw py::buffer_error(
-			"The storage of the array can not be reached from the host, and "
-			"only host memory is exchanged through DLPack."
-		);
-	}
-
+	check_exportable(source);
 	return py::make_tuple(static_cast<int>(kDLCPU), 0);
 }
 
