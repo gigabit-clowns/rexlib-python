@@ -17,14 +17,22 @@ asks it last, and would otherwise wrap such an array in an object array
 instead of failing.
 
 `__dlpack__` and `__dlpack_device__` hand the same memory to whatever
-library takes DLPack. The capsule is built by the binding; what the protocol
-lets a consumer ask for is decided here.
+library takes DLPack, and `from_dlpack` takes the memory of whatever library
+hands it out. The capsule is built and read by the binding; what the protocol
+lets either side ask for is decided here.
 """
 
 from __future__ import annotations
 
 from . import _functional
-from ._binding.ndarray import Array, get_dlpack_device, to_dlpack
+from ._binding.ndarray import (
+	Array,
+	from_dlpack_capsule,
+	get_dlpack_device,
+	get_dlpack_version,
+	is_dlpack_capsule_read_only,
+	to_dlpack,
+)
 
 def _binary_operator(function):
 	def operator(self: Array, other: Array) -> Array:
@@ -71,9 +79,58 @@ def _dlpack(
 			"move it there. Transfer it first."
 		)
 
-	versioned = max_version is not None and max_version[0] >= 1
+	major = get_dlpack_version()[0]
+	versioned = max_version is not None and max_version[0] >= major
 	source = _functional.copy(self) if copy else self
 	return to_dlpack(source, versioned, bool(copy))
+
+def _request_dlpack(source, copy: bool | None):
+	try:
+		return source.__dlpack__(
+			max_version=get_dlpack_version(), copy=copy
+		)
+	except TypeError:
+		# An exporter from before DLPack 1.0 takes neither argument, so it
+		# cannot be asked for a copy. It never makes one by itself.
+		if copy:
+			raise
+		return source.__dlpack__()
+
+def from_dlpack(source, /, *, copy: bool | None = None) -> Array:
+	"""
+	Create an array over the memory of an object that exports DLPack.
+
+	The array shares the memory of `source` and keeps it alive. Only host
+	memory is taken: a source on another device is refused, never moved.
+
+	An array can always be written to, so a read-only source is not shared:
+	it is copied, or refused under `copy=False`. Some libraries do not say
+	that their memory is read only; theirs is shared like any other.
+
+	Args:
+		source: Any object with a `__dlpack__` method.
+		copy: True asks `source` for a copy of its own. False never copies.
+			None copies only a read-only source, which needs an active
+			device (see `rexlib.device`).
+
+	Returns:
+		An array over the memory of `source`, or over a copy of it.
+
+	Raises:
+		BufferError: `source` is not in host memory, holds a data type no
+			array has, is not aligned for its data type, or is read only
+			under `copy=False`.
+	"""
+	capsule = _request_dlpack(source, copy)
+	if not is_dlpack_capsule_read_only(capsule):
+		return from_dlpack_capsule(capsule)
+
+	if copy is False:
+		raise BufferError(
+			"The source is read only, and an array can always be written "
+			"to. Pass copy=None to have it copied."
+		)
+	return _functional.copy(from_dlpack_capsule(capsule))
 
 Array.__add__ = _binary_operator(_functional.add)
 Array.__sub__ = _binary_operator(_functional.subtract)

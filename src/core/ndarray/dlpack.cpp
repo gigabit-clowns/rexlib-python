@@ -2,6 +2,8 @@
 
 #include "dlpack.hpp"
 
+#include "dlpack_buffer.hpp"
+
 #include <rexlib/core/hardware/buffer.hpp>
 #include <rexlib/core/hardware/memory_resource.hpp>
 #include <rexlib/core/hardware/memory_resource_kind.hpp>
@@ -11,6 +13,7 @@
 #include <rexlib/core/ndarray/array_ref.hpp>
 #include <rexlib/core/ndarray/host_access.hpp>
 #include <rexlib/core/numerical/numerical_type.hpp>
+#include <rexlib/core/span.hpp>
 
 #include <dlpack/dlpack.h>
 
@@ -18,6 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 namespace rexlib
@@ -38,6 +42,31 @@ const char* get_capsule_name(const DLManagedTensorVersioned* /*tag*/) noexcept
 	return "dltensor_versioned";
 }
 
+const char* get_used_capsule_name(const DLManagedTensor* /*tag*/) noexcept
+{
+	return "used_dltensor";
+}
+
+const char*
+get_used_capsule_name(const DLManagedTensorVersioned* /*tag*/) noexcept
+{
+	return "used_dltensor_versioned";
+}
+
+template <typename Managed>
+bool holds_tensor(PyObject *capsule) noexcept
+{
+	const auto *name = get_capsule_name(static_cast<const Managed*>(nullptr));
+	return PyCapsule_IsValid(capsule, name) != 0;
+}
+
+template <typename Managed>
+Managed* get_tensor(PyObject *capsule) noexcept
+{
+	const auto *name = get_capsule_name(static_cast<const Managed*>(nullptr));
+	return static_cast<Managed*>(PyCapsule_GetPointer(capsule, name));
+}
+
 void set_version_and_flags(
 	DLManagedTensor& /*managed*/,
 	std::uint64_t /*flags*/
@@ -55,38 +84,90 @@ void set_version_and_flags(
 	managed.flags = flags;
 }
 
-DLDataType get_dlpack_data_type(numerical_type type)
+void check_version(const DLManagedTensor& /*managed*/) noexcept
 {
-	DLDataType result;
-	result.bits = static_cast<std::uint8_t>(8 * get_size(type));
-	result.lanes = 1;
+}
 
+void check_version(const DLManagedTensorVersioned &managed)
+{
+	// A tensor of another major version is laid out in another way.
+	if (managed.version.major != DLPACK_MAJOR_VERSION)
+	{
+		std::ostringstream oss;
+		oss << "The tensor follows version " << managed.version.major
+			<< " of DLPack, and only version " << DLPACK_MAJOR_VERSION
+			<< " is understood.";
+		throw py::buffer_error(oss.str());
+	}
+}
+
+bool
+get_dlpack_type_code(numerical_type type, std::uint8_t &code) noexcept
+{
 	switch (get_category(type))
 	{
 	case numerical_type_category::boolean:
-		result.code = kDLBool;
-		break;
+		code = kDLBool;
+		return true;
 	case numerical_type_category::signed_integer:
-		result.code = kDLInt;
-		break;
+		code = kDLInt;
+		return true;
 	case numerical_type_category::unsigned_integer:
-		result.code = kDLUInt;
-		break;
+		code = kDLUInt;
+		return true;
 	case numerical_type_category::floating_point:
-		result.code = kDLFloat;
-		break;
+		code = kDLFloat;
+		return true;
 	case numerical_type_category::complex:
-		result.code = kDLComplex;
-		break;
+		code = kDLComplex;
+		return true;
 	default:
+		return false;
+	}
+}
+
+DLDataType get_dlpack_data_type(numerical_type type)
+{
+	DLDataType result;
+	if (!get_dlpack_type_code(type, result.code))
+	{
+		std::ostringstream oss;
+		oss << "DLPack has no data type for " << type << ".";
+		throw py::buffer_error(oss.str());
+	}
+
+	result.bits = static_cast<std::uint8_t>(8 * get_size(type));
+	result.lanes = 1;
+	return result;
+}
+
+bool is_dlpack_data_type(numerical_type type, const DLDataType &other) noexcept
+{
+	std::uint8_t code = 0;
+	return
+		get_dlpack_type_code(type, code) &&
+		code == other.code &&
+		8 * get_size(type) == other.bits &&
+		other.lanes == 1;
+}
+
+numerical_type get_numerical_type(const DLDataType &type)
+{
+	const auto count = static_cast<int>(numerical_type::count);
+	for (int i = 0; i < count; ++i)
+	{
+		const auto candidate = static_cast<numerical_type>(i);
+		if (is_dlpack_data_type(candidate, type))
 		{
-			std::ostringstream oss;
-			oss << "DLPack has no data type for " << type << ".";
-			throw py::buffer_error(oss.str());
+			return candidate;
 		}
 	}
 
-	return result;
+	std::ostringstream oss;
+	oss << "No array holds the data type of the tensor (code "
+		<< static_cast<int>(type.code) << ", " << static_cast<int>(type.bits)
+		<< " bits, " << type.lanes << " lanes).";
+	throw py::buffer_error(oss.str());
 }
 
 /**
@@ -170,13 +251,10 @@ void dlpack_export<Managed>::destroy(Managed *managed)
 template <typename Managed>
 void destroy_capsule(PyObject *capsule)
 {
-	const auto *name = get_capsule_name(static_cast<const Managed*>(nullptr));
-
 	// A consumer renames the capsule when it takes the tensor over.
-	if (PyCapsule_IsValid(capsule, name) != 0)
+	if (holds_tensor<Managed>(capsule))
 	{
-		auto *managed =
-			static_cast<Managed*>(PyCapsule_GetPointer(capsule, name));
+		auto *managed = get_tensor<Managed>(capsule);
 		managed->deleter(managed);
 	}
 }
@@ -237,6 +315,153 @@ py::tuple get_dlpack_device(const array &source)
 	return py::make_tuple(static_cast<int>(kDLCPU), 0);
 }
 
+py::tuple get_dlpack_version()
+{
+	return py::make_tuple(DLPACK_MAJOR_VERSION, DLPACK_MINOR_VERSION);
+}
+
+void check_device(const DLTensor &tensor)
+{
+	if (tensor.device.device_type != kDLCPU)
+	{
+		throw py::buffer_error(
+			"The tensor is not in host memory, and only host memory is "
+			"exchanged through DLPack."
+		);
+	}
+}
+
+/**
+ * How many elements lie between the lowest address a layout reaches and its
+ * first element. The two differ when a stride is negative.
+ */
+std::ptrdiff_t compute_offset(
+	const std::vector<std::size_t> &extents,
+	const std::vector<std::ptrdiff_t> &strides
+) noexcept
+{
+	std::ptrdiff_t result = 0;
+
+	for (std::size_t i = 0; i < extents.size(); ++i)
+	{
+		if (extents[i] == 0)
+		{
+			return 0;
+		}
+
+		if (strides[i] < 0)
+		{
+			const auto last_index = static_cast<std::ptrdiff_t>(extents[i] - 1);
+			result -= last_index * strides[i];
+		}
+	}
+
+	return result;
+}
+
+strided_layout make_layout(const DLTensor &tensor)
+{
+	const auto rank = static_cast<std::size_t>(tensor.ndim);
+	const std::vector<std::size_t> extents(tensor.shape, tensor.shape + rank);
+
+	// A tensor without strides is contiguous, with its last axis fastest.
+	if (tensor.strides == nullptr)
+	{
+		return strided_layout::make_contiguous_layout(make_span(extents));
+	}
+
+	const std::vector<std::ptrdiff_t> strides(
+		tensor.strides,
+		tensor.strides + rank
+	);
+
+	return strided_layout::make_custom_layout(
+		make_span(extents),
+		make_span(strides),
+		compute_offset(extents, strides)
+	);
+}
+
+void check_alignment(const void *data, numerical_type type)
+{
+	const auto alignment = get_size(make_real(type));
+	if (reinterpret_cast<std::uintptr_t>(data) % alignment != 0)
+	{
+		std::ostringstream oss;
+		oss << "The memory of the tensor is not aligned for " << type << ".";
+		throw py::buffer_error(oss.str());
+	}
+}
+
+template <typename Managed>
+array import_tensor(PyObject *capsule)
+{
+	auto *managed = get_tensor<Managed>(capsule);
+	check_version(*managed);
+
+	const auto &tensor = managed->dl_tensor;
+	check_device(tensor);
+
+	const auto data_type = get_numerical_type(tensor.dtype);
+	const auto item_size = get_size(data_type);
+	auto layout = make_layout(tensor);
+
+	auto *first = static_cast<char*>(tensor.data) + tensor.byte_offset;
+	check_alignment(first, data_type);
+
+	auto storage = std::make_shared<dlpack_buffer>(
+		managed,
+		first - layout.get_offset() * static_cast<std::ptrdiff_t>(item_size),
+		layout.compute_storage_requirement() * item_size
+	);
+
+	// The buffer owns the tensor from here on, and the capsule must not
+	// release it again.
+	const auto *used_name =
+		get_used_capsule_name(static_cast<const Managed*>(nullptr));
+	if (PyCapsule_SetName(capsule, used_name) != 0)
+	{
+		throw py::error_already_set();
+	}
+
+	return array(
+		std::move(storage),
+		array_descriptor(std::move(layout), data_type)
+	);
+}
+
+array from_dlpack_capsule(const py::capsule &capsule)
+{
+	if (holds_tensor<DLManagedTensorVersioned>(capsule.ptr()))
+	{
+		return import_tensor<DLManagedTensorVersioned>(capsule.ptr());
+	}
+
+	if (holds_tensor<DLManagedTensor>(capsule.ptr()))
+	{
+		return import_tensor<DLManagedTensor>(capsule.ptr());
+	}
+
+	throw py::value_error(
+		"The capsule holds no DLPack tensor. A tensor can be taken out of "
+		"its capsule only once."
+	);
+}
+
+bool is_dlpack_capsule_read_only(const py::capsule &capsule)
+{
+	// A tensor without a version has no way to say it is read only.
+	if (!holds_tensor<DLManagedTensorVersioned>(capsule.ptr()))
+	{
+		return false;
+	}
+
+	const auto *managed =
+		get_tensor<DLManagedTensorVersioned>(capsule.ptr());
+	check_version(*managed);
+	return (managed->flags & DLPACK_FLAG_BITMASK_READ_ONLY) != 0;
+}
+
 } // anonymous namespace
 
 void bind_dlpack(pybind11::module_ &m)
@@ -250,6 +475,17 @@ void bind_dlpack(pybind11::module_ &m)
 		"get_dlpack_device",
 		&get_dlpack_device,
 		py::arg("array")
+	);
+	m.def("get_dlpack_version", &get_dlpack_version);
+	m.def(
+		"from_dlpack_capsule",
+		&from_dlpack_capsule,
+		py::arg("capsule")
+	);
+	m.def(
+		"is_dlpack_capsule_read_only",
+		&is_dlpack_capsule_read_only,
+		py::arg("capsule")
 	);
 }
 
