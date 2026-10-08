@@ -15,6 +15,12 @@ CUDA = (2, 0)
 FLOAT32 = (2, 32, 1)
 BRAIN_FLOAT16 = (4, 16, 1)
 FLOAT32_PAIR = (2, 32, 2)
+READ_ONLY = 1
+
+numpy_speaks_dlpack_1 = pytest.mark.skipif(
+	numpy.lib.NumpyVersion(numpy.__version__) < '2.1.0',
+	reason='numpy takes and gives versioned tensors from 2.1 on'
+)
 
 DATA_TYPES = [
 	(rexlib.NumericalType.boolean, numpy.bool_),
@@ -78,37 +84,53 @@ class DLTensor(ctypes.Structure):
 		('byte_offset', ctypes.c_uint64),
 	)
 
+Deleter = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+
 class DLManagedTensor(ctypes.Structure):
-	pass
+	_fields_ = (
+		('dl_tensor', DLTensor),
+		('manager_ctx', ctypes.c_void_p),
+		('deleter', Deleter),
+	)
 
-Deleter = ctypes.CFUNCTYPE(None, ctypes.POINTER(DLManagedTensor))
+class DLPackVersion(ctypes.Structure):
+	_fields_ = (
+		('major', ctypes.c_uint32),
+		('minor', ctypes.c_uint32),
+	)
 
-DLManagedTensor._fields_ = (
-	('dl_tensor', DLTensor),
-	('manager_ctx', ctypes.c_void_p),
-	('deleter', Deleter),
-)
+class DLManagedTensorVersioned(ctypes.Structure):
+	_fields_ = (
+		('version', DLPackVersion),
+		('manager_ctx', ctypes.c_void_p),
+		('deleter', Deleter),
+		('flags', ctypes.c_uint64),
+		('dl_tensor', DLTensor),
+	)
 
-CAPSULE_NAME = b'dltensor'
+UNVERSIONED_NAME = b'dltensor'
+VERSIONED_NAME = b'dltensor_versioned'
 
 new_capsule = ctypes.PYFUNCTYPE(
 	ctypes.py_object, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_void_p
 )(('PyCapsule_New', ctypes.pythonapi))
 
 class HandMade:
-	"""Exports a tensor of floats built by hand, and counts its releases.
+	"""Exports a tensor of floats built by hand.
 
-	It gives what no library is known to export: a tensor without strides,
-	with a byte offset, without a deleter, on another device or of a data
-	type no array has.
+	It counts its releases and keeps what it was asked for. It also gives
+	what a library does not export, or not in every version: a tensor
+	without strides, with a byte offset, without a deleter, on another
+	device, of a data type no array has, read only or of another version.
 	"""
 
 	def __init__(
 		self, values, shape, *,
 		strides=None, byte_offset=0, device=CPU, data_type=FLOAT32,
-		has_deleter=True
+		has_deleter=True, version=None, flags=0
 	):
 		self.released = 0
+		self.requested = None
 		self.capsule = None
 		self.__values = (ctypes.c_float * len(values))(*values)
 		self.__shape = (ctypes.c_int64 * len(shape))(*shape)
@@ -117,26 +139,32 @@ class HandMade:
 			else (ctypes.c_int64 * len(strides))(*strides)
 		)
 		self.__deleter = Deleter(self.__release) if has_deleter else Deleter()
-		self.__managed = DLManagedTensor(
-			DLTensor(
-				ctypes.addressof(self.__values),
-				DLDevice(*device),
-				len(shape),
-				DLDataType(*data_type),
-				self.__shape,
-				self.__strides,
-				byte_offset,
-			),
-			None,
-			self.__deleter,
+
+		tensor = DLTensor(
+			ctypes.addressof(self.__values),
+			DLDevice(*device),
+			len(shape),
+			DLDataType(*data_type),
+			self.__shape,
+			self.__strides,
+			byte_offset,
 		)
+		if version is None:
+			self.__name = UNVERSIONED_NAME
+			self.__managed = DLManagedTensor(tensor, None, self.__deleter)
+		else:
+			self.__name = VERSIONED_NAME
+			self.__managed = DLManagedTensorVersioned(
+				DLPackVersion(*version), None, self.__deleter, flags, tensor
+			)
 
 	def __release(self, _):
 		self.released += 1
 
-	def __dlpack__(self, **_):
+	def __dlpack__(self, **requested):
+		self.requested = requested
 		self.capsule = new_capsule(
-			ctypes.addressof(self.__managed), CAPSULE_NAME, None
+			ctypes.addressof(self.__managed), self.__name, None
 		)
 		return self.capsule
 
@@ -192,6 +220,7 @@ def test_the_capsule_is_versioned_for_a_consumer_that_can_take_it(
 	capsule = array.__dlpack__(max_version=(1, 0))
 	assert '"dltensor_versioned"' in repr(capsule)
 
+@numpy_speaks_dlpack_1
 def test_numpy_takes_a_versioned_capsule(__setup_context):
 	array = __setup_full([2, 3], 2.5, __setup_context)
 	exported = Exported(array.__dlpack__(max_version=(1, 0)))
@@ -351,32 +380,58 @@ def test_a_writable_source_is_shared_when_no_copy_is_allowed():
 	array = rexlib.from_dlpack(source, copy=False)
 	assert numpy.shares_memory(numpy.asarray(array), source)
 
-def test_the_source_is_asked_for_a_copy():
+@pytest.mark.parametrize('copy', [None, False, True])
+def test_the_source_is_asked_for_what_the_caller_wants(copy):
+	source = HandMade([1, 2, 3], [3])
+	array = rexlib.from_dlpack(source, copy=copy)
+	assert source.requested['copy'] is copy
+	assert source.requested['max_version'][0] == 1
+	del array
+
+@numpy_speaks_dlpack_1
+def test_numpy_copies_when_asked_to():
 	source = numpy.arange(6, dtype=numpy.float32)
 	copied = numpy.asarray(rexlib.from_dlpack(source, copy=True))
 	assert numpy.array_equal(copied, source)
 	assert not numpy.shares_memory(copied, source)
 
-def test_a_read_only_source_is_copied():
+def test_a_versioned_tensor_is_taken():
+	source = HandMade([1, 2, 3], [3], version=(1, 0))
+	array = rexlib.from_dlpack(source)
+	assert numpy.asarray(array).tolist() == [1, 2, 3]
+	assert '"used_dltensor_versioned"' in repr(source.capsule)
+	del array
+	gc.collect()
+	assert source.released == 1
+
+def test_a_tensor_of_another_major_version_is_refused():
+	source = HandMade([1, 2, 3], [3], version=(2, 0))
+	with pytest.raises(BufferError, match='version 2'):
+		rexlib.from_dlpack(source)
+	assert source.released == 0
+
+def test_a_read_only_tensor_is_copied_and_given_back():
+	source = HandMade([1, 2, 3], [3], version=(1, 0), flags=READ_ONLY)
+	with rexlib.device('cpu'):
+		copied = rexlib.from_dlpack(source)
+	gc.collect()
+	assert numpy.asarray(copied).tolist() == [1, 2, 3]
+	assert source.released == 1
+
+def test_a_read_only_tensor_is_refused_when_no_copy_is_allowed():
+	source = HandMade([1, 2, 3], [3], version=(1, 0), flags=READ_ONLY)
+	with pytest.raises(BufferError, match='read only'):
+		rexlib.from_dlpack(source, copy=False)
+	assert source.released == 0
+
+@numpy_speaks_dlpack_1
+def test_a_read_only_array_of_numpy_is_copied():
 	source = numpy.arange(6, dtype=numpy.float32)
 	source.flags.writeable = False
 	with rexlib.device('cpu'):
 		copied = numpy.asarray(rexlib.from_dlpack(source))
 	assert numpy.array_equal(copied, source)
 	assert not numpy.shares_memory(copied, source)
-
-def test_a_read_only_source_is_asked_for_a_copy():
-	source = numpy.arange(6, dtype=numpy.float32)
-	source.flags.writeable = False
-	copied = numpy.asarray(rexlib.from_dlpack(source, copy=True))
-	assert numpy.array_equal(copied, source)
-	assert not numpy.shares_memory(copied, source)
-
-def test_a_read_only_source_is_refused_when_no_copy_is_allowed():
-	source = numpy.arange(6, dtype=numpy.float32)
-	source.flags.writeable = False
-	with pytest.raises(BufferError, match='read only'):
-		rexlib.from_dlpack(source, copy=False)
 
 def test_a_source_that_is_not_aligned_is_refused():
 	source = numpy.frombuffer(
