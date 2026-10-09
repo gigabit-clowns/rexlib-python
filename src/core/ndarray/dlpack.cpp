@@ -72,6 +72,7 @@ void set_version_and_flags(
 	std::uint64_t /*flags*/
 ) noexcept
 {
+	// A tensor without a version has no field for either.
 }
 
 void set_version_and_flags(
@@ -86,6 +87,7 @@ void set_version_and_flags(
 
 void check_version(const DLManagedTensor& /*managed*/) noexcept
 {
+	// A tensor without a version has one layout only.
 }
 
 void check_version(const DLManagedTensorVersioned &managed)

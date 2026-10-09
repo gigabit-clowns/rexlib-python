@@ -446,9 +446,9 @@ def test_an_old_exporter_is_taken():
 	assert numpy.shares_memory(numpy.asarray(array), source)
 
 def test_an_old_exporter_cannot_be_asked_for_a_copy():
-	source = numpy.arange(6, dtype=numpy.float32)
+	exporter = OldExporter(numpy.arange(6, dtype=numpy.float32))
 	with pytest.raises(TypeError):
-		rexlib.from_dlpack(OldExporter(source), copy=True)
+		rexlib.from_dlpack(exporter, copy=True)
 
 def test_an_object_that_does_not_export_is_refused():
 	with pytest.raises(AttributeError):
@@ -501,8 +501,9 @@ def test_a_capsule_is_marked_once_its_tensor_is_taken():
 def test_a_tensor_is_taken_out_of_its_capsule_only_once():
 	source = HandMade([1, 2, 3], [3])
 	array = rexlib.from_dlpack(source)
+	emptied = Exported(source.capsule)
 	with pytest.raises(ValueError, match='only once'):
-		rexlib.from_dlpack(Exported(source.capsule))
+		rexlib.from_dlpack(emptied)
 	del array
 	gc.collect()
 	assert source.released == 1

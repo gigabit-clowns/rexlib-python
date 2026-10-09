@@ -16,6 +16,7 @@ command_queue_class declare_command_queue(pybind11::module_ &m)
 
 void define_command_queue(command_queue_class &/*c*/)
 {
+	// A queue only takes commands, and a command is not bound.
 }
 
 } // namespace rexlib
