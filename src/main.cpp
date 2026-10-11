@@ -3,7 +3,6 @@
 #include "core/ndarray/main.hpp"
 #include "core/numerical/main.hpp"
 #include "core/dispatch/main.hpp"
-// #include "em/main.hpp"
 #include "functional/main.hpp"
 
 #include "core/service_catalog.hpp"
@@ -35,13 +34,6 @@ PYBIND11_MODULE(_binding, m) {
 
 	auto functional_module = m.def_submodule("functional");
 	bind_functional(functional_module);
-
-	// em has nothing to bind yet. Uncomment these lines, the include
-	// above and the import of em in python/rexlib/__init__.py once
-	// bind_em creates a submodule.
-	//
-	// auto em_module = m.def_submodule("em");
-	// bind_em(em_module);
 
 	define_version(version, m);
 	define_plugin(plugin);
