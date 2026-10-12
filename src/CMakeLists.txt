@@ -51,6 +51,10 @@ target_include_directories(
 )
 if(MSVC)
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
+	target_compile_definitions(
+		${TARGET_NAME}
+		PRIVATE _SILENCE_NONFLOATING_COMPLEX_DEPRECATION_WARNING
+	)
 else()
 	target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 endif()
