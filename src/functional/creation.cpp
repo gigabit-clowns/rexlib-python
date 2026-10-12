@@ -15,6 +15,7 @@
 #include <rexlib/core/dispatch/execution_context.hpp>
 
 #include <nanobind/stl/complex.h>
+#include <nanobind/stl/string.h>
 
 #include <string>
 
@@ -28,8 +29,8 @@ namespace nb = nanobind;
 [[noreturn]]
 static void throw_scalar_cast_error(numerical_type type, const nb::object &value)
 {
-	const std::string given =
-		nb::str(value.type().attr("__name__")).c_str();
+	const auto given =
+		nb::cast<std::string>(value.type().attr("__name__"));
 	auto message =
 		"cannot use a '" + given + "' as a " + to_string(type) + " value";
 	if (type == numerical_type::char8)
