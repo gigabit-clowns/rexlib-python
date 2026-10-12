@@ -9,11 +9,11 @@ file(GLOB_RECURSE INLINE_SOURCES ${PROJECT_SOURCE_DIR}/include/*.inl)
 set(TARGET_NAME "_binding")
 # nanobind falls back to the interpreter's own ABI where the stable one
 # cannot serve: before Python 3.12, and on a free-threaded interpreter.
+set(NANOBIND_OPTIONS NB_SUPPRESS_WARNINGS)
 if(REXLIB_PYTHON_STABLE_ABI)
-	nanobind_add_module(${TARGET_NAME} STABLE_ABI ${SOURCES})
-else()
-	nanobind_add_module(${TARGET_NAME} ${SOURCES})
+	list(APPEND NANOBIND_OPTIONS STABLE_ABI)
 endif()
+nanobind_add_module(${TARGET_NAME} ${NANOBIND_OPTIONS} ${SOURCES})
 
 target_compile_definitions(
 	${TARGET_NAME}
