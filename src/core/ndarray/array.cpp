@@ -10,6 +10,7 @@
 
 #include <nanobind/stl/string.h>
 
+#include <array>
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -34,7 +35,7 @@ struct buffer_view
 {
 	std::vector<Py_ssize_t> shape;
 	std::vector<Py_ssize_t> strides;
-	const char *format;
+	std::string format;
 };
 
 std::vector<std::size_t> get_extents(const array &self)
@@ -201,7 +202,7 @@ void fill_buffer(PyObject *self, Py_buffer *view, int flags)
 	view->itemsize = item_size;
 	view->format =
 		(flags & PyBUF_FORMAT) == PyBUF_FORMAT
-		? const_cast<char*>(result->format)
+		? result->format.data()
 		: nullptr;
 	view->ndim = static_cast<int>(result->shape.size());
 	view->shape =
@@ -236,14 +237,16 @@ int get_buffer(PyObject *self, Py_buffer *view, int flags) noexcept
 
 void release_buffer(PyObject* /*self*/, Py_buffer *view) noexcept
 {
-	delete static_cast<buffer_view*>(view->internal);
+	const std::unique_ptr<buffer_view> owned(
+		static_cast<buffer_view*>(view->internal)
+	);
 }
 
-PyType_Slot array_slots[] = {
+const std::array<PyType_Slot, 3> array_slots = {{
 	{ Py_bf_getbuffer, reinterpret_cast<void*>(&get_buffer) },
 	{ Py_bf_releasebuffer, reinterpret_cast<void*>(&release_buffer) },
 	{ 0, nullptr }
-};
+}};
 
 std::string to_repr(const array &self)
 {
@@ -257,7 +260,7 @@ std::string to_repr(const array &self)
 
 array_class declare_array(nanobind::module_ &m)
 {
-	return array_class(m, "Array", nb::type_slots(array_slots));
+	return array_class(m, "Array", nb::type_slots(array_slots.data()));
 }
 
 void define_array(array_class &c)
