@@ -20,6 +20,7 @@ the same pull request that causes it.
 | `tests/assets/` | Two dummy plugins, built by CMake, that the plugin tests discover |
 | `scripts/` | Development tools: the test runner, the stub generator and collector, the wheel check |
 | `cmake/modules/` | `python_stubs.cmake`, which installs the type stubs |
+| `cmake/scripts/` | `name_rexlib_by_soname.cmake`, run when a wheel is installed |
 | `conf/` | `coverage.ini` |
 | `external/rexlib` | The rexlib the repository is developed against, a submodule |
 
@@ -422,7 +423,7 @@ Tests for what `_binding` exposes at its top level stay at the root.
 
 | Directory | Covers |
 |---|---|
-| `tests/` | `Version`, `PluginManager`, `ServiceCatalog` |
+| `tests/` | `Version`, `PluginManager`, `ServiceCatalog`, the CMake package of the rexlib inside |
 | `tests/numerical/` | `NumericalType` |
 | `tests/ndarray/` | `ArrayDescriptor`, the operators installed onto `Array`, the buffer protocol and DLPack |
 | `tests/hardware/` | Devices, sessions, memory resources, the session pool |
@@ -493,9 +494,15 @@ The wheel carries librexlib itself, put there by this project's install rules,
 and every repair tool is told to leave it alone: `auditwheel --exclude`,
 `delvewheel --exclude`, `delocate --ignore-missing-dependencies`. Vendoring it
 would rename it under a hash-mangled SONAME, which breaks `find_package` for
-plugin authors and the sibling directory the plugins are discovered in. The
-namelink is excluded from the wheel instead, since a wheel stores a symlink as
-another full copy.
+plugin authors and the sibling directory the plugins are discovered in.
+
+A wheel stores a symlink as another full copy, so it keeps one name of the
+library: the soname, `librexlib.so.0` or `librexlib.0.dylib`, which is what
+the extension asks the loader for. The fully versioned file is excluded, and
+`cmake/scripts/name_rexlib_by_soname.cmake` rewrites the CMake package the
+wheel carries to name the soname instead, so that `find_package(rexlib)`
+against an installed wheel finds a library that is there.
+`tests/test_cmake_package.py` checks every file the package names.
 
 musllinux is skipped: NVIDIA ships no CUDA for musl, so rexlib-cuda is
 manylinux only and an Alpine install could never reach the GPU backend. Alpine

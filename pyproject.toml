@@ -82,7 +82,8 @@ wheel.py-api = "cp312"
 # stubs imports the extension, which does not load until rexlib is in place.
 install.components = ["rexlib_runtime", "rexlib_development", "Unspecified"]
 
-# The versioned names, beside which rexlib installs a soname.
+# The versioned names, beside which rexlib installs a soname. The CMake
+# package the wheel carries is rewritten to name the soname instead.
 wheel.exclude = [
     "librexlib.so.*.*.*",
     "librexlib.*.*.*.dylib",

@@ -148,6 +148,17 @@ if(REXLIB_PYTHON_INSTALL)
 		)
 	endif()
 
+	# A wheel keeps rexlib's library under its soname alone (wheel.exclude in
+	# pyproject.toml), and the CMake package it carries names that file.
+	if(SKBUILD)
+		install(CODE
+			"set(REXLIB_PYTHON_PACKAGE_DIR \"${REXLIB_PYTHON_PACKAGE_DIR}\")"
+		)
+		install(SCRIPT
+			"${CMAKE_CURRENT_SOURCE_DIR}/cmake/scripts/name_rexlib_by_soname.cmake"
+		)
+	endif()
+
 	# After everything the import needs is in place.
 	install_python_stubs(
 		MODULE rexlib._binding
