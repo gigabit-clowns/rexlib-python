@@ -88,7 +88,6 @@ wheel.exclude = [
     "librexlib.*.*.*.dylib",
 ]
 
-# The stable ABI component of FindPython arrived in CMake 3.26.
 cmake.version = ">=3.26"
 cmake.args = []
 build.verbose = false

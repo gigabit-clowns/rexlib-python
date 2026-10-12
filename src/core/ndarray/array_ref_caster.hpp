@@ -15,7 +15,7 @@ namespace detail
 
 /**
  * Loads a reference to an array from a bound Array, under the name of
- * Array. Nothing produces one in Python, so it is never cast to Python.
+ * Array. It is never cast to Python.
  */
 template <typename Ref, typename Referenced>
 struct array_ref_caster

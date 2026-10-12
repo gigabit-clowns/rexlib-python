@@ -11,8 +11,7 @@ namespace nanobind
 namespace detail
 {
 
-// Converts rexlib::float16_t through `float`: Python has no half-width
-// float type.
+// Converts rexlib::float16_t through `float`.
 template <>
 struct type_caster<rexlib::float16_t>
 {

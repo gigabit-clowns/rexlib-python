@@ -267,7 +267,6 @@ nb::capsule make_capsule(array &source, void *data, std::uint64_t flags)
 	auto exported =
 		std::make_unique<dlpack_export<Managed>>(source, data, flags);
 
-	// The destructor is handed the capsule itself, and so sees its name.
 	auto *result = PyCapsule_New(
 		exported->get_managed(),
 		get_capsule_name(static_cast<const Managed*>(nullptr)),

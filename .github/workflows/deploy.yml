@@ -108,8 +108,8 @@ jobs:
             architectures: "x86_64"
           - os: ubuntu-24.04-arm
             architectures: "aarch64"
-          # 10.14 is the oldest nanobind supports, for the C++17 library it
-          # needs; arm64 did not exist before 11.0.
+          # The oldest macOS each architecture can target: nanobind's for
+          # x86_64, the first with arm64 for arm64.
           - os: macos-latest
             architectures: "x86_64"
             deployment-target: "10.14"

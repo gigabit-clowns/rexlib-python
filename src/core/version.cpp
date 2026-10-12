@@ -93,7 +93,6 @@ void define_version(version_class &c, nanobind::module_ &m)
 			}
 		);
 
-	// Unhashable, as a Python class defining __eq__ and no __hash__ is.
 	c.attr("__hash__") = nb::none();
 
 	m.attr("rexlib_version") = nb::cast(get_library_version());

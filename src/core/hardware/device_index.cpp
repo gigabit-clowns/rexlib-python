@@ -95,7 +95,6 @@ void define_device_index(device_index_class &c)
 			}
 		);
 
-	// Unhashable, as a Python class defining __eq__ and no __hash__ is.
 	c.attr("__hash__") = nb::none();
 }
 

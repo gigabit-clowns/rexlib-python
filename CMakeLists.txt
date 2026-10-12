@@ -16,8 +16,6 @@ include(CTest)
 include(GNUInstallDirs)
 include(python_stubs)
 
-# Read here rather than with the options below, because it decides what is
-# asked of FindPython, which the other options need found.
 option(
 	REXLIB_PYTHON_STABLE_ABI
 	"Build the extension against the stable ABI, so that one build serves \
