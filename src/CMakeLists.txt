@@ -7,7 +7,14 @@ file(GLOB_RECURSE INLINE_SOURCES ${PROJECT_SOURCE_DIR}/include/*.inl)
 
 # Create the shared library
 set(TARGET_NAME "_binding")
-pybind11_add_module(${TARGET_NAME} ${SOURCES})
+nanobind_add_module(${TARGET_NAME} ${SOURCES})
+
+if(REXLIB_PYTHON_MODULE_SUFFIX)
+	set_target_properties(
+		${TARGET_NAME}
+		PROPERTIES SUFFIX "${REXLIB_PYTHON_MODULE_SUFFIX}"
+	)
+endif()
 
 target_compile_definitions(
 	${TARGET_NAME}

@@ -4,6 +4,8 @@
 
 #include <rexlib/core/service_catalog.hpp>
 
+#include <nanobind/stl/shared_ptr.h>
+
 namespace rexlib
 {
 
@@ -12,12 +14,12 @@ static std::shared_ptr<program_manager> get_program_manager(service_catalog &cat
 	return catalog.get_service_manager<program_manager>();
 }
 
-program_manager_class declare_program_manager(pybind11::module_ &m)
+program_manager_class declare_program_manager(nanobind::module_ &m)
 {
 	return program_manager_class(m, "ProgramManager");
 }
 
-void define_program_manager(pybind11::module_ &m)
+void define_program_manager(nanobind::module_ &m)
 {
 	m.def("get_program_manager", &get_program_manager);
 }

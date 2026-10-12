@@ -7,14 +7,14 @@
 #include <rexlib/core/hardware/memory_resource_affinity.hpp>
 #include <rexlib/core/dispatch/execution_context.hpp>
 
-#include <pybind11/stl.h>
+#include <nanobind/stl/optional.h>
 
 #include <optional>
 
 namespace rexlib
 {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 static array py_transfer_copy(
 	const array &input,
@@ -36,35 +36,35 @@ static array py_to_host_copy(const array &input, const execution_context &contex
 	return rexlib::to_host_copy(input, context, out.value_or(nullptr));
 }
 
-void bind_transfer(pybind11::module_ &m)
+void bind_transfer(nanobind::module_ &m)
 {
 	m.def(
 		"transfer",
 		&rexlib::transfer,
-		py::arg("input"), py::arg("affinity"), py::arg("context")
+		nb::arg("input"), nb::arg("affinity"), nb::arg("context")
 	);
 	m.def(
 		"transfer_copy", &py_transfer_copy,
-		py::arg("input"), py::arg("affinity"), py::arg("context"),
-		py::arg("out") = py::none()
+		nb::arg("input"), nb::arg("affinity"), nb::arg("context"),
+		nb::arg("out") = nb::none()
 	);
 	m.def(
 		"to_device",
 		&rexlib::to_device,
-		py::arg("input"), py::arg("context")
+		nb::arg("input"), nb::arg("context")
 	);
 	m.def(
 		"to_device_copy", &py_to_device_copy,
-		py::arg("input"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("input"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"to_host",
 		&rexlib::to_host,
-		py::arg("input"), py::arg("context")
+		nb::arg("input"), nb::arg("context")
 	);
 	m.def(
 		"to_host_copy", &py_to_host_copy,
-		py::arg("input"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("input"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 }
 

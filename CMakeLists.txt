@@ -37,9 +37,10 @@ set(REXLIB_PYTHON_INSTALL_DIR "${DEFAULT_INSTALL_DIR}" CACHE PATH
 	"Directory the Python package is installed into")
 unset(DEFAULT_INSTALL_DIR)
 
-# Empty lets pybind11 take the suffix from the interpreter it found, which
-# is right unless that interpreter is not the one being targeted.
-# cibuildwheel publishes the target's suffix in the environment.
+# Empty lets nanobind take the suffix from scikit-build-core or from the
+# interpreter it found, which is right unless that interpreter is not the one
+# being targeted. cibuildwheel publishes the target's suffix in the
+# environment.
 set(REXLIB_PYTHON_MODULE_SUFFIX "$ENV{SETUPTOOLS_EXT_SUFFIX}" CACHE STRING
 	"Extension suffix, for example .cp312-win_arm64.pyd")
 
@@ -66,19 +67,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 # Dependencies
 # ---------------------------------------------------------------------------
 
-if(REXLIB_PYTHON_MODULE_SUFFIX)
-	# Read by pybind11 when it is brought in below, which is when it
-	# decides how to name the module.
-	set(PYTHON_MODULE_EXTENSION "${REXLIB_PYTHON_MODULE_SUFFIX}")
-endif()
-
 include(FetchContent)
 FetchContent_Declare(
-	pybind11
-	GIT_REPOSITORY https://github.com/pybind/pybind11
+	nanobind
+	GIT_REPOSITORY https://github.com/wjakob/nanobind
 	GIT_TAG v3.1.0
 )
-FetchContent_MakeAvailable(pybind11)
+FetchContent_MakeAvailable(nanobind)
 
 # Only the header is wanted. SOURCE_SUBDIR names a directory dlpack does not
 # have, so that its own build file, which installs itself and builds a mock,
@@ -150,5 +145,6 @@ if(REXLIB_PYTHON_INSTALL)
 		SEARCH_PATH "${REXLIB_PYTHON_INSTALL_DIR}"
 		STUBS_DIR "${REXLIB_PYTHON_STUBS_DIR}"
 		GENERATOR "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py"
+		STUBGEN "${nanobind_SOURCE_DIR}/src/stubgen.py"
 	)
 endif()

@@ -7,14 +7,14 @@
 #include <rexlib/core/numerical/numerical_type.hpp>
 #include <rexlib/core/dispatch/execution_context.hpp>
 
-#include <pybind11/stl.h>
+#include <nanobind/stl/optional.h>
 
 #include <optional>
 
 namespace rexlib
 {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 static array py_cast_copy(
 	const array &input,
@@ -26,17 +26,17 @@ static array py_cast_copy(
 	return rexlib::cast_copy(input, target_type, context, out.value_or(nullptr));
 }
 
-void bind_cast(pybind11::module_ &m)
+void bind_cast(nanobind::module_ &m)
 {
 	m.def(
 		"cast",
 		&rexlib::cast,
-		py::arg("input"), py::arg("target_type"), py::arg("context")
+		nb::arg("input"), nb::arg("target_type"), nb::arg("context")
 	);
 	m.def(
 		"cast_copy", &py_cast_copy,
-		py::arg("input"), py::arg("target_type"), py::arg("context"),
-		py::arg("out") = py::none()
+		nb::arg("input"), nb::arg("target_type"), nb::arg("context"),
+		nb::arg("out") = nb::none()
 	);
 }
 

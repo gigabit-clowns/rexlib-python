@@ -9,7 +9,7 @@
 namespace rexlib
 {
 
-void bind_ndarray(pybind11::module_ &m)
+void bind_ndarray(nanobind::module_ &m)
 {
 	auto array = declare_array(m);
 	auto array_descriptor = declare_array_descriptor(m);

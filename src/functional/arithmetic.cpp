@@ -6,14 +6,14 @@
 #include <rexlib/core/ndarray/array.hpp>
 #include <rexlib/core/dispatch/execution_context.hpp>
 
-#include <pybind11/stl.h>
+#include <nanobind/stl/optional.h>
 
 #include <optional>
 
 namespace rexlib
 {
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 static array py_add(const array &x, const array &y, const execution_context &context, std::optional<array*> out)
 {
@@ -50,35 +50,35 @@ static array py_modulo(const array &x, const array &y, const execution_context &
 	return rexlib::modulo(x, y, context, out.value_or(nullptr));
 }
 
-void bind_arithmetic(pybind11::module_ &m)
+void bind_arithmetic(nanobind::module_ &m)
 {
 	m.def(
 		"add", &py_add,
-		py::arg("x"), py::arg("y"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("y"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"subtract", &py_subtract,
-		py::arg("x"), py::arg("y"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("y"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"negate", &py_negate,
-		py::arg("x"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"abs", &py_abs,
-		py::arg("x"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"multiply", &py_multiply,
-		py::arg("x"), py::arg("y"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("y"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"divide", &py_divide,
-		py::arg("x"), py::arg("y"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("y"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 	m.def(
 		"modulo", &py_modulo,
-		py::arg("x"), py::arg("y"), py::arg("context"), py::arg("out") = py::none()
+		nb::arg("x"), nb::arg("y"), nb::arg("context"), nb::arg("out") = nb::none()
 	);
 }
 
