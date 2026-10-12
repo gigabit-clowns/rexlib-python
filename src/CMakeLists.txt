@@ -7,13 +7,12 @@ file(GLOB_RECURSE INLINE_SOURCES ${PROJECT_SOURCE_DIR}/include/*.inl)
 
 # Create the shared library
 set(TARGET_NAME "_binding")
-nanobind_add_module(${TARGET_NAME} ${SOURCES})
-
-if(REXLIB_PYTHON_MODULE_SUFFIX)
-	set_target_properties(
-		${TARGET_NAME}
-		PROPERTIES SUFFIX "${REXLIB_PYTHON_MODULE_SUFFIX}"
-	)
+# nanobind falls back to the interpreter's own ABI where the stable one
+# cannot serve: before Python 3.12, and on a free-threaded interpreter.
+if(REXLIB_PYTHON_STABLE_ABI)
+	nanobind_add_module(${TARGET_NAME} STABLE_ABI ${SOURCES})
+else()
+	nanobind_add_module(${TARGET_NAME} ${SOURCES})
 endif()
 
 target_compile_definitions(

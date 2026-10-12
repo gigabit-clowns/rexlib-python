@@ -16,7 +16,26 @@ include(CTest)
 include(GNUInstallDirs)
 include(python_stubs)
 
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+# Read here rather than with the options below, because it decides what is
+# asked of FindPython, which the other options need found.
+option(
+	REXLIB_PYTHON_STABLE_ABI
+	"Build the extension against the stable ABI, so that one build serves \
+Python 3.12 and newer. Needs CMake 3.26"
+	OFF
+)
+
+set(REXLIB_PYTHON_COMPONENTS Interpreter Development.Module)
+if(REXLIB_PYTHON_STABLE_ABI)
+	if(CMAKE_VERSION VERSION_LESS 3.26)
+		message(FATAL_ERROR
+			"REXLIB_PYTHON_STABLE_ABI needs CMake 3.26 or newer, the first "
+			"whose FindPython has the Development.SABIModule component"
+		)
+	endif()
+	list(APPEND REXLIB_PYTHON_COMPONENTS Development.SABIModule)
+endif()
+find_package(Python REQUIRED COMPONENTS ${REXLIB_PYTHON_COMPONENTS})
 
 # ---------------------------------------------------------------------------
 # Options
@@ -36,13 +55,6 @@ endif()
 set(REXLIB_PYTHON_INSTALL_DIR "${DEFAULT_INSTALL_DIR}" CACHE PATH
 	"Directory the Python package is installed into")
 unset(DEFAULT_INSTALL_DIR)
-
-# Empty lets nanobind take the suffix from scikit-build-core or from the
-# interpreter it found, which is right unless that interpreter is not the one
-# being targeted. cibuildwheel publishes the target's suffix in the
-# environment.
-set(REXLIB_PYTHON_MODULE_SUFFIX "$ENV{SETUPTOOLS_EXT_SUFFIX}" CACHE STRING
-	"Extension suffix, for example .cp312-win_arm64.pyd")
 
 set(REXLIB_PYTHON_STUBS_DIR "" CACHE PATH
 	"Directory of pre-generated .pyi stubs. Empty generates them, which \
