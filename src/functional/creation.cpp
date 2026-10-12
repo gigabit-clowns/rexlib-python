@@ -2,6 +2,7 @@
 
 #include "creation.hpp"
 
+#include "../core/ndarray/array_ref_caster.hpp"
 #include "../core/numerical/float16_caster.hpp"
 
 #include <rexlib/functional/creation.hpp>
@@ -14,9 +15,7 @@
 #include <rexlib/core/dispatch/execution_context.hpp>
 
 #include <nanobind/stl/complex.h>
-#include <nanobind/stl/optional.h>
 
-#include <optional>
 #include <string>
 
 namespace rexlib
@@ -91,63 +90,16 @@ static scalar_value make_scalar_value(numerical_type type, const nb::object &val
 	);
 }
 
-static array py_empty(
-	array_descriptor descriptor,
-	memory_resource_affinity affinity,
-	const execution_context &context,
-	std::optional<array*> out
-)
-{
-	return rexlib::empty(
-		std::move(descriptor), affinity, context, out.value_or(nullptr)
-	);
-}
-
-static array py_zeros(
-	array_descriptor descriptor,
-	memory_resource_affinity affinity,
-	const execution_context &context,
-	std::optional<array*> out
-)
-{
-	return rexlib::zeros(
-		std::move(descriptor), affinity, context, out.value_or(nullptr)
-	);
-}
-
-static array py_ones(
-	array_descriptor descriptor,
-	memory_resource_affinity affinity,
-	const execution_context &context,
-	std::optional<array*> out
-)
-{
-	return rexlib::ones(
-		std::move(descriptor), affinity, context, out.value_or(nullptr)
-	);
-}
-
 static array py_full(
 	array_descriptor descriptor,
 	memory_resource_affinity affinity,
 	const nb::object &fill_value,
 	const execution_context &context,
-	std::optional<array*> out
+	array *out
 )
 {
 	const auto scalar = make_scalar_value(descriptor.get_data_type(), fill_value);
-	return rexlib::full(
-		std::move(descriptor), affinity, scalar, context, out.value_or(nullptr)
-	);
-}
-
-static array py_copy(
-	const array &source,
-	const execution_context &context,
-	std::optional<array*> out
-)
-{
-	return rexlib::copy(source, context, out.value_or(nullptr));
+	return rexlib::full(std::move(descriptor), affinity, scalar, context, out);
 }
 
 static void py_fill(array &out, const nb::object &fill_value, const execution_context &context)
@@ -159,28 +111,29 @@ static void py_fill(array &out, const nb::object &fill_value, const execution_co
 void bind_creation(nanobind::module_ &m)
 {
 	m.def(
-		"empty", &py_empty,
+		"empty", &rexlib::empty,
 		nb::arg("descriptor"), nb::arg("affinity"), nb::arg("context"),
-		nb::arg("out") = nb::none()
+		nb::arg("out").none() = nb::none()
 	);
 	m.def(
-		"zeros", &py_zeros,
+		"zeros", &rexlib::zeros,
 		nb::arg("descriptor"), nb::arg("affinity"), nb::arg("context"),
-		nb::arg("out") = nb::none()
+		nb::arg("out").none() = nb::none()
 	);
 	m.def(
-		"ones", &py_ones,
+		"ones", &rexlib::ones,
 		nb::arg("descriptor"), nb::arg("affinity"), nb::arg("context"),
-		nb::arg("out") = nb::none()
+		nb::arg("out").none() = nb::none()
 	);
 	m.def(
 		"full", &py_full,
 		nb::arg("descriptor"), nb::arg("affinity"), nb::arg("fill_value"),
-		nb::arg("context"), nb::arg("out") = nb::none()
+		nb::arg("context"), nb::arg("out").none() = nb::none()
 	);
 	m.def(
-		"copy", &py_copy,
-		nb::arg("source"), nb::arg("context"), nb::arg("out") = nb::none()
+		"copy", &rexlib::copy,
+		nb::arg("source"), nb::arg("context"),
+		nb::arg("out").none() = nb::none()
 	);
 	m.def(
 		"fill", &py_fill,
