@@ -135,6 +135,13 @@ CMake, and the install rules are what put the package together. A CMake build
 on its own is what CI uses to get a compilation database for the scanner, not
 a way to get a working package.
 
+Installed this way the package carries no rexlib, and the extension's RPATH
+names, after the package's own library directory, the one rexlib was found
+in, so the package works where it was built. Windows has no RPATH: there the
+rexlib DLL has to be on the loader's search path. A wheel carries rexlib, as
+does any build given `REXLIB_PYTHON_STAGE_PREFIX` or one that builds
+`external/rexlib`, and names nothing outside itself.
+
 That build is thrown away with its directory, so installing twice compiles the
 binding twice. `SKBUILD_BUILD_DIR` names one to keep and is left to whoever is
 installing rather than set here — the README carries it. It is deliberately
@@ -460,7 +467,7 @@ skipped in CI.
 `build_with_cmake` covers Linux with gcc and clang, macOS, and Windows on both
 architectures; it exists to keep the plain CMake path working and to produce
 the compilation database the scanner reads. `build_with_pip` is the one that
-runs the tests, across five platforms and Python 3.10 through 3.14, minus
+runs the tests, across five platforms and Python 3.10 through 3.15, minus
 Windows ARM on 3.10, which CPython never shipped there.
 
 Both build rexlib first, into a prefix outside the project, and point the
@@ -473,7 +480,7 @@ Every job moves the submodule to rexlib's `main` before building. That step is
 temporary and goes away, along with the Renovate rule holding the submodule
 back, once rexlib tags releases.
 
-Coverage is produced by one entry only, Linux on 3.14, and handed to the scan
+Coverage is produced by one entry only, Linux on 3.15, and handed to the scan
 as an artifact.
 
 ### Wheels
