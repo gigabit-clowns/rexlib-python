@@ -15,12 +15,12 @@
 namespace rexlib
 {
 
+namespace nb = nanobind;
+
 static std::shared_ptr<device_manager> get_device_manager(service_catalog &catalog)
 {
 	return catalog.get_service_manager<device_manager>();
 }
-
-namespace nb = nanobind;
 
 device_manager_class declare_device_manager(nb::module_ &m)
 {
