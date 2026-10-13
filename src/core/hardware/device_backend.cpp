@@ -15,7 +15,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-device_backend_class declare_device_backend(nanobind::module_ &m)
+device_backend_class declare_device_backend(nb::module_ &m)
 {
 	return device_backend_class(m, "DeviceBackend");
 }

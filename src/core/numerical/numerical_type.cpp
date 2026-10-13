@@ -9,7 +9,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-numerical_type_class declare_numerical_type(nanobind::module_ &m)
+numerical_type_class declare_numerical_type(nb::module_ &m)
 {
 	return numerical_type_class(m, "NumericalType");
 }

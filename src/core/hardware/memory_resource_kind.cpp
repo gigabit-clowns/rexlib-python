@@ -9,7 +9,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-memory_resource_kind_class declare_memory_resource_kind(nanobind::module_ &m)
+memory_resource_kind_class declare_memory_resource_kind(nb::module_ &m)
 {
 	return memory_resource_kind_class(m, "MemoryResourceKind");
 }

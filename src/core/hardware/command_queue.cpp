@@ -9,7 +9,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-command_queue_class declare_command_queue(nanobind::module_ &m)
+command_queue_class declare_command_queue(nb::module_ &m)
 {
 	return command_queue_class(m, "CommandQueue");
 }

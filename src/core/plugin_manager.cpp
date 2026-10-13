@@ -18,12 +18,12 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-plugin_manager_class declare_plugin_manager(nanobind::module_ &m)
+plugin_manager_class declare_plugin_manager(nb::module_ &m)
 {
 	return plugin_manager_class(m, "PluginManager");
 }
 
-void define_plugin_manager(plugin_manager_class &c, nanobind::module_ &m)
+void define_plugin_manager(plugin_manager_class &c, nb::module_ &m)
 {
 	c
 		.def(nb::init<>())

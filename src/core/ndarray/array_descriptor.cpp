@@ -63,12 +63,12 @@ static std::string to_repr(const array_descriptor &self)
 	return oss.str();
 }
 
-array_descriptor_class declare_array_descriptor(nanobind::module_ &m)
+array_descriptor_class declare_array_descriptor(nb::module_ &m)
 {
 	return array_descriptor_class(m, "ArrayDescriptor");
 }
 
-void define_array_descriptor(array_descriptor_class &c, nanobind::module_ &m)
+void define_array_descriptor(array_descriptor_class &c, nb::module_ &m)
 {
 	c
 		.def(nb::init<>())

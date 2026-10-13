@@ -246,6 +246,10 @@ something at module level, which is how the free functions beside a type are
 bound: `define_device_manager` adds `get_device_manager`, `define_version`
 adds the `rexlib_version` attribute.
 
+A source declares `namespace nb = nanobind;` inside `namespace rexlib` and
+writes `nb::` throughout, signatures included. A header writes `nanobind::`
+in full, since an alias there would reach every source that includes it.
+
 Managers are reached through a module-level getter taking a `ServiceCatalog`,
 never constructed: `get_device_manager(catalog)`, `get_program_manager(catalog)`.
 They are services the catalog owns.

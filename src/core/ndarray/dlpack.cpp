@@ -480,7 +480,7 @@ bool is_dlpack_capsule_read_only(const nb::capsule &capsule)
 
 } // anonymous namespace
 
-void bind_dlpack(nanobind::module_ &m)
+void bind_dlpack(nb::module_ &m)
 {
 	m.def(
 		"to_dlpack",

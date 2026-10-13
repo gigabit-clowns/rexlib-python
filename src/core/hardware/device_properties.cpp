@@ -16,7 +16,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-device_properties_class declare_device_properties(nanobind::module_ &m)
+device_properties_class declare_device_properties(nb::module_ &m)
 {
 	return device_properties_class(m, "DeviceProperties");
 }

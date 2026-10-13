@@ -10,7 +10,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-memory_allocator_class declare_memory_allocator(nanobind::module_ &m)
+memory_allocator_class declare_memory_allocator(nb::module_ &m)
 {
 	return memory_allocator_class(m, "MemoryAllocator");
 }

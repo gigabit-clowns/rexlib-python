@@ -21,7 +21,7 @@ static std::string to_repr(const plugin &p)
 	return oss.str();
 }
 
-plugin_class declare_plugin(nanobind::module_ &m)
+plugin_class declare_plugin(nb::module_ &m)
 {
 	return plugin_class(m, "Plugin");
 }

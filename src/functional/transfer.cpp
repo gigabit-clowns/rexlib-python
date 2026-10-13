@@ -14,7 +14,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-void bind_transfer(nanobind::module_ &m)
+void bind_transfer(nb::module_ &m)
 {
 	m.def(
 		"transfer", &rexlib::transfer,

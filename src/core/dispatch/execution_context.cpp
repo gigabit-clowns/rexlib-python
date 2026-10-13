@@ -13,7 +13,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-execution_context_class declare_execution_context(nanobind::module_ &m)
+execution_context_class declare_execution_context(nb::module_ &m)
 {
 	return execution_context_class(m, "ExecutionContext");
 }

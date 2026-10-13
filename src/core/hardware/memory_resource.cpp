@@ -12,12 +12,12 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-memory_resource_class declare_memory_resource(nanobind::module_ &m)
+memory_resource_class declare_memory_resource(nb::module_ &m)
 {
 	return memory_resource_class(m, "MemoryResource");
 }
 
-void define_memory_resource(memory_resource_class &c, nanobind::module_ &m)
+void define_memory_resource(memory_resource_class &c, nb::module_ &m)
 {
 	c
 		.def_prop_ro("kind", &memory_resource::get_kind)

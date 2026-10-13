@@ -16,7 +16,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-device_session_class declare_device_session(nanobind::module_ &m)
+device_session_class declare_device_session(nb::module_ &m)
 {
 	return device_session_class(m, "DeviceSession");
 }

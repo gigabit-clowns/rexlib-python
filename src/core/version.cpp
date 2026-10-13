@@ -43,12 +43,12 @@ static version get_binding_version() noexcept
 	);
 }
 
-version_class declare_version(nanobind::module_ &m)
+version_class declare_version(nb::module_ &m)
 {
 	return version_class(m, "Version");
 }
 
-void define_version(version_class &c, nanobind::module_ &m)
+void define_version(version_class &c, nb::module_ &m)
 {
 	c
 		.def(

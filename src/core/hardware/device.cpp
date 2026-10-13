@@ -9,7 +9,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-device_class declare_device(nanobind::module_ &m)
+device_class declare_device(nb::module_ &m)
 {
 	return device_class(m, "Device");
 }

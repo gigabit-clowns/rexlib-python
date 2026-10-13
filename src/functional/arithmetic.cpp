@@ -13,7 +13,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-void bind_arithmetic(nanobind::module_ &m)
+void bind_arithmetic(nb::module_ &m)
 {
 	m.def(
 		"add", &rexlib::add,

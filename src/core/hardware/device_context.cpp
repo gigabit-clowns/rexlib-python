@@ -15,7 +15,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-device_context_class declare_device_context(nanobind::module_ &m)
+device_context_class declare_device_context(nb::module_ &m)
 {
 	return device_context_class(m, "DeviceContext");
 }

@@ -48,7 +48,7 @@ static device_index from_string(const std::string &str)
 
 
 
-device_index_class declare_device_index(nanobind::module_ &m)
+device_index_class declare_device_index(nb::module_ &m)
 {
 	return device_index_class(m, "DeviceIndex");
 }

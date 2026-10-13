@@ -14,7 +14,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-void bind_cast(nanobind::module_ &m)
+void bind_cast(nb::module_ &m)
 {
 	m.def(
 		"cast", &rexlib::cast,

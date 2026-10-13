@@ -9,7 +9,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-memory_resource_affinity_class declare_memory_resource_affinity(nanobind::module_ &m)
+memory_resource_affinity_class declare_memory_resource_affinity(nb::module_ &m)
 {
 	return memory_resource_affinity_class(m, "MemoryResourceAffinity");
 }

@@ -11,7 +11,7 @@ namespace rexlib
 
 namespace nb = nanobind;
 
-service_catalog_class declare_service_catalog(nanobind::module_ &m)
+service_catalog_class declare_service_catalog(nb::module_ &m)
 {
 	return service_catalog_class(m, "ServiceCatalog");
 }

@@ -109,7 +109,7 @@ static void py_fill(array &out, const nb::object &fill_value, const execution_co
 	rexlib::fill(out, scalar, context);
 }
 
-void bind_creation(nanobind::module_ &m)
+void bind_creation(nb::module_ &m)
 {
 	m.def(
 		"empty", &rexlib::empty,

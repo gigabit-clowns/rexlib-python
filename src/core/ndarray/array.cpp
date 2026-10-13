@@ -258,7 +258,7 @@ std::string to_repr(const array &self)
 
 } // anonymous namespace
 
-array_class declare_array(nanobind::module_ &m)
+array_class declare_array(nb::module_ &m)
 {
 	return array_class(m, "Array", nb::type_slots(array_slots.data()));
 }

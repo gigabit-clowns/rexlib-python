@@ -22,12 +22,12 @@ static std::shared_ptr<device_manager> get_device_manager(service_catalog &catal
 
 namespace nb = nanobind;
 
-device_manager_class declare_device_manager(nanobind::module_ &m)
+device_manager_class declare_device_manager(nb::module_ &m)
 {
 	return device_manager_class(m, "DeviceManager");
 }
 
-void define_device_manager(device_manager_class &c, nanobind::module_ &m)
+void define_device_manager(device_manager_class &c, nb::module_ &m)
 {
 	c
 		.def_prop_ro(
