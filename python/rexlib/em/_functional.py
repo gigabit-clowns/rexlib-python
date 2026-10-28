@@ -18,13 +18,20 @@ from .._functional import _resolve_context
 
 # -- preprocessing --------------------------------------------------------
 
+def _resolve_bounds(
+	bounds: float | tuple[float, float]
+) -> tuple[float, float]:
+	if isinstance(bounds, tuple):
+		lower, upper = bounds
+		return lower, upper
+	return -bounds, bounds
+
 def standardize_background(
 	value: Array,
 	seed: Array,
 	axes: Sequence[int],
 	radius: float,
-	lower_bound: float,
-	upper_bound: float,
+	bounds: float | tuple[float, float],
 	context: ExecutionContext | None = None,
 	out: Array | None = None
 ) -> Array:
@@ -34,7 +41,7 @@ def standardize_background(
 	from its centre, the element at index n // 2 along each of `axes`.
 	Each image has the mean of its finite background subtracted and is
 	divided by its standard deviation, both computed again without the
-	elements whose standardized value lies outside the bounds. Elements
+	elements whose standardized value lies outside `bounds`. Elements
 	that are not finite, or that end up outside the bounds, are replaced
 	by standard normal draws keyed by `seed`.
 
@@ -46,8 +53,8 @@ def standardize_background(
 		axes: The axes of an image. Negative values count from the end.
 		radius: The radius of the region left out of the background, in
 			elements.
-		lower_bound: The lowest standardized value kept, below 0.
-		upper_bound: The highest standardized value kept, above 0.
+		bounds: The lowest and the highest standardized value kept, on
+			either side of 0, or one value `k` for the bounds `(-k, k)`.
 		context: The execution context. Defaults to the active one.
 		out: An array to write the result into.
 
@@ -59,8 +66,7 @@ def standardize_background(
 		seed,
 		list(axes),
 		radius,
-		lower_bound,
-		upper_bound,
+		*_resolve_bounds(bounds),
 		_resolve_context(context),
 		out
 	)
@@ -69,8 +75,7 @@ def standardize_background_2d(
 	value: Array,
 	seed: Array,
 	radius: float,
-	lower_bound: float,
-	upper_bound: float,
+	bounds: float | tuple[float, float],
 	context: ExecutionContext | None = None,
 	out: Array | None = None
 ) -> Array:
@@ -85,8 +90,8 @@ def standardize_background_2d(
 			per image.
 		radius: The radius of the region left out of the background, in
 			elements.
-		lower_bound: The lowest standardized value kept, below 0.
-		upper_bound: The highest standardized value kept, above 0.
+		bounds: The lowest and the highest standardized value kept, on
+			either side of 0, or one value `k` for the bounds `(-k, k)`.
 		context: The execution context. Defaults to the active one.
 		out: An array to write the result into.
 
@@ -97,8 +102,7 @@ def standardize_background_2d(
 		value,
 		seed,
 		radius,
-		lower_bound,
-		upper_bound,
+		*_resolve_bounds(bounds),
 		_resolve_context(context),
 		out
 	)
@@ -107,8 +111,7 @@ def standardize_background_3d(
 	value: Array,
 	seed: Array,
 	radius: float,
-	lower_bound: float,
-	upper_bound: float,
+	bounds: float | tuple[float, float],
 	context: ExecutionContext | None = None,
 	out: Array | None = None
 ) -> Array:
@@ -123,8 +126,8 @@ def standardize_background_3d(
 			per volume.
 		radius: The radius of the region left out of the background, in
 			elements.
-		lower_bound: The lowest standardized value kept, below 0.
-		upper_bound: The highest standardized value kept, above 0.
+		bounds: The lowest and the highest standardized value kept, on
+			either side of 0, or one value `k` for the bounds `(-k, k)`.
 		context: The execution context. Defaults to the active one.
 		out: An array to write the result into.
 
@@ -135,8 +138,7 @@ def standardize_background_3d(
 		value,
 		seed,
 		radius,
-		lower_bound,
-		upper_bound,
+		*_resolve_bounds(bounds),
 		_resolve_context(context),
 		out
 	)

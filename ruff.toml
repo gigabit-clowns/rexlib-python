@@ -35,10 +35,10 @@ ignore = [
 "python/rexlib/__init__.py" = [
     "D104", # __doc__ is re-exported from the compiled extension, not written here
 ]
-"python/rexlib/em/_functional.py" = [
-    "PLR0913", # The operations take the arguments of their C++ counterparts
-    "PLR0917", # in the same order, positional as they are there
-]
 
 [lint.pydocstyle]
 convention = "pep257"
+
+[lint.pylint]
+max-args = 7
+max-positional-args = 7

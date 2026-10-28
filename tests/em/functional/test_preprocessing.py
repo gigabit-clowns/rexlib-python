@@ -14,7 +14,6 @@ def test_standardize_background_2d_matches_a_reference(__setup_context):
 		rexlib.from_dlpack(images),
 		__setup_seeds(3),
 		4,
-		-math.inf,
 		math.inf,
 		__setup_context
 	)
@@ -29,11 +28,11 @@ def test_standardize_background_takes_axes_from_the_end(__setup_context):
 	seeds = __setup_seeds(3)
 
 	named = rexlib.em.standardize_background(
-		rexlib.from_dlpack(images), seeds, [-2, -1], 4, -3, 3,
+		rexlib.from_dlpack(images), seeds, [-2, -1], 4, (-3, 3),
 		__setup_context
 	)
 	numbered = rexlib.em.standardize_background_2d(
-		rexlib.from_dlpack(images), seeds, 4, -3, 3, __setup_context
+		rexlib.from_dlpack(images), seeds, 4, (-3, 3), __setup_context
 	)
 
 	assert numpy.array_equal(numpy.asarray(named), numpy.asarray(numbered))
@@ -44,7 +43,7 @@ def test_standardize_background_replaces_what_is_not_finite(__setup_context):
 	images[1, 5, 5] = math.inf
 
 	result = numpy.asarray(rexlib.em.standardize_background_2d(
-		rexlib.from_dlpack(images), __setup_seeds(3), 4, -3, 3,
+		rexlib.from_dlpack(images), __setup_seeds(3), 4, 3,
 		__setup_context
 	))
 
@@ -57,7 +56,7 @@ def test_standardize_background_draws_by_seed(__setup_context):
 		return numpy.asarray(rexlib.em.standardize_background_2d(
 			rexlib.from_dlpack(images.copy()),
 			rexlib.from_dlpack(numpy.asarray(seeds, dtype=numpy.uint64)),
-			2, -3, 3, __setup_context
+			2, 3, __setup_context
 		))
 
 	assert numpy.array_equal(draw([1, 2]), draw([1, 2]))
@@ -68,7 +67,7 @@ def test_standardize_background_3d_keeps_the_shape(__setup_context):
 	volumes = numpy.random.default_rng(7).normal(size=(2, 6, 6, 6))
 
 	result = rexlib.em.standardize_background_3d(
-		rexlib.from_dlpack(volumes), __setup_seeds(2), 2, -3, 3,
+		rexlib.from_dlpack(volumes), __setup_seeds(2), 2, 3,
 		__setup_context
 	)
 
@@ -79,7 +78,7 @@ def test_standardize_background_writes_into_out(__setup_context):
 	out = rexlib.from_dlpack(numpy.zeros_like(images))
 
 	result = rexlib.em.standardize_background_2d(
-		rexlib.from_dlpack(images), __setup_seeds(3), 4, -3, 3,
+		rexlib.from_dlpack(images), __setup_seeds(3), 4, 3,
 		__setup_context, out=out
 	)
 
@@ -89,13 +88,27 @@ def test_standardize_background_uses_the_active_context():
 	images = __setup_images()
 	with rexlib.device('cpu'):
 		result = rexlib.em.standardize_background_2d(
-			rexlib.from_dlpack(images), __setup_seeds(3), 4, -3, 3
+			rexlib.from_dlpack(images), __setup_seeds(3), 4, 3
 		)
 	assert numpy.asarray(result).shape == images.shape
 
+def test_standardize_background_reads_one_bound_as_both(__setup_context):
+	images = __setup_images()
+	images[0, 0, 0] = 1000
+	seeds = __setup_seeds(3)
+
+	symmetric = rexlib.em.standardize_background_2d(
+		rexlib.from_dlpack(images), seeds, 4, 2.5, __setup_context
+	)
+	paired = rexlib.em.standardize_background_2d(
+		rexlib.from_dlpack(images), seeds, 4, (-2.5, 2.5), __setup_context
+	)
+
+	assert numpy.array_equal(numpy.asarray(symmetric), numpy.asarray(paired))
+
 @pytest.mark.parametrize(
 	"bounds",
-	[(0.0, 3.0), (-3.0, 0.0), (3.0, -3.0), (math.nan, 3.0)],
+	[(0.0, 3.0), (-3.0, 0.0), (3.0, -3.0), (math.nan, 3.0), 0.0, -3.0],
 )
 def test_standardize_background_refuses_bounds_around_no_mean(
 	__setup_context, bounds
@@ -103,7 +116,16 @@ def test_standardize_background_refuses_bounds_around_no_mean(
 	with pytest.raises(ValueError):
 		rexlib.em.standardize_background_2d(
 			rexlib.from_dlpack(__setup_images()), __setup_seeds(3), 4,
-			bounds[0], bounds[1], __setup_context
+			bounds, __setup_context
+		)
+
+def test_standardize_background_refuses_bounds_of_another_length(
+	__setup_context
+):
+	with pytest.raises(ValueError):
+		rexlib.em.standardize_background_2d(
+			rexlib.from_dlpack(__setup_images()), __setup_seeds(3), 4,
+			(-3.0, 0.0, 3.0), __setup_context
 		)
 
 def __reference(images, radius):
