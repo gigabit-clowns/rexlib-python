@@ -1,6 +1,7 @@
 [build-system]
 requires = [
     "scikit-build-core==1.1.1",
+    "nanobind==3.1.0",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -43,6 +44,12 @@ test = [
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "ruff==0.17.1",
+]
+
+[dependency-groups]
+# What a build by CMake itself needs, which pip would otherwise provide.
+dev = [
+    "nanobind==3.1.0",
 ]
 
 [project.urls]

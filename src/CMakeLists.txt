@@ -54,13 +54,9 @@ endif()
 
 target_link_libraries(
 	${TARGET_NAME}
-	PRIVATE 
+	PRIVATE
 		rexlib::rexlib
-)
-target_include_directories(
-	${TARGET_NAME}
-	SYSTEM PRIVATE
-		${dlpack_SOURCE_DIR}/include
+		dlpack::dlpack
 )
 if(MSVC)
 	target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)

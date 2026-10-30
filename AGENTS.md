@@ -155,11 +155,24 @@ unlike rexlib itself, which is C++14: nothing here has to build on the
 compilers rexlib supports, only on the ones that build wheels.
 `CMAKE_CXX_STANDARD_REQUIRED` is off all the same.
 
-nanobind and DLPack are fetched, each pinned in `CMakeLists.txt` as a git tag
-that Renovate follows. DLPack is one header, and only the header is taken:
-its own build file is not read. rexlib is found with `find_package` and only
-built from `external/rexlib` when none is found, which is what makes a source
-distribution installable on a machine with no rexlib.
+nanobind comes from pip and is never fetched: it is in `build-system.requires`
+for pip, and in the `dev` group of `pyproject.toml` for a build by CMake
+itself (`pip install --group dev`, pip 25.1 or newer). CMake asks the
+interpreter it found where nanobind's package is, `python -m nanobind
+--cmake_dir`, unless `nanobind_ROOT` or `nanobind_DIR` says so.
+
+DLPack is fetched by default, through `rexlib_python_fetch_dlpack()` in
+`cmake/modules/`, pinned as `COMMIT <sha>) # <tag>` in `CMakeLists.txt`,
+which Renovate keeps up to date. It is one header, and only the header is
+taken: its own build file is not read. `REXLIB_PYTHON_BUILD_DEPENDENCIES`,
+or `REXLIB_PYTHON_BUILD_DLPACK` alone, off finds an installed one instead;
+no version is asked of it, since its package reports 0.6 whatever the
+release. A new dependency gets a toggle, a branch, a module and a manager in
+`renovate.json`.
+
+rexlib is found with `find_package` and only built from `external/rexlib`
+when none is found, which is what makes a source distribution installable
+on a machine with no rexlib.
 
 Options:
 
@@ -199,8 +212,8 @@ decides nothing.
 ## Type stubs
 
 The extension's `.pyi` files are generated while it is built, by
-`scripts/generate_stubs.py` through nanobind's stubgen, run from the fetched
-sources, and land in `rexlib/_binding/` beside it. They are not in the
+`scripts/generate_stubs.py` through the stubgen of the nanobind pip installed,
+and land in `rexlib/_binding/` beside it. They are not in the
 repository and there is nothing to run by hand.
 
 Generating them imports the extension, which a cross-compiling build cannot

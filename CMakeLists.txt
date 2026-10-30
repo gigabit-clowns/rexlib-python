@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 
+# What a fetched archive holds takes the time it is extracted at, so that a
+# new archive always rebuilds what came from it.
+if(POLICY CMP0135)
+	cmake_policy(SET CMP0135 NEW)
+endif()
+
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION PROJECT_VERSION)
 string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 project(
@@ -14,6 +20,7 @@ include(CTest)
 # Names the library directory this platform uses, which the package
 # reproduces and the extension's RPATH points at.
 include(GNUInstallDirs)
+include(CMakeDependentOption)
 include(python_stubs)
 
 option(
@@ -70,6 +77,21 @@ leaving the package to find rexlib on the system")
 
 option(REXLIB_PYTHON_INSTALL "Generate install rules for the Python package" ON)
 
+# Every dependency but rexlib is private to the extension, so building one
+# here or finding an installed one changes nothing for whoever imports it.
+# Turning the global switch off turns every one of the others off, on every
+# configure. nanobind is neither: pip provides it.
+option(
+	REXLIB_PYTHON_BUILD_DEPENDENCIES
+	"Build the dependencies with the binding, rather than finding installed \
+ones"
+	ON
+)
+cmake_dependent_option(
+	REXLIB_PYTHON_BUILD_DLPACK "Fetch DLPack and build it with the binding" ON
+	"REXLIB_PYTHON_BUILD_DEPENDENCIES" OFF
+)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 
@@ -77,24 +99,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 # Dependencies
 # ---------------------------------------------------------------------------
 
-include(FetchContent)
-FetchContent_Declare(
-	nanobind
-	GIT_REPOSITORY https://github.com/wjakob/nanobind
-	GIT_TAG v3.1.0
-)
-FetchContent_MakeAvailable(nanobind)
+# nanobind ships its CMake package inside its Python package, so the
+# interpreter that has it is asked where that is.
+if(NOT nanobind_ROOT AND NOT nanobind_DIR)
+	execute_process(
+		COMMAND ${Python_EXECUTABLE} -m nanobind --cmake_dir
+		OUTPUT_VARIABLE nanobind_ROOT
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		ERROR_QUIET
+	)
+endif()
+find_package(nanobind 3.0 REQUIRED CONFIG)
 
-# Only the header is wanted. SOURCE_SUBDIR names a directory dlpack does not
-# have, so that its own build file, which installs itself and builds a mock,
-# is not read.
-FetchContent_Declare(
-	dlpack
-	GIT_REPOSITORY https://github.com/dmlc/dlpack
-	GIT_TAG v1.3
-	SOURCE_SUBDIR header-only
-)
-FetchContent_MakeAvailable(dlpack)
+if(REXLIB_PYTHON_BUILD_DLPACK)
+	include(rexlib_python_fetch_dlpack)
+	rexlib_python_fetch_dlpack(
+		COMMIT 84d107bf416c6bab9ae68ad285876600d230490d
+	) # v1.3
+else()
+	# No version is asked for: the package of DLPack reports 0.6 whatever
+	# the release, so asking for the 1.0 the versioned tensors arrived in
+	# would refuse every release that has them.
+	find_package(dlpack REQUIRED CONFIG)
+endif()
 
 if(NOT TARGET rexlib::rexlib)
 	find_package(rexlib ${REXLIB_PYTHON_REXLIB_VERSION} QUIET)
@@ -155,6 +182,6 @@ if(REXLIB_PYTHON_INSTALL)
 		SEARCH_PATH "${REXLIB_PYTHON_INSTALL_DIR}"
 		STUBS_DIR "${REXLIB_PYTHON_STUBS_DIR}"
 		GENERATOR "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_stubs.py"
-		STUBGEN "${nanobind_SOURCE_DIR}/src/stubgen.py"
+		STUBGEN "${NB_DIR}/stubgen.py"
 	)
 endif()

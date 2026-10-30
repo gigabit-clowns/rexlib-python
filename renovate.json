@@ -20,24 +20,12 @@
   },
   "customManagers": [
     {
-      "description": "Track nanobind, fetched by CMake FetchContent",
       "customType": "regex",
       "managerFilePatterns": ["**/CMakeLists.txt"],
-      "matchStrings": ["GIT_REPOSITORY https://github.com/wjakob/nanobind\\s+GIT_TAG v(?<currentValue>[^\\s]+)"],
-      "depNameTemplate": "nanobind",
-      "packageNameTemplate": "wjakob/nanobind",
-      "datasourceTemplate": "github-tags",
-      "extractVersionTemplate": "^v(?<version>.*)$"
-    },
-    {
-      "description": "Track dlpack, fetched by CMake FetchContent",
-      "customType": "regex",
-      "managerFilePatterns": ["**/CMakeLists.txt"],
-      "matchStrings": ["GIT_REPOSITORY https://github.com/dmlc/dlpack\\s+GIT_TAG v(?<currentValue>[^\\s]+)"],
+      "matchStrings": ["rexlib_python_fetch_dlpack\\(\\s*COMMIT (?<currentDigest>[0-9a-f]{40})\\s*\\) # (?<currentValue>\\S+)"],
       "depNameTemplate": "dlpack",
       "packageNameTemplate": "dmlc/dlpack",
-      "datasourceTemplate": "github-tags",
-      "extractVersionTemplate": "^v(?<version>.*)$"
+      "datasourceTemplate": "github-tags"
     }
   ],
   "packageRules": [

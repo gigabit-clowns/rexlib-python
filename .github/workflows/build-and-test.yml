@@ -59,6 +59,19 @@ jobs:
       - name: Move the submodule to rexlib's main
         run: git submodule update --remote external/rexlib
 
+      - name: Set up Python
+        id: python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.13'
+
+      # nanobind comes from pip, and a group of pyproject.toml is installed by
+      # pip 25.1 and newer.
+      - name: Install what the binding is built with
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --group dev
+
       # Ninja does not locate MSVC on its own the way the Visual Studio
       # generator does; without this the configure step finds no cl.exe.
       - name: Set up MSVC environment
@@ -78,7 +91,7 @@ jobs:
         id: fetched
         uses: gigabit-clowns/.github/.github/composites/restore-fetched@main
         with:
-          key: ${{ hashFiles('CMakeLists.txt', 'external/rexlib/CMakeLists.txt', 'external/rexlib/cmake/modules/fetch_*.cmake') }}
+          key: ${{ hashFiles('CMakeLists.txt', 'external/rexlib/CMakeLists.txt', 'cmake/modules/rexlib_python_fetch_*.cmake', 'external/rexlib/cmake/modules/rexlib_fetch_*.cmake') }}
 
       - name: Install rexlib
         env:
@@ -111,6 +124,7 @@ jobs:
             CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
             CMAKE_EXPORT_COMPILE_COMMANDS=ON
             rexlib_ROOT=${{ runner.temp }}/rexlib
+            Python_EXECUTABLE=${{ steps.python.outputs.python-path }}
             FETCHCONTENT_BASE_DIR=${{ steps.fetched.outputs.dir }}
             CMAKE_C_COMPILER_LAUNCHER=ccache
             CMAKE_CXX_COMPILER_LAUNCHER=ccache
@@ -195,7 +209,7 @@ jobs:
         id: fetched
         uses: gigabit-clowns/.github/.github/composites/restore-fetched@main
         with:
-          key: ${{ hashFiles('CMakeLists.txt', 'external/rexlib/CMakeLists.txt', 'external/rexlib/cmake/modules/fetch_*.cmake') }}
+          key: ${{ hashFiles('CMakeLists.txt', 'external/rexlib/CMakeLists.txt', 'cmake/modules/rexlib_python_fetch_*.cmake', 'external/rexlib/cmake/modules/rexlib_fetch_*.cmake') }}
 
       - name: Install rexlib
         env:
