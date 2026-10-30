@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+
 cmake_minimum_required(VERSION 3.18)
 
 # What a fetched archive holds takes the time it is extracted at, so that a
@@ -11,6 +13,7 @@ string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 project(
 	rexlib-python
 	VERSION ${PROJECT_VERSION}
+	DESCRIPTION "Python binding for the rexlib framework"
 	LANGUAGES C CXX
 )
 
@@ -21,7 +24,8 @@ include(CTest)
 # reproduces and the extension's RPATH points at.
 include(GNUInstallDirs)
 include(CMakeDependentOption)
-include(python_stubs)
+include(rexlib_python_enable_warnings)
+include(rexlib_python_stubs)
 
 option(
 	REXLIB_PYTHON_STABLE_ABI
@@ -42,14 +46,14 @@ if(REXLIB_PYTHON_STABLE_ABI)
 endif()
 find_package(Python REQUIRED COMPONENTS ${REXLIB_PYTHON_COMPONENTS})
 
-# ---------------------------------------------------------------------------
-# Options
-# ---------------------------------------------------------------------------
-
-# Its own option rather than BUILD_TESTING: dependencies of dependencies
-# write that one into the cache, and this project's tests should not be at
-# their mercy.
-option(REXLIB_PYTHON_BUILD_TESTING "Build this project's tests" ${BUILD_TESTING})
+# Its own option rather than BUILD_TESTING, nor one that depends on it:
+# dependencies of dependencies write that one into the cache, and this
+# project's tests should not be at their mercy.
+option(
+	REXLIB_PYTHON_BUILD_TESTING
+	"Build the plugins the tests of the package load"
+	${BUILD_TESTING}
+)
 
 # scikit-build-core stages each wheel in a directory of its own, which this
 # build is told anew every time it is configured; a plain build installs
@@ -57,25 +61,39 @@ option(REXLIB_PYTHON_BUILD_TESTING "Build this project's tests" ${BUILD_TESTING}
 if(SKBUILD_PLATLIB_DIR)
 	set(REXLIB_PYTHON_INSTALL_DIR "${SKBUILD_PLATLIB_DIR}")
 else()
-	set(REXLIB_PYTHON_INSTALL_DIR "${Python_SITEARCH}" CACHE PATH
-		"Directory the Python package is installed into")
+	set(
+		REXLIB_PYTHON_INSTALL_DIR "${Python_SITEARCH}"
+		CACHE PATH "Directory the Python package is installed into"
+	)
 endif()
 
-set(REXLIB_PYTHON_STUBS_DIR "" CACHE PATH
+set(
+	REXLIB_PYTHON_STUBS_DIR ""
+	CACHE PATH
 	"Directory of pre-generated .pyi stubs. Empty generates them, which \
-requires importing the extension this build produces")
+requires importing the extension this build produces"
+)
 
-set(REXLIB_PYTHON_REXLIB_VERSION 0.1 CACHE STRING
-	"Version of rexlib this binding requires")
+set(
+	REXLIB_PYTHON_REXLIB_VERSION 0.1
+	CACHE STRING "Version of rexlib this binding requires"
+)
 
 # A prefix is copied in whole, so it must hold rexlib and nothing else, and
 # no symlinks - a wheel stores those as another copy of the file. rexlib's
 # rexlib_runtime and rexlib_development components produce exactly that.
-set(REXLIB_PYTHON_STAGE_PREFIX "" CACHE PATH
+set(
+	REXLIB_PYTHON_STAGE_PREFIX ""
+	CACHE PATH
 	"rexlib installation to carry inside the package. Empty ships none, \
-leaving the package to find rexlib on the system")
+leaving the package to find rexlib on the system"
+)
 
-option(REXLIB_PYTHON_INSTALL "Generate install rules for the Python package" ON)
+option(
+	REXLIB_PYTHON_INSTALL
+	"Generate the install rules of the Python package"
+	ON
+)
 
 # Every dependency but rexlib is private to the extension, so building one
 # here or finding an installed one changes nothing for whoever imports it.
@@ -92,12 +110,11 @@ cmake_dependent_option(
 	"REXLIB_PYTHON_BUILD_DEPENDENCIES" OFF
 )
 
+# The binding is C++20. The standard is required rather than preferred, so
+# that nothing newer gets in unnoticed.
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
-
-# ---------------------------------------------------------------------------
-# Dependencies
-# ---------------------------------------------------------------------------
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # nanobind ships its CMake package inside its Python package, so the
 # interpreter that has it is asked where that is.
@@ -146,10 +163,6 @@ else()
 	message(STATUS "Using rexlib from ${rexlib_DIR}")
 endif()
 
-# ---------------------------------------------------------------------------
-# The package
-# ---------------------------------------------------------------------------
-
 set(REXLIB_PYTHON_PACKAGE_DIR "${REXLIB_PYTHON_INSTALL_DIR}/rexlib")
 
 add_subdirectory(src)
@@ -176,7 +189,7 @@ if(REXLIB_PYTHON_INSTALL)
 	endif()
 
 	# After everything the import needs is in place.
-	install_python_stubs(
+	rexlib_python_install_stubs(
 		MODULE rexlib._binding
 		DESTINATION "${REXLIB_PYTHON_PACKAGE_DIR}/_binding"
 		SEARCH_PATH "${REXLIB_PYTHON_INSTALL_DIR}"
