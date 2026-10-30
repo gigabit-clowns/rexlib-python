@@ -113,19 +113,21 @@ def test_standardize_background_reads_one_bound_as_both(__setup_context):
 def test_standardize_background_refuses_bounds_around_no_mean(
 	__setup_context, bounds
 ):
+	images = rexlib.from_dlpack(__setup_images())
+	seeds = __setup_seeds(3)
 	with pytest.raises(ValueError):
 		rexlib.em.standardize_background_2d(
-			rexlib.from_dlpack(__setup_images()), __setup_seeds(3), 4,
-			bounds, __setup_context
+			images, seeds, 4, bounds, __setup_context
 		)
 
 def test_standardize_background_refuses_bounds_of_another_length(
 	__setup_context
 ):
+	images = rexlib.from_dlpack(__setup_images())
+	seeds = __setup_seeds(3)
 	with pytest.raises(ValueError):
 		rexlib.em.standardize_background_2d(
-			rexlib.from_dlpack(__setup_images()), __setup_seeds(3), 4,
-			(-3.0, 0.0, 3.0), __setup_context
+			images, seeds, 4, (-3.0, 0.0, 3.0), __setup_context
 		)
 
 def __reference(images, radius):
