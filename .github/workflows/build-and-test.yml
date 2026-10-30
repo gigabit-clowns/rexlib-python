@@ -234,8 +234,11 @@ jobs:
         env:
           rexlib_ROOT: ${{ runner.temp }}/rexlib
           CMAKE_GENERATOR: Ninja
+        # A group of pyproject.toml is installed by pip 25.1 and newer.
         run: |
-          pip install .[test] -v \
+          python -m pip install --upgrade pip
+          python -m pip install --group test
+          python -m pip install . -v \
             -Ccmake.define.FETCHCONTENT_BASE_DIR=${{ steps.fetched.outputs.dir }} \
             -Ccmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache \
             -Ccmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache \

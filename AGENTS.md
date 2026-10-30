@@ -125,9 +125,13 @@ cmake -S external/rexlib -B build/rexlib -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=~/.local -DCMAKE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF
 cmake --build build/rexlib --target install --parallel $(nproc)
 
+pip install --group dev
 CMAKE_PREFIX_PATH=~/.local CMAKE_BUILD_PARALLEL_LEVEL=$(nproc) \
   pip install . --no-build-isolation -v -Ccmake.define.REXLIB_PYTHON_BUILD_TESTING=ON
 ```
+
+Without build isolation the build uses the CMake on the `PATH`, which
+`pyproject.toml` asks to be 3.26 or newer; the `dev` group installs one.
 
 `pip install` is the way in, not `cmake --build`: scikit-build-core drives
 CMake, and the install rules are what put the package together. A CMake build
@@ -157,7 +161,8 @@ compilers rexlib supports, only on the ones that build wheels.
 
 nanobind comes from pip and is never fetched: it is in `build-system.requires`
 for pip, and in the `dev` group of `pyproject.toml` for a build by CMake
-itself (`pip install --group dev`, pip 25.1 or newer). CMake asks the
+itself (`pip install --group dev`, pip 25.1 or newer, which also installs
+scikit-build-core, CMake and the `test` group). CMake asks the
 interpreter it found where nanobind's package is, `python -m nanobind
 --cmake_dir`, unless `nanobind_ROOT` or `nanobind_DIR` says so.
 
@@ -428,8 +433,10 @@ export, such as a tensor on another device or of another version.
 ./scripts/run-tests.sh --coverage
 ```
 
-The package has to be installed with `REXLIB_PYTHON_BUILD_TESTING=ON`, which
-is what builds the dummy plugins in `tests/assets/`. The runner sets pytest's
+What the tests need is the `test` group of `pyproject.toml` (`pip install
+--group test`, which `dev` includes). The package has to be installed with
+`REXLIB_PYTHON_BUILD_TESTING=ON`, which is what builds the dummy plugins in
+`tests/assets/`. The runner sets pytest's
 rootdir to the repository and, with `--coverage`, writes `coverage.xml`
 against `conf/coverage.ini`, which maps `python/rexlib` onto the installed
 copy the tests actually import.
