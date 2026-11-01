@@ -13,6 +13,7 @@ target_sources(
 		main.cpp
 )
 add_subdirectory(core)
+add_subdirectory(em)
 add_subdirectory(functional)
 
 target_compile_definitions(
