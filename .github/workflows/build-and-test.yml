@@ -234,14 +234,22 @@ jobs:
           cmake --install "${{ runner.temp }}/rexlib-build" \
             --config Release --component rexlib_development
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+
+      # The tests' requirements are taken from uv.lock: every file is checked
+      # against its hash, and only wheels are accepted, so no setup script of
+      # a dependency runs.
       - name: Install with pip
         env:
           rexlib_ROOT: ${{ runner.temp }}/rexlib
           CMAKE_GENERATOR: Ninja
-        # A group of pyproject.toml is installed by pip 25.1 and newer.
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --group test
+          uv export --frozen --only-group test --no-emit-project \
+            --output-file "$RUNNER_TEMP/test-requirements.txt"
+          python -m pip install --require-hashes --only-binary :all: \
+            --requirement "$RUNNER_TEMP/test-requirements.txt"
           python -m pip install . -v \
             -Ccmake.define.FETCHCONTENT_BASE_DIR=${{ steps.fetched.outputs.dir }} \
             -Ccmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache \

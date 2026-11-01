@@ -9,6 +9,10 @@
     "dependencies"
   ],
   "minimumReleaseAge": "14 days",
+  "lockFileMaintenance": {
+    "description": "Moves what uv.lock pins beyond the groups' own pins, those they pull in, to their newest releases",
+    "enabled": true
+  },
   "internalChecksFilter": "strict",
   "poetry": {
     "description": "Not a poetry project, but supersedes default pep manager if left enabled.",
@@ -19,6 +23,14 @@
     "enabled": false
   },
   "customManagers": [
+    {
+      "description": "The version of uv that writes uv.lock, which CI installs too",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)pyproject\\.toml$/"],
+      "matchStrings": ["required-version = \"==(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "uv",
+      "datasourceTemplate": "pypi"
+    },
     {
       "customType": "regex",
       "managerFilePatterns": ["**/CMakeLists.txt"],

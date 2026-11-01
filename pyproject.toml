@@ -59,6 +59,12 @@ dev = [
 Homepage = "https://github.com/gigabit-clowns/rexlib-python"
 Issues = "https://github.com/gigabit-clowns/rexlib-python/issues"
 
+# uv.lock pins every package of the groups, those they pull in included, for
+# every Python and platform, with the hash of each file. Only uv writes it,
+# and only this version of uv, which CI installs too.
+[tool.uv]
+required-version = "==0.13.1"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
