@@ -245,7 +245,6 @@ jobs:
           rexlib_ROOT: ${{ runner.temp }}/rexlib
           CMAKE_GENERATOR: Ninja
         run: |
-          python -m pip install --upgrade pip
           uv export --frozen --only-group test --no-emit-project \
             --output-file "$RUNNER_TEMP/test-requirements.txt"
           python -m pip install --require-hashes --only-binary :all: \
