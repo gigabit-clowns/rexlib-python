@@ -48,6 +48,9 @@ Tests for what `_binding` exposes at its top level stay at the root.
 | `tests/ndarray/` | `ArrayDescriptor`, the operators installed onto `Array`, the buffer protocol and DLPack |
 | `tests/hardware/` | Devices, sessions, memory resources, the session pool |
 | `tests/dispatch/` | `ExecutionContext`, the active context, `rexlib.device(...)` |
+| `tests/ops/fourier/` | `FourierNormalization` |
+| `tests/em/functional/` | The operations of `rexlib.em` |
+| `tests/em/ops/parameters/` | `GriddingProfile`, `GriddingWindow`, `CtfOptics` |
 | `tests/functional/` | The operations |
 
 There are no `__init__.py` files and no `conftest.py`. Test module names are
