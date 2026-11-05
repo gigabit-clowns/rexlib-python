@@ -179,8 +179,6 @@ jobs:
         with:
           enable-cache: false
 
-      # Beside the project, where every wheel's tests read it, even from a
-      # container: pyproject.toml's before-test installs it.
       - name: Export the tests' requirements
         shell: bash
         run: >-
