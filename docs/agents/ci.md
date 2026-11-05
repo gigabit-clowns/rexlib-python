@@ -29,7 +29,9 @@ Both build rexlib first, into a prefix outside the project, and point the
 build at it with `rexlib_ROOT`. It is the bulk of the wall clock, and ccache
 is what makes every run after the first a link. The compiler cache and the
 fetched sources are saved only on `main`: a pull request reads them and writes
-nothing, so one branch cannot evict another's.
+nothing, so one branch cannot evict another's. uv only exports the lockfile,
+so its cache is off. `clean-up-caches.yml` names every cache family, `*` for
+what varies; a new one is added there and to `keep-caches-warm.yml`.
 
 Every job moves the submodule to rexlib's `main` before building. That step is
 temporary and goes away, along with the Renovate rule holding the submodule
