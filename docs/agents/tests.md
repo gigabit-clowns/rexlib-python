@@ -30,7 +30,9 @@ or a source distribution of a dependency is refused. Only the uv of
 maintenance, and bumps `required-version`.
 
 The package has to be installed with `REXLIB_PYTHON_BUILD_TESTING=ON`, which
-is what builds the dummy plugins in `tests/assets/`. The runner sets pytest's
+is what builds the dummy plugins in `tests/assets/`. A test that loads them is
+marked `dummy_plugins`, so that the wheels, which never carry them, can run
+the rest. The runner sets pytest's
 rootdir to the repository and, with `--coverage`, writes `coverage.xml`
 against `conf/coverage.ini`, which maps `python/rexlib` onto the installed
 copy the tests actually import.

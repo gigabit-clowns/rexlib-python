@@ -66,6 +66,11 @@ musllinux is skipped: NVIDIA ships no CUDA for musl, so rexlib-cuda is
 manylinux only and an Alpine install could never reach the GPU backend. Alpine
 can still build from the source distribution.
 
+Each wheel is imported, then tested with the whole suite on every interpreter
+it serves, the test requirements taken from `uv.lock` with their hashes. The
+tests marked `dummy_plugins` are left out: the plugins they load are built
+only with `REXLIB_PYTHON_BUILD_TESTING`, which a wheel never is.
+
 `scripts/check_wheels_agree.py` asserts that every wheel of a platform carries
 the same rexlib, which is what makes reusing rexlib's objects between
 interpreters sound rather than assumed.

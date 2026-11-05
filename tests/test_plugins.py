@@ -27,6 +27,7 @@ def test_plugin_manager_discovers_the_whole_search_path_by_default():
     explicit.discover_plugins(directory)
   assert list(map(repr, default.plugins)) == list(map(repr, explicit.plugins))
 
+@pytest.mark.dummy_plugins
 def test_plugin_manager_discovers_plugins():
   pm = rexlib.PluginManager()
   pm.discover_plugins(__get_dummy_plugin_directory())
@@ -36,6 +37,7 @@ def test_plugin_manager_discovers_plugins():
     'Plugin(name="dummy-plugin2", version="4.5.6")',
   }
 
+@pytest.mark.dummy_plugins
 def test_plugin_manager_adds_a_discovered_plugin():
   source = rexlib.PluginManager()
   source.discover_plugins(__get_dummy_plugin_directory())
@@ -48,6 +50,7 @@ def test_plugin_manager_raises_when_loading_a_missing_plugin():
   with pytest.raises(RuntimeError):
     pm.load_plugin(f'/path/to/invalid/plugin/{uuid.uuid4()}')
 
+@pytest.mark.dummy_plugins
 def test_plugin_exposes_name_and_version():
   pm = rexlib.PluginManager()
   pm.discover_plugins(__get_dummy_plugin_directory())
