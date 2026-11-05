@@ -2,16 +2,14 @@ name: Clean up caches
 permissions: {}
 
 on:
-  pull_request:
-    types:
-      - closed
-
   workflow_run:
     workflows:
       - Build and test
       - Deploy release
     types:
       - completed
+    branches:
+      - main
 
   workflow_dispatch:
     inputs:
@@ -29,22 +27,6 @@ on:
         type: string
 
 jobs:
-  # A closed pull request's caches are reachable from its own ref alone, so
-  # none of them can ever be restored again.
-  after_a_pull_request:
-    permissions:
-      actions: write
-    name: Delete every cache of the closed pull request
-    # A fork's token is read only, so the deletion would fail rather than
-    # leave anything behind. Those caches expire on their own after 7 days.
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
-    uses: gigabit-clowns/.github/.github/workflows/clean-up-caches.yml@main
-    with:
-      scope: all
-      ref: refs/pull/${{ github.event.pull_request.number }}/merge
-
   # Every ref: a superseded entry is dead wherever it sits, since the newest
   # of its prefix is the only one that will ever be restored.
   after_a_build:
@@ -55,6 +37,29 @@ jobs:
     uses: gigabit-clowns/.github/.github/workflows/clean-up-caches.yml@main
     with:
       scope: superseded
+      patterns: &patterns |
+        ccache-ubuntu-latest-g++-*
+        ccache-ubuntu-latest-clang++-*
+        ccache-pip-ubuntu-latest-*
+        ccache-stubs-ubuntu-latest-*
+        ccache-sdist-ubuntu-latest-*
+        ccache-pip-ubuntu-22.04-*
+        ccache-macos-latest-clang++-*
+        ccache-pip-macos-latest-*
+        ccache-wheels-macos-latest-arm64-*
+        ccache-wheels-macos-latest-x86_64-*
+        ccache-windows-latest-cl-*
+        ccache-pip-windows-latest-*
+        ccache-wheels-windows-latest-AMD64-*
+        ccache-windows-11-arm-cl-*
+        ccache-pip-windows-11-arm-*
+        ccache-wheels-windows-11-arm-ARM64-*
+        wheels-ubuntu-latest-x86_64-*
+        wheels-ubuntu-24.04-arm-aarch64-*
+        fetched-host-Linux-*
+        fetched-Linux-*
+        fetched-macOS-*
+        fetched-Windows-*
 
   on_request:
     permissions:
@@ -65,3 +70,4 @@ jobs:
     with:
       scope: ${{ inputs.scope }}
       ref: ${{ inputs.ref != '' && inputs.ref || github.ref_name }}
+      patterns: *patterns

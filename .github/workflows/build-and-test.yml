@@ -236,6 +236,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa # v10.3.1
+        with:
+          enable-cache: false
 
       # The tests' requirements are taken from uv.lock: every file is checked
       # against its hash, and only wheels are accepted, so no setup script of
