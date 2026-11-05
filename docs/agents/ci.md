@@ -69,7 +69,8 @@ can still build from the source distribution.
 Each wheel is imported, then tested with the whole suite on every interpreter
 it serves, the test requirements taken from `uv.lock` with their hashes. The
 tests marked `dummy_plugins` are left out: the plugins they load are built
-only with `REXLIB_PYTHON_BUILD_TESTING`, which a wheel never is.
+only with `REXLIB_PYTHON_BUILD_TESTING`, which a wheel never is. The 3.10
+wheel for Windows ARM is only imported: numpy ships nothing for it.
 
 `scripts/check_wheels_agree.py` asserts that every wheel of a platform carries
 the same rexlib, which is what makes reusing rexlib's objects between

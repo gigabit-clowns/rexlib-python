@@ -125,3 +125,23 @@ input = "VERSION"
 regex = "(?P<value>\\d+\\.\\d+\\.\\d+)"
 
 [tool.cibuildwheel]
+# The tests' requirements, exported from uv.lock by deploy.yml, checked
+# against their hashes and taken as wheels only, as build-and-test installs
+# them.
+before-test = "pip install --require-hashes --only-binary :all: --requirement {project}/test-requirements.txt"
+# Run from a temporary directory, so this imports the installed wheel rather
+# than the source tree beside it. The import is the plain check that the
+# library the wheel carries is found at run time; the suite then runs on the
+# wheel itself, without the tests that load the plugins only a test build
+# installs.
+test-command = [
+    "python -c \"import rexlib; print(rexlib.__version__, rexlib.rexlib_version)\"",
+    "pytest {project}/tests -m \"not dummy_plugins\" -p no:cacheprovider",
+]
+
+# numpy ships no wheel for CPython 3.10 on Windows ARM, where build-and-test
+# runs no tests either, so that wheel is only imported.
+[[tool.cibuildwheel.overrides]]
+select = "cp310-win_arm64"
+before-test = ""
+test-command = "python -c \"import rexlib; print(rexlib.__version__, rexlib.rexlib_version)\""
