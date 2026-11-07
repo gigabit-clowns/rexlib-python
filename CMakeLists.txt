@@ -131,8 +131,8 @@ find_package(nanobind 3.0 REQUIRED CONFIG)
 if(REXLIB_PYTHON_BUILD_DLPACK)
 	include(rexlib_python_fetch_dlpack)
 	rexlib_python_fetch_dlpack(
-		COMMIT 84d107bf416c6bab9ae68ad285876600d230490d
-	) # v1.3
+		COMMIT 6eca9e643fcf7e870b7a1c99ee7fb166c5c2c459
+	) # v1.4
 else()
 	# No version is asked for: the package of DLPack reports 0.6 whatever
 	# the release, so asking for the 1.0 the versioned tensors arrived in
