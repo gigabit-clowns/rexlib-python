@@ -44,7 +44,7 @@ test = [
     "numpy==2.5.4; python_version >= '3.12'",
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
 ]
 # What a build without build isolation, or by CMake itself, needs and pip
 # would otherwise provide, and the tests.
